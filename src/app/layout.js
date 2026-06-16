@@ -22,12 +22,19 @@ export default function RootLayout({ children }) {
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} antialiased`}
     >
-      <body className="min-h-full flex flex-col">
-        <Navbar />
-        <HeroSection />
-        {children}
+      <body className="bg-black text-white min-h-screen">
+        {/* Normal header container, NO fixed or sticky positioning here */}
+        <header className="w-full">
+          <Navbar />
+        </header>
+        
+        {/* Removed the hardcoded padding since the top bar isn't floating anymore */}
+        <main className="relative">
+          <HeroSection />
+          {children}
+        </main>
       </body>
     </html>
   );

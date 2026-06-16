@@ -176,3 +176,34 @@ body {
     display: inline-block; /* Ensures the transform/scale applies correctly */
   }
 }
+@layer utilities{
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+}
+
+@layer utilities{
+  /* Moves the light reflection smoothly from right to left */
+@keyframes shimmerLeft {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+}

@@ -1,4 +1,5 @@
-import React from 'react';
+"use client";
+import React, { useState, useRef } from 'react';
 import { Cormorant_Garamond,Cormorant_SC,  Noto_Serif_Devanagari } from 'next/font/google';
 import Card from './Card';
 
@@ -23,7 +24,38 @@ const notoDevanagari = Noto_Serif_Devanagari({
   variable: '--font-nepali-serif',
 });
 
+
+
 export default function HeroSection() {
+  const buttonRef = useRef(null);
+  const [transformStyle, setTransformStyle] = useState({ x: 0, y: 0 });
+
+  const handleMouseMove = (e) => {
+    if (!buttonRef.current) return;
+
+    const rect = buttonRef.current.getBoundingClientRect();
+    
+    // Calculate the center point of the button
+    const buttonCenterX = rect.left + rect.width / 2;
+    const buttonCenterY = rect.top + rect.height / 2;
+    
+    // Calculate distance from mouse to center
+    const distanceX = e.clientX - buttonCenterX;
+    const distanceY = e.clientY - buttonCenterY;
+    
+    // Controls the strength of the magnetic pull (Max 15px movement)
+    const maxPull = 15; 
+    
+    const pullX = (distanceX / rect.width) * maxPull;
+    const pullY = (distanceY / rect.height) * maxPull;
+
+    setTransformStyle({ x: pullX, y: pullY });
+  };
+
+  const handleMouseLeave = () => {
+    // Snap cleanly back to origin when mouse exits
+    setTransformStyle({ x: 0, y: 0 });
+  };
   return (
     <div className={`${cormorant.variable} ${cormorantSC.variable}  ${notoDevanagari.variable} min-h-screen w-full text-cream-luxury p-8 md:p-20 flex flex-col justify-between font-serif-editorial relative overflow-x-hidden`}>
       
@@ -66,10 +98,21 @@ export default function HeroSection() {
       </div>
 
       {/* Top Header Label */}
-      <div className="text-[11px] tracking-[0.4em] text-[#dbb86b] uppercase opacity-80 mt-4 font-sans fade-in-up fade-in-up-1">
-        ★ EST. 1984 · KAKARVITTA
-      </div>
-
+     <div className="text-[11px] tracking-[0.4em] text-[#dbb86b] uppercase opacity-80 mt-4 font-sans fade-in-up fade-in-up-1">
+  <span className="inline-block animate-[float_4s_ease-in-out_infinite]">
+    <span className="relative inline-block select-none">
+      {/* Background Stroke Layer */}
+      <span className="absolute inset-0 text-transparent [-webkit-text-stroke:1px_#d4b77a] pointer-events-none">
+        ☆
+      </span>
+      {/* Foreground Shimmering Layer */}
+      <span className="relative text-transparent bg-clip-text bg-[linear-gradient(110deg,#dbb86b_30%,#fff_50%,#dbb86b_70%)] bg-[length:200%_100%] animate-[shimmer_2s_linear_infinite]">
+        ☆
+      </span>
+    </span>
+  </span>{' '}
+  EST. 1984 · KAKARVITTA
+</div>
       {/* Main Content Area */}
       <div className="grow flex items-end pt-5 pb-8">
         
@@ -84,7 +127,7 @@ export default function HeroSection() {
           </h1>
           
           {/* Devanagari Script text (Fixed: Styled with custom font-nepali-serif) */}
-          <p className="font-nepali-serif text-xl tracking-wide md:text-2xl font-light text-[#e2d5c3] opacity-85  fade-in-up fade-in-up-5">
+          <p className="italic  font-nepali-serif text-xl tracking-wide md:text-2xl font-light text-[#e2d5c3] opacity-85  fade-in-up fade-in-up-5">
             तीन पुस्ताको कारीगरी — एउटै बेन्चबाट
           </p>
           
@@ -96,32 +139,42 @@ export default function HeroSection() {
           
           {/* CTA Buttons */}
           <div className="relative flex flex-row flex-wrap items-start justify-start gap-4">
-            <div className="relative">
-              <button
-                className="
-                  bg-[#d5a560] text-[#2c251e]
-                  px-7 py-3.5
-                  flex items-center gap-3
-                  shadow-md
-                  transition-all duration-300 ease-out
-                  relative z-20
-                  hover:bg-[#d5a560]
-                  peer-hover/bottom:translate-y-3
-                "
-              >
-                ENTER THE ATELIER <span>→</span>
-              </button>
+            <div className="relative  flex justify-center items-center">
+      <button
+        ref={buttonRef}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+        style={{
+          transform: `translate3d(${transformStyle.x}px, ${transformStyle.y}px, 0)`,
+        }}
+        className="
+          bg-[#d5a560] text-[#080808] tracking-widest font-light
+          px-7 py-3.5
+          flex items-center gap-5
+          shadow-md
+          relative z-20
+          
+          /* Smoothly transitions the position tracking */
+          transition-transform duration-200 ease-out
+          
+          /* Shimmer Gradient Properties (Right to Left / Subtle Sparkle) */
+          hover:bg-[linear-gradient(110deg,#d5a560_40%,#ffffff90_50%,#d5a560_60%)]
+          bg-[length:200%_100%]
+          bg-[position:0_0]
+          hover:animate-[shimmerLeft_1s_linear_infinite]
+        "
+      >
+        ENTER THE ATELIER <span>→</span>
+      </button>
 
-              <div className="peer/bottom absolute -bottom-10 left-0 right-0 h-10 bg-transparent"></div>
-            </div>
+      <div className="peer/bottom absolute -bottom-10 left-0 right-0 h-10 bg-transparent"></div>
+    </div>
 
             <button
               className="
-                border border-[#9b8465]
+                border border-[#9b8465] tracking-widest font-light
                 text-cream-luxury
                 px-7 py-3.5
-                bg-transparent
-
               "
             >
               BRIDAL LOOKBOOK
@@ -134,11 +187,11 @@ export default function HeroSection() {
           <Card />
         </div>
       </div>
-
+      
       {/* Bottom Center Indicator */}
       <div className="flex flex-col items-center mx-auto space-y-2 font-sans opacity-50 pt-4">
         <span className="text-[9px] tracking-[0.4em] uppercase text-cream-luxury">SCROLL</span>
-        <div className="w-[1px] h-7 bg-cream-luxury/60 animate-[bounce-y_4s_ease-in-out_infinite]"></div>
+        <div className="w-[1px] h-7 bg-cream-luxury/60 animate-[bounce-y_3s_ease-in-out_infinite]"></div>
 
       </div>
     </div>
