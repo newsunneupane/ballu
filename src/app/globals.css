@@ -5,19 +5,6 @@
   --foreground: #171717;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-  
-
-  /* Map Next.js custom CSS font variables directly into Tailwind */
-  --font-serif: var(--font-serif), serif;
-  --font-sans: var(--font-sans), sans-serif;
-
-}
-
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
@@ -25,22 +12,167 @@
   }
 }
 
+@theme {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  
+  --font-sans: var(--font-geist-sans), sans-serif;
+  --font-mono: var(--font-geist-mono), monospace;
+
+  /* Theme variables linked up to Next.js font classes */
+  --font-serif-editorial: var(--font-serif-editorial), serif;
+  --font-nepali-serif: var(--font-nepali-serif), serif;
+  --color-cream-luxury: #f4edd9;
+}
+
+html,
+body {
+  min-height: 100%;
+  overflow-x: hidden;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
 }
 
-.rotate-background {
-  animation: slow-rotate 50s linear infinite;
-  transform-origin: center;
+/* ==========================================================================
+   ROTATION ENGINE (Bypasses compilation flags for instant execution)
+   ========================================================================== */
+.animate-bj-grad-shift {
+  animation: bj-grad-rotate 80s linear infinite !important;
+  transform-origin: left center !important;
+  will-change: transform;
 }
 
-@keyframes slow-rotate {
+@keyframes bj-grad-rotate {
+  0% {
+    transform: rotate(0deg) scale(1.2);
+  }
+  100% {
+    transform: rotate(360deg) scale(1.2);
+  }
+}
+
+/* Accessibility: Stop motion if requested by user system settings */
+@media (prefers-reduced-motion: reduce) {
+  .animate-bj-grad-shift {
+    animation: none !important;
+  }
+}
+
+/* ==========================================================================
+   HERO TEXT/CARD FADE ENTRIES
+   ========================================================================== */
+@keyframes fadeInUp {
   from {
-    transform: rotate(0deg);
+    opacity: 0;
+    transform: translateY(20px);
   }
   to {
-    transform: rotate(360deg);
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(100px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.fade-in-up {
+  animation: fadeInUp 0.6s ease-out forwards;
+  opacity: 0;
+}
+
+.slide-in-left {
+  animation: slideInLeft 0.8s ease-out forwards;
+  opacity: 0;
+}
+
+/* Stagger configs */
+.fade-in-up-1 { animation-delay: 0.2s; }
+.fade-in-up-2 { animation-delay: 0.4s; }
+.fade-in-up-3 { animation-delay: 0.6s; }
+.fade-in-up-4 { animation-delay: 0.8s; }
+.fade-in-up-5 { animation-delay: 1.0s; }
+.fade-in-up-6 { animation-delay: 1.2s; }
+.fade-in-up-7 { animation-delay: 1.4s; }
+
+.slide-in-left-delay { animation-delay: 1.2s; }
+
+
+
+@keyframes bounce-y {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); } /* Moves up 6px */
+}
+
+/* If using Tailwind v4, register the utility name directly like this: */
+@utility animate-bounce-y {
+  animation: bounce-y 2s ease-in-out infinite;
+}
+
+.btn-hover-move {
+  transition: transform 0.3s ease;
+  transform: translateX(0);
+}
+
+.btn-hover-move:hover {
+  transform: translateX(0.5rem);
+}
+
+.btn-exit-right {
+  transition: transform 0.3s ease;
+  transform: translateX(0.5rem);
+}
+
+.btn-exit-right:hover {
+  transform: translateX(0);
+}
+
+.btn-hover-move-soft {
+  transition: transform 0.3s ease;
+  transform: translateX(0);
+}
+
+.btn-hover-move-soft:hover {
+  transform: translateX(0.25rem);
+}
+
+/* In your global.css */
+@layer utilities {
+  .view-piece-link .arrow {
+    display: inline-block !important; /* Force inline-block so transform works */
+    transition: transform 0.3s ease-in-out !important;
+  }
+
+  .view-piece-link:hover .arrow {
+    transform: translateX(6px) !important; /* Force the movement */
+  }
+}
+
+
+@layer utilities {
+  @keyframes infiniteZoom {
+    0%, 100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.6); /* Adjust this number to make it zoom in more or less */
+    }
+  }
+
+  .animate-infinite-zoom {
+    animation: infiniteZoom 4s ease-in-out infinite;
+    display: inline-block; /* Ensures the transform/scale applies correctly */
   }
 }

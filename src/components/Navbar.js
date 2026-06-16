@@ -29,7 +29,7 @@ const Navbar = () => {
       </div>
 
       {/* Main Navbar */}
-      <div className="max-w-[1400px] bg-[#0d0d0d] border-b border-[#2b2415] mx-30px px-10 h-[68px] flex items-center justify-between">
+      <div className="sticky top-0 z-50 max-w-[1400px] bg-[#0d0d0d] border-b border-[#2b2415] mx-auto px-10 h-[68px] flex items-center justify-between">
         <div className="flex gap-5 text-[13px] text-[rgb(218,206,183)] tracking-[4px] uppercase">
            <Link
     href="/"
@@ -107,7 +107,8 @@ hover:after:w-full
 
   <Link
     href="/"
-    className="relative text-[13px] tracking-[4px] uppercase text-[rgb(218,206,183)]
+    className="
+relative text-[13px] tracking-[4px] uppercase text-[rgb(218,206,183)]
 hover:text-[#d4b77a]
 active:text-[#b99755]
 transition-colors duration-300
@@ -117,14 +118,16 @@ after:absolute after:left-0 after:-bottom-1
 after:h-[1px] after:w-0 after:bg-[#d4b77a]
 after:transition-all after:duration-500
 
-hover:after:w-full"
+hover:after:w-full
+"
   >
     Journal
   </Link>
 
   <Link
     href="/"
-    className="relative text-[13px] tracking-[4px] uppercase text-[rgb(218,206,183)]
+    className="
+relative text-[13px] tracking-[4px] uppercase text-[rgb(218,206,183)]
 hover:text-[#d4b77a]
 active:text-[#b99755]
 transition-colors duration-300
@@ -134,9 +137,10 @@ after:absolute after:left-0 after:-bottom-1
 after:h-[1px] after:w-0 after:bg-[#d4b77a]
 after:transition-all after:duration-500
 
-hover:after:w-full"
+hover:after:w-full
+"
   >
-    Visit
+    Visit 
   </Link>
 
   <div className="text-[13px]  text-[#4e4226] ">
@@ -147,25 +151,21 @@ hover:after:w-full"
 
   <div className="flex items-center gap-6 ml-4">
   <span className="relative inline-flex cursor-pointer group text-[rgb(218,206,183)] hover:text-[#d4b77a] transition-all duration-300">
-  <FiSearch
-    size={13}
-    className="transition-all duration-300 group-hover:text-[#d4b77a]"
-  />
+    <FiSearch
+      size={13}
+      className="transition-all duration-300 group-hover:text-[#d4b77a]"
+    />
+    <span className="absolute left-0 -bottom-1 h-px w-0 bg-[#d4b77a] transition-all duration-500 group-hover:w-full" />
+  </span>
 
-  <span className="absolute left-0 -bottom-1 h-[1px] w-0 bg-[#d4b77a] transition-all duration-500 group-hover:w-full" />
-</span>
-
-    <span className="relative inline-flex cursor-pointer group text-[rgb(218,206,183)] hover:text-[#d4b77a] transition-all duration-300">
-  <FiHeart
-    size={13}
-    className="transition-all duration-300 group-hover:text-[#d4b77a]"
-  />
-
-  <span className="absolute left-0 -bottom-1 h-[1px] w-0 bg-[#d4b77a] transition-all duration-500 group-hover:w-full" />
-</span>
-
-    
-  </div>
+  <span className="relative inline-flex cursor-pointer group text-[rgb(218,206,183)] hover:text-[#d4b77a] transition-all duration-300">
+    <FiHeart
+      size={13}
+      className="transition-all duration-300 group-hover:text-[#d4b77a]"
+    />
+    <span className="absolute left-0 -bottom-1 h-px w-0 bg-[#d4b77a] transition-all duration-500 group-hover:w-full" />
+  </span>
+</div>
 </div>
       </div>
     </nav>
