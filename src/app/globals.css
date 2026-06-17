@@ -186,24 +186,46 @@ body {
   }
 }
 
-@keyframes shimmer {
-  0% {
-    background-position: 200% 0;
+
+  @keyframes shimmerLeft {
+  from {
+    background-position: 100% 0%;
   }
-  100% {
-    background-position: -200% 0;
+  to {
+    background-position: -100% 0%;
   }
-}
 }
 
-@layer utilities{
-  /* Moves the light reflection smoothly from right to left */
-@keyframes shimmerLeft {
-  0% {
-    background-position: -200% 0;
+@keyframes shimmerRight {
+  from {
+    background-position: -100% 0%;
   }
-  100% {
-    background-position: 200% 0;
+  to {
+    background-position: 100% 0%;
   }
 }
+
 }
+ 
+
+  @layer utilities {
+    @keyframes spinClockwise {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes spinCounterClockwise {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(-360deg); }
+}
+
+/* 40 seconds linear ensures a slow, elegant luxury movement */
+.animate-spin-clockwise {
+  animation: spinClockwise 40s linear infinite;
+}
+
+.animate-spin-counter {
+  animation: spinCounterClockwise 40s linear infinite;
+}
+  }
+

@@ -2,6 +2,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import  Navbar  from "../components/Navbar";
 import HeroSection from "../components/HeroSection";
+import Herodown from "../components/Herodown";
+import BrandTrust from "../components/BrandTrust";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,6 +35,8 @@ export default function RootLayout({ children }) {
         {/* Removed the hardcoded padding since the top bar isn't floating anymore */}
         <main className="relative">
           <HeroSection />
+          <Herodown />
+          <BrandTrust />
           {children}
         </main>
       </body>

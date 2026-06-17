@@ -57,7 +57,7 @@ export default function HeroSection() {
     setTransformStyle({ x: 0, y: 0 });
   };
   return (
-    <div className={`${cormorant.variable} ${cormorantSC.variable}  ${notoDevanagari.variable} min-h-screen w-full text-cream-luxury p-8 md:p-20 flex flex-col justify-between font-serif-editorial relative overflow-x-hidden`}>
+    <div className={`${cormorant.variable} ${cormorantSC.variable}  ${notoDevanagari.variable} min-h-screen w-full text-cream-luxury p-6 md:p-20 flex flex-col justify-between font-serif-editorial relative overflow-x-hidden`}>
       
       {/* Rotating gradient SVG background */}
       <div className="pointer-events-none absolute inset-0 -z-10 bg-[#0e0b08] overflow-hidden">
@@ -120,11 +120,17 @@ export default function HeroSection() {
         <div className="flex flex-col space-y-4 max-w-4xl lg:pr-380px w-full"> 
           
           {/* Main Headline */}
-          <h1 className="text-[clamp(3.5rem,7.5vw,5.8rem)] font-light leading-[1.1] text-cream-luxury tracking-tight font-serif-editorial fade-in-up fade-in-up-2">
-            Heirlooms,<br />
-            made for<br />
-            a quieter wear.
-          </h1>
+          <h1 className="text-[clamp(3.5rem,7.5vw,5.8rem)] font-light leading-[1.1] text-cream-luxury tracking-tight font-serif-editorial">
+  <span className="block fade-in-up" style={{ animationDelay: '0ms' }}>
+    Heirlooms,
+  </span>
+  <span className="block fade-in-up"  style={{ animationDelay: '200ms' }}>
+    made for
+  </span>
+  <span className="block fade-in-up" style={{ animationDelay: '400ms' }}>
+    a quieter wear.
+  </span>
+</h1>
           
           {/* Devanagari Script text (Fixed: Styled with custom font-nepali-serif) */}
           <p className="italic  font-nepali-serif text-xl tracking-wide md:text-2xl font-light text-[#e2d5c3] opacity-85  fade-in-up fade-in-up-5">
@@ -138,7 +144,7 @@ export default function HeroSection() {
           </p>
           
           {/* CTA Buttons */}
-          <div className="relative flex flex-row flex-wrap items-start justify-start gap-4">
+          <div className="relative flex flex-row flex-wrap items-start justify-start gap-4 fade-in-up fade-in-up-7">
             <div className="relative  flex justify-center items-center">
       <button
         ref={buttonRef}
@@ -147,22 +153,22 @@ export default function HeroSection() {
         style={{
           transform: `translate3d(${transformStyle.x}px, ${transformStyle.y}px, 0)`,
         }}
-        className="
-          bg-[#d5a560] text-[#080808] tracking-widest font-light
-          px-7 py-3.5
-          flex items-center gap-5
-          shadow-md
-          relative z-20
-          
-          /* Smoothly transitions the position tracking */
-          transition-transform duration-200 ease-out
-          
-          /* Shimmer Gradient Properties (Right to Left / Subtle Sparkle) */
-          hover:bg-[linear-gradient(110deg,#d5a560_40%,#ffffff90_50%,#d5a560_60%)]
-          bg-[length:200%_100%]
-          bg-[position:0_0]
-          hover:animate-[shimmerLeft_1s_linear_infinite]
-        "
+        className="bg-[linear-gradient(110deg,#d5a560_40%,#ffffff40_50%,#d5a560_60%)]
+bg-[length:200%_100%]
+text-[#080808] tracking-widest font-light
+px-7 py-3.5
+flex items-center gap-5
+shadow-md
+relative z-20
+
+/* Smoothly transitions the position tracking transform */
+transition-transform duration-200 ease-out
+
+/* 1. MOUSE LEAVE: Plays a left-to-right animation once when NOT hovering */
+animate-[shimmerRight_0.6s_ease-out_forwards]
+
+/* 2. HOVER: Overrides with the fast 3-loop right-to-left animation */
+hover:animate-[shimmerLeft_0.33s_linear_3]"
       >
         ENTER THE ATELIER <span>→</span>
       </button>
@@ -173,8 +179,10 @@ export default function HeroSection() {
             <button
               className="
                 border border-[#9b8465] tracking-widest font-light
-                text-cream-luxury
-                px-7 py-3.5
+                text-cream-luxury bg-[#241f1a]/100
+                px-7 py-3.5 hover:bg-[#241f1a]/90
+                transition-colors duration-300
+                relative z-10 cursor-pointer
               "
             >
               BRIDAL LOOKBOOK

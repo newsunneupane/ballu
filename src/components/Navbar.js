@@ -51,7 +51,7 @@ const Navbar = () => {
       {/* Main Navbar Row */}
       <div 
         className={`
-          bg-[#0d0d0d] border-b border-[#2b2415] w-full left-0 right-0 transition-shadow duration-300
+          bg-[#0e0b08] border-b border-[#2b2415] w-full left-0 right-0 transition-shadow duration-300
           ${isPinned ? 'fixed top-0 z-50 shadow-xl' : 'relative'}
         `}
       >
