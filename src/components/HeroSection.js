@@ -98,7 +98,7 @@ export default function HeroSection() {
       </div>
 
       {/* Top Header Label */}
-     <div className="text-[11px] tracking-[0.4em] text-[#dbb86b] uppercase opacity-80 mt-4 font-sans fade-in-up fade-in-up-1">
+     <div className="text-[11px] tracking-[0.4em] text-[#dbb86b] text-thin uppercase opacity-80 mt-4 font-sans fade-in-up fade-in-up-1">
   <span className="inline-block animate-[float_4s_ease-in-out_infinite]">
     <span className="relative inline-block select-none">
       {/* Background Stroke Layer */}
@@ -106,7 +106,7 @@ export default function HeroSection() {
         ☆
       </span>
       {/* Foreground Shimmering Layer */}
-      <span className="relative text-transparent bg-clip-text bg-[linear-gradient(110deg,#dbb86b_30%,#fff_50%,#dbb86b_70%)] bg-[length:200%_100%] animate-[shimmer_2s_linear_infinite]">
+      <span className="relative  text-transparent bg-clip-text bg-[linear-gradient(110deg,#dbb86b_30%,#fff_50%,#dbb86b_70%)] bg-[length:200%_100%] animate-[shimmer_2s_linear_infinite]">
         ☆
       </span>
     </span>

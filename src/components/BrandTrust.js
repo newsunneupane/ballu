@@ -56,8 +56,8 @@ const BrandTrust = () => {
       <div className="max-w-7xl w-full mx-auto px-6 md:px-12 lg:px-16 pt-24 pb-20 flex flex-col items-center text-center relative overflow-hidden">
         
         {/* Editorial Star Icon Divider */}
-        <div className="text-[#dbb86b] text-sm tracking-widest mb-6 opacity-80 relative z-10">
-          ★
+        <div className="text-[#dbb86b]  tracking-widest mb-6 opacity-80 relative z-10">
+          ☆
         </div>
 
         {/* Central Masterpiece Quote Statement */}
@@ -66,7 +66,7 @@ const BrandTrust = () => {
         </p>
 
         {/* Signature Attribution Tag */}
-        <span className="text-[10px] tracking-[0.4em] text-[#dbb86b] uppercase opacity-70 relative z-10">
+        <span className="text-[10px] tracking-[0.4em] text-thin text-[#dbb86b] uppercase opacity-70 relative z-10">
           — Ballu Suvedi, Master Karigar
         </span>
 
@@ -86,7 +86,7 @@ const BrandTrust = () => {
           cy="50"
           r="49"
           fill="none"
-          stroke="white"
+          stroke="#dbb86b"
           strokeWidth="0.2"
           strokeDasharray="1 2" 
           strokeLinecap="round"
@@ -104,7 +104,7 @@ const BrandTrust = () => {
           cy="50"
           r="48"
           fill="none"
-          stroke="white"
+          stroke="#dbb86b"
           strokeWidth="0.5"
           className="opacity-70"
         />
@@ -114,7 +114,7 @@ const BrandTrust = () => {
           cy="50"
           r="48"
           fill="none"
-          stroke="white"
+          stroke="#dbb86b"
           strokeWidth="1.8" /* Thicker weight to create the distinct beads */
           strokeDasharray="0.1 24" /* 0.1 creates a round dot when combined with round linecap, 24 creates the large gap */
           strokeLinecap="round"
@@ -138,7 +138,7 @@ const BrandTrust = () => {
           cy="50"
           r="48"
           fill="none"
-          stroke="white"
+          stroke="#dbb86b"
           strokeWidth="0.5"
           strokeDasharray="1.5 3.5" 
           strokeLinecap="round"

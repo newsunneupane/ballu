@@ -1,5 +1,5 @@
 "use client";
-import React from 'react'
+import React, { useRef, useState, useEffect } from 'react'; // ⚡ Added useState and useEffect
 import { Cormorant_Garamond, Cormorant_SC } from 'next/font/google';
 
 const cormorant = Cormorant_Garamond({
@@ -50,6 +50,46 @@ const collections = [
 ];
 
 const Herodown = () => {
+  const scrollContainerRef = useRef(null);
+  
+  // ⚡ 1. Track whether there's remaining scrollable content on either side
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
+
+  // ⚡ 2. Function to check the container's scroll position
+  const checkScrollPosition = () => {
+    if (scrollContainerRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
+      
+      // If scrollLeft > 1, there are cards to the left
+      setCanScrollLeft(scrollLeft > 1);
+      
+      // If scrollLeft + clientWidth is less than scrollWidth, there are cards to the right
+      // (Using a -2 margin of error to account for sub-pixel zooming precision issues)
+      setCanScrollRight(scrollLeft + clientWidth < scrollWidth - 2);
+    }
+  };
+
+  // ⚡ 3. Check layout dimensions on mount or content shift
+  useEffect(() => {
+    checkScrollPosition();
+    window.addEventListener('resize', checkScrollPosition);
+    return () => window.removeEventListener('resize', checkScrollPosition);
+  }, []);
+
+  const handleScroll = (direction) => {
+    if (scrollContainerRef.current) {
+      const container = scrollContainerRef.current;
+      const scrollAmount = container.clientWidth * 0.4; 
+
+      if (direction === 'left') {
+        container.scrollLeft -= scrollAmount;
+      } else {
+        container.scrollLeft += scrollAmount;
+      }
+    }
+  };
+
   return (
     <div className="text-white min-h-[30vh] flex flex-col justify-end">
       
@@ -57,69 +97,39 @@ const Herodown = () => {
 <style jsx global>{`
   /* 1. HOVER ENTRY: Lifts up slightly, then shakes */
   @keyframes subtleLiftThenVibrate {
-    0% { 
-      transform: scaleY(1) translateX(0); 
-    }
-    30% { 
-      transform: scaleY(0.985) translateX(0); 
-    }
-    45% { 
-      transform: scaleY(0.985) translateX(-1px); 
-    }
-    60% { 
-      transform: scaleY(0.985) translateX(1px); 
-    }
-    75% { 
-      transform: scaleY(0.985) translateX(-0.5px); 
-    }
-    90% { 
-      transform: scaleY(0.985) translateX(0.5px); 
-    }
-    100% { 
-      transform: scaleY(0.985) translateX(0); 
-    }
+    0% { transform: scaleY(1) translateX(0); }
+    30% { transform: scaleY(0.985) translateX(0); }
+    45% { transform: scaleY(0.985) translateX(-1px); }
+    60% { transform: scaleY(0.985) translateX(1px); }
+    75% { transform: scaleY(0.985) translateX(-0.5px); }
+    90% { transform: scaleY(0.985) translateX(0.5px); }
+    100% { transform: scaleY(0.985) translateX(0); }
   }
 
   /* 2. MOUSE LEAVE: Shakes immediately while lifted, then drops down smoothly */
   @keyframes vibrateThenSettleDown {
-    0% { 
-      transform: scaleY(0.985) translateX(0); 
-    }
-    15% { 
-      transform: scaleY(0.985) translateX(-1px); 
-    }
-    30% { 
-      transform: scaleY(0.985) translateX(1px); 
-    }
-    45% { 
-      transform: scaleY(0.985) translateX(-0.5px); 
-    }
-    60% { 
-      transform: scaleY(0.985) translateX(0); 
-    }
-    /* 60% to 100%: The vibration stops and the bottom edge glides down to normal */
-    100% { 
-      transform: scaleY(1) translateX(0); 
-    }
+    0% { transform: scaleY(0.985) translateX(0); }
+    15% { transform: scaleY(0.985) translateX(-1px); }
+    30% { transform: scaleY(0.985) translateX(1px); }
+    45% { transform: scaleY(0.985) translateX(-0.5px); }
+    60% { transform: scaleY(0.985) translateX(0); }
+    100% { transform: scaleY(1) translateX(0); }
   }
   
   .vibrate-card-hover {
     transform-origin: top !important; 
     transition: shadow 0.3s ease-out;
-    /* Default animation state: Plays the exit drop when NOT hovering */
     animation: vibrateThenSettleDown 0.35s ease-out forwards;
   }
 
   .vibrate-card-hover:hover {
-    /* Plays the entry lift when hovering */
     animation: subtleLiftThenVibrate 0.35s ease-out forwards !important;
-    
   }
 `}</style>
 
       {/* SECTION HEADER BLOCK */}
       <div className="max-w-7xl w-full mx-auto px-6 md:px-12 lg:px-16 pt-16 pb-8">
-        <div className="text-[11px] tracking-[0.4em] text-[#dbb86b] uppercase opacity-80 mb-6 font-sans">
+        <div className="text-[11px] tracking-[0.4em] text-[#dbb86b] active:text-[#b99755] transition-colors uppercase font-thin opacity-80 mb-6 font-sans">
           The collections
         </div>
 
@@ -134,12 +144,32 @@ const Herodown = () => {
 
           {/* Right Side: Navigation Slider Buttons */}
           <div className="flex items-center gap-3 self-end md:self-auto pb-2">
-            <button className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center text-white/70 hover:border-white/50 transition-colors duration-200">
+            
+            {/* ⚡ LEFT BUTTON: Glows gold when active, fades and defaults to dim white border when inactive */}
+            <button 
+              onClick={() => handleScroll('left')} 
+              disabled={!canScrollLeft}
+              className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${
+                canScrollLeft 
+                  ? 'bg-[#dbb86b] text-[#080808] cursor-pointer  shadow-[0_0_15px_rgba(219,184,107,0.4)] hover:bg-[#c9a65a] hover:scale-105' 
+                  : 'border border-white/10 text-white/30  opacity-40'
+              }`}
+            >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M15 19l-7-7 7-7" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
               </svg>
             </button>
-            <button className="w-10 h-10 rounded-full bg-[#dbb86b] flex items-center justify-center text-[#080808] hover:bg-[#c9a65a] transition-colors duration-200 shadow-lg">
+            
+            {/* ⚡ RIGHT BUTTON: Glows gold when active, fades and defaults to dim white border when inactive */}
+            <button 
+              onClick={() => handleScroll('right')} 
+              disabled={!canScrollRight}
+              className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${
+                canScrollRight 
+                  ? 'bg-[#dbb86b] text-[#080808] cursor-pointer  shadow-[0_0_15px_rgba(219,184,107,0.4)] hover:bg-[#c9a65a] hover:scale-105' 
+                  : 'border border-white/10 text-white/30  opacity-40'
+              }`}
+            >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
               </svg>
@@ -152,7 +182,12 @@ const Herodown = () => {
       <div className="w-full pb-20 overflow-hidden select-none">
         <div className="max-w-7xl w-full mx-auto px-6 md:px-12 lg:px-16">
           
-          <div className="flex gap-6 overflow-x-auto scrollbar-none scroll-smooth overflow-y-visible py-4 -mx-6 md:-mx-12 lg:-mx-16 px-6 md:px-12 lg:px-16">
+          {/* ⚡ Connected onScroll listener here */}
+          <div 
+            ref={scrollContainerRef} 
+            onScroll={checkScrollPosition}
+            className="flex gap-6 overflow-x-auto scrollbar-none scroll-smooth overflow-y-visible py-4 -mx-6 md:-mx-12 lg:-mx-16 px-6 md:px-12 lg:px-16"
+          >
             {collections.map((item) => (
               <div
                 key={item.id}
@@ -192,15 +227,15 @@ const Herodown = () => {
                 {/* Bottom Info Details */}
                 <div className="relative z-10 flex flex-col space-y-4 pt-12">
                   <div>
-                    <p className="font-nepali-serif text-[#dbb86b] text-xs tracking-wide font-light mb-1 opacity-90">
+                    <p className="font-nepali-serif italic text-[#dbb86b] text-xs tracking-wide font-light mb-1 opacity-90">
                       {item.nepaliTitle}
                     </p>
-                    <h3 className={`${cormorant.variable} text-xl md:text-2xl font-light font-serif-editorial text-[#fbf7f0] tracking-wide`}>
+                    <h3 className={`${cormorant.variable} text-2xl inline-block scale-y-[1.2] md:text-2xl font-light font-serif-editorial text-[#fbf7f0] tracking-wide`}>
                       {item.englishTitle}
                     </h3>
                   </div>
 
-                  <div className="flex items-center justify-between pt-2 border-t border-white/5 text-[10px] tracking-[0.25em] text-white/40 font-sans">
+                  <div className="flex items-center justify-between   text-[10px] tracking-[0.25em] text-white/40 font-sans">
                     <span>{item.pieces}</span>
                     <span className="group/inner flex items-center gap-1 text-[#dbb86b] transition-colors duration-300 tracking-widest ">
                       EXPLORE <span className="transform group-hover/inner:translate-x-1 transition-transform duration-300">→</span>
