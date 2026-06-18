@@ -1,12 +1,15 @@
 import React from 'react'
+import HeroSection from '../components/HeroSection'
+import Herodown from '../components/Herodown'
+import BrandTrust from '../components/BrandTrust'
 
 const Home = () => {
   return (
-    <div>
-      Newsun
-      
-      
-    </div>
+    <>
+      <HeroSection />
+      <Herodown />
+      <BrandTrust />
+    </>
   )
 }
 

@@ -2,6 +2,7 @@
 import React, { useState, useRef } from 'react';
 import { Cormorant_Garamond,Cormorant_SC,  Noto_Serif_Devanagari } from 'next/font/google';
 import Card from './Card';
+import { star } from "@/components/Icons";
 
 const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
@@ -102,7 +103,7 @@ export default function HeroSection() {
   <span className="inline-block animate-[float_4s_ease-in-out_infinite]">
     <span className="relative inline-block select-none">
       {/* Background Stroke Layer */}
-      <span className="absolute inset-0 text-transparent [-webkit-text-stroke:1px_#d4b77a] pointer-events-none">
+      <span className="absolute  inset-0 text-transparent [-webkit-text-stroke:1px_#d4b77a] pointer-events-none">
         ☆
       </span>
       {/* Foreground Shimmering Layer */}

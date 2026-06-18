@@ -37,7 +37,7 @@ const Navbar = () => {
       
       {/* Top Bar (h-8 = 32px) */}
       <div className="bg-black">
-        <div className="max-w-[1400px] font-normal mx-auto px-10 h-8 flex items-center justify-between text-[12px] tracking-[4px] uppercase [font-variant-numeric:lining-nums]">
+        <div className="max-w-[1400px] font-normal mx-auto px-10 h-6  flex items-center justify-between text-[11px] tracking-[4px] uppercase [font-variant-numeric:lining-nums]">
           <span>TODAY · 22K GOLD ₨ 14,260/G · SILVER ₨ 175/G</span>
           <span>TIHAR ATELIER HOURS · NOW EXTENDED TO 9PM</span>
           <span>WHATSAPP +977 9842 000 000</span>
@@ -66,13 +66,13 @@ const Navbar = () => {
               Atelier
             </Link>
             <Link
-              href="/Page2"
+              href="/catalogue"
               className="relative text-[13px] tracking-[4px] uppercase text-[rgb(218,206,183)] hover:text-[#d4b77a] active:text-[#b99755] transition-colors duration-300 after:content-[''] after:absolute after:left-0 after:-bottom-1 after:h-[1px] after:w-0 after:bg-[#d4b77a] after:transition-all after:duration-500 hover:after:w-full"
             >
               Catalogue
             </Link>
             <Link
-              href="/page2"
+              href="/bespoke"
               className="relative text-[13px] tracking-[4px] uppercase text-[rgb(218,206,183)] hover:text-[#d4b77a] active:text-[#b99755] transition-colors duration-300 after:content-[''] after:absolute after:left-0 after:-bottom-1 after:h-[1px] after:w-0 after:bg-[#d4b77a] after:transition-all after:duration-500 hover:after:w-full"
             >
               Bespoke
@@ -92,19 +92,19 @@ const Navbar = () => {
           {/* Right Links & Action Utilities */}
           <div className="flex gap-5 text-[13px] text-[rgb(218,206,183)] tracking-[8px]">
             <Link
-              href="/"
+              href="/bridal"
               className="relative text-[13px] tracking-[4px] uppercase text-[rgb(218,206,183)] hover:text-[#d4b77a] active:text-[#b99755] transition-colors duration-300 after:content-[''] after:absolute after:left-0 after:-bottom-1 after:h-[1px] after:w-0 after:bg-[#d4b77a] after:transition-all after:duration-500 hover:after:w-full"
             >
               Bridal
             </Link>
             <Link
-              href="/"
+              href="/journal"
               className="relative text-[13px] tracking-[4px] uppercase text-[rgb(218,206,183)] hover:text-[#d4b77a] active:text-[#b99755] transition-colors duration-300 after:content-[''] after:absolute after:left-0 after:-bottom-1 after:h-[1px] after:w-0 after:bg-[#d4b77a] after:transition-all after:duration-500 hover:after:w-full"
             >
               Journal
             </Link>
             <Link
-              href="/"
+              href="/visit"
               className="relative text-[13px] tracking-[4px] uppercase text-[rgb(218,206,183)] hover:text-[#d4b77a] active:text-[#b99755] transition-colors duration-300 after:content-[''] after:absolute after:left-0 after:-bottom-1 after:h-[1px] after:w-0 after:bg-[#d4b77a] after:transition-all after:duration-500 hover:after:w-full"
             >
               Visit
