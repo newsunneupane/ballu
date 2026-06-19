@@ -17,14 +17,22 @@ const cormorant = Cormorant_Garamond({
 
 const Navbar = () => {
   const [isPinned, setIsPinned] = useState(false);
+  const [isShrunk, setIsShrunk] = useState(false); // New state for the shrink effect
 
   useEffect(() => {
     const handleScroll = () => {
-      // 32px is the height of the gold/silver rate top bar (h-8)
+      // Pin to the top right after the 32px top bar is scrolled past
       if (window.scrollY > 32) {
         setIsPinned(true);
       } else {
         setIsPinned(false);
+      }
+
+      // Wait for a little more scroll (150px) before shrinking
+      if (window.scrollY > 150) {
+        setIsShrunk(true);
+      } else {
+        setIsShrunk(false);
       }
     };
 
@@ -37,25 +45,28 @@ const Navbar = () => {
       
       {/* Top Bar (h-8 = 32px) */}
       <div className="bg-black">
-        <div className="max-w-[1400px] font-normal mx-auto px-10 h-6  flex items-center justify-between text-[11px] tracking-[4px] uppercase [font-variant-numeric:lining-nums]">
+        <div className="max-w-[1400px] font-normal mx-auto px-10 h-6 flex items-center justify-between text-[11px] tracking-[4px] uppercase [font-variant-numeric:lining-nums]">
           <span>TODAY · 22K GOLD ₨ 14,260/G · SILVER ₨ 175/G</span>
           <span>TIHAR ATELIER HOURS · NOW EXTENDED TO 9PM</span>
           <span>WHATSAPP +977 9842 000 000</span>
         </div>
       </div>
 
-      {/* Placeholder spacer element to prevent the page content layout 
-          from jumping up abruptly when the navbar turns to absolute/fixed positioning */}
+      {/* Placeholder spacer element - ensures smooth transition when fixed positioning kicks in */}
       {isPinned && <div className="h-[68px] w-full bg-transparent" />}
 
       {/* Main Navbar Row */}
       <div 
         className={`
-          bg-[#0e0b08] border-b border-[#2b2415] w-full left-0 right-0 transition-shadow duration-300
+          bg-[#0e0b08] border-b border-[#2b2415] w-full left-0 right-0 transition-all duration-500 ease-in-out
           ${isPinned ? 'fixed top-0 z-50 shadow-xl' : 'relative'}
         `}
       >
-        <div className="max-w-[1400px] mx-auto px-10 h-[68px] flex items-center justify-between">
+        <div 
+          className={`max-w-[1400px] mx-auto px-10 flex items-center justify-between transition-all duration-500 ease-in-out
+            ${isShrunk ? 'h-[50px]' : 'h-[68px]'}
+          `}
+        >
           
           {/* Left Links */}
           <div className="flex gap-5 text-[13px] text-[rgb(218,206,183)] tracking-[4px] uppercase">
@@ -81,10 +92,18 @@ const Navbar = () => {
 
           {/* Center Brand Identity */}
           <div className="text-center flex flex-row space-x-2 items-baseline">
-            <div className="italic text-[rgb(218,206,183)] text-[18px] leading-none">
+            <div 
+              className={`italic text-[rgb(218,206,183)] leading-none transition-all duration-500 ease-in-out
+                ${isShrunk ? 'text-[16px]' : 'text-[18px]'}
+              `}
+            >
               Ballu
             </div>
-            <div className={`${cormorantSC.className} tracking-[0.35em] text-[18px] leading-none [font-variant:small-caps]`}>
+            <div 
+              className={`${cormorantSC.className} tracking-[0.35em] leading-none [font-variant:small-caps] transition-all duration-500 ease-in-out
+                ${isShrunk ? 'text-[15px]' : 'text-[18px]'}
+              `}
+            >
               JEWELLERS
             </div>
           </div>
