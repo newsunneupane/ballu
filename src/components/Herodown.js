@@ -141,7 +141,7 @@ const Herodown = () => {
               </span>
             </h1>
           </div>
-
+          
           {/* Right Side: Navigation Slider Buttons */}
           <div className="flex items-center gap-3 self-end md:self-auto pb-2">
             

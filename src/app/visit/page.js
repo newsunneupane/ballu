@@ -29,22 +29,22 @@ export default function AboutContactPage() {
       <section className="min-h-screen flex flex-col relative">
         
         {/* Top Main Section - Centered */}
-        <div className="flex-grow flex flex-col items-center justify-center px-6 py-20 text-center">
+        <div className="flex-grow flex flex-col items-center justify-center px-6 pt-15 pb-20 text-center">
           
           {/* Star Icon */}
-          <div className="text-[#cda274] mb-8 opacity-80">
+          <div className="text-[#cda274] mb-3 opacity-80">
             <FiStar size={18} strokeWidth={1.5} />
           </div>
 
           {/* Find Us Label */}
-          <div className={`${tenorSans.className} text-[10px] tracking-[0.4em] uppercase text-[#cda274] mb-10`}>
+          <div className={`${tenorSans.className} text-[10px] tracking-[0.4em] uppercase text-[#cda274] mb-2`}>
             Find Us
           </div>
 
           {/* Large Headline */}
-          <h1 className={`${cormorant.className} text-5xl md:text-[80px] lg:text-[96px] leading-[1.1] text-[#fbf7f0] font-light tracking-tight mb-8`}>
+          <h1 className={`${cormorant.className} text-5xl md:text-[80px] lg:text-[96px] leading-[1.1] text-[#fbf7f0] font-light tracking-tight `}>
             Two doors from <br />
-            <span className="italic text-[#cda274] pr-4">the post office.</span>
+            <span className="italic text-[#cda274] pr-1">the post office.</span>
           </h1>
 
           {/* Devanagari Subtitle */}
@@ -60,7 +60,7 @@ export default function AboutContactPage() {
             
             {/* HOURS */}
             <div className="flex flex-col items-center justify-center py-12 px-6">
-              <h3 className={`${tenorSans.className} text-[9px] tracking-[0.3em] uppercase text-[#6e695f] mb-6`}>
+              <h3 className={`${tenorSans.className} text-[9px] tracking-[0.3em] uppercase text-[#6e695f] mb-6 hover:transition-x-2`}>
                 Hours
               </h3>
               <p className={`${cormorant.className} text-[18px] text-[#ebd3b4] text-center leading-relaxed opacity-90`}>
@@ -136,7 +136,7 @@ export default function AboutContactPage() {
             <div className="w-3.5 h-3.5 rounded-full bg-[#cda274] shadow-[0_0_12px_#cda274]"></div>
 
             {/* Location Label */}
-            <div className={`${tenorSans.className} absolute left-8 w-max text-[9px] tracking-[0.3em] uppercase text-[#cda274] font-medium tracking-widest pl-2`}>
+            <div className={`${tenorSans.className} absolute left-20 w-max text-[9px] tracking-[0.3em] uppercase text-[#cda274] font-medium tracking-widest pl-2`}>
               Ballu Jewellers
             </div>
           </div>

@@ -58,7 +58,7 @@ export default function HeroSection() {
     setTransformStyle({ x: 0, y: 0 });
   };
   return (
-    <div className={`${cormorant.variable} ${cormorantSC.variable}  ${notoDevanagari.variable} min-h-screen w-full text-cream-luxury p-6 md:p-20 flex flex-col justify-between font-serif-editorial relative overflow-x-hidden`}>
+    <div className={`${cormorant.variable} ${cormorantSC.variable}  ${notoDevanagari.variable} min-h-screen w-full text-cream-luxury p-6 md:p-10 flex flex-col justify-between font-serif-editorial relative overflow-x-hidden`}>
       
       {/* Rotating gradient SVG background */}
       <div className="pointer-events-none absolute inset-0 -z-10 bg-[#0e0b08] overflow-hidden">
@@ -99,7 +99,7 @@ export default function HeroSection() {
       </div>
 
       {/* Top Header Label */}
-     <div className="text-[11px] tracking-[0.4em] text-[#dbb86b] text-thin uppercase opacity-80 mt-4 font-sans fade-in-up fade-in-up-1">
+     <div className="text-[11px] tracking-[0.4em] text-[#dbb86b] text-thin uppercase opacity-80  font-sans fade-in-up fade-in-up-1">
   <span className="inline-block animate-[float_4s_ease-in-out_infinite]">
     <span className="relative inline-block select-none">
       {/* Background Stroke Layer */}
@@ -115,13 +115,13 @@ export default function HeroSection() {
   EST. 1984 · KAKARVITTA
 </div>
       {/* Main Content Area */}
-      <div className="grow flex items-end pt-5 pb-8">
+      <div className="grow flex items-end  ">
         
         {/* LEFT SIDE TEXT */}
-        <div className="flex flex-col space-y-4 max-w-4xl lg:pr-380px w-full"> 
+        <div className="flex flex-col  max-w-4xl lg:pr-380px w-full"> 
           
           {/* Main Headline */}
-          <h1 className="text-[clamp(3.5rem,7.5vw,5.8rem)] font-light leading-[1.1] text-cream-luxury tracking-tight font-serif-editorial">
+          <h1 className="text-[80px] font-light leading-[0.8] text-cream-luxury tracking-tight font-serif-editorial">
   <span className="block fade-in-up" style={{ animationDelay: '0ms' }}>
     Heirlooms,
   </span>
@@ -134,12 +134,12 @@ export default function HeroSection() {
 </h1>
           
           {/* Devanagari Script text (Fixed: Styled with custom font-nepali-serif) */}
-          <p className="italic  font-nepali-serif text-xl tracking-wide md:text-2xl font-light text-[#e2d5c3] opacity-85  fade-in-up fade-in-up-5">
+          <p className="italic my-6 font-nepali-serif text-[16px] tracking-widest md:text- font-light text-[#e2d5c3] opacity-85  fade-in-up fade-in-up-5">
             तीन पुस्ताको कारीगरी — एउटै बेन्चबाट
           </p>
           
           {/* Description Copy */}
-          <p className="text-xs md:text-[13px] font-sans font-light leading-relaxed max-w-md text-[#c4b9a6] tracking-wide fade-in-up fade-in-up-6">
+          <p className="text-xs mb-2 md:text-[13px] font-sans font-light leading-relaxed max-w-md text-[#c4b9a6] tracking-wide fade-in-up fade-in-up-6">
             Forty years on the same bench in Kakarvitta. Hallmarked gold, hand-finished silver, 
             made-to-order bridal sets. Browse online, reserve, collect in store.
           </p>
