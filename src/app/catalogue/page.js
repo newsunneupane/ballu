@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import Link from 'next/link'; // Imported Next.js Link
+import Link from 'next/link';
 import { Cormorant_Garamond, Cormorant_SC, Tenor_Sans } from "next/font/google";
 
 const cormorantSC = Cormorant_SC({
@@ -31,29 +31,32 @@ export default function CataloguePage() {
   const [activeCategories, setActiveCategories] = useState(['ALL']);
   const [activeMaterial, setActiveMaterial] = useState('ALL');
   const [viewMode, setViewMode] = useState('GRID');
-  
-  // JavaScript scroll states
   const [isFixed, setIsFixed] = useState(false);
-  const headerRef = useRef(null);
-  const [headerHeight, setHeaderHeight] = useState(0);
+  
+  const containerRef = useRef(null);
 
   useEffect(() => {
-    // Measure the header so the page doesn't jump when it becomes fixed
-    if (headerRef.current) {
-      setHeaderHeight(headerRef.current.offsetHeight);
-    }
-
     const handleScroll = () => {
-      // 120px is roughly the height of the title. Once we scroll past it, force it fixed.
-      if (window.scrollY > 120) {
+      if (!containerRef.current) return;
+      
+      // Get the absolute position of our navigation gap placeholder relative to the screen view
+      const rect = containerRef.current.getBoundingClientRect();
+      
+      // If the top of our component hits or passes the bottom boundary of your top navbar (80px), lock it.
+      if (rect.top <= 80) {
         setIsFixed(true);
       } else {
         setIsFixed(false);
       }
     };
-    
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    // Run an initial check on mount in case the page loaded mid-scroll
+    handleScroll();
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
   }, []);
 
   const categories = ['ALL', 'BRIDAL', 'DAILY WEAR', 'FESTIVE', 'ENGAGEMENT', 'OFFICE', 'GIFT'];
@@ -86,120 +89,122 @@ export default function CataloguePage() {
   return (
     <div className={`${cormorant.className} min-h-screen bg-[#0f0d0a] text-[#e5e5e0] antialiased`}>
       
-      {/* This spacer prevents the page from jerking upward when the header detaches */}
-      {isFixed && <div style={{ height: `${headerHeight}px` }} className="w-full" aria-hidden="true" />}
-
-      {/* Header section */}
-      <header 
-        ref={headerRef}
-        className={`px-6 md:px-16 lg:px-15 border-b border-[#2b2415] transition-all duration-[350ms] ease-in-out w-full ${
-          isFixed 
-            ? 'fixed top-[80px] left-0 right-0 z-40 bg-[#15130f] pb-3 shadow-[0_20px_40px_-10px_rgba(0,0,0,0.8)]' 
-            : 'relative bg-[#0f0d0a] pt-8 pb-4 mb-8'
-        }`}
-      >
-        
-        {/* Title Area */}
-        <div className={`overflow-hidden transition-all duration-[350ms] ease-in-out ${isFixed ? 'max-h-0 opacity-0' : 'max-h-[180px] opacity-100 mb-7'}`}>
-          <div className={`${tenorSans.className} text-[10px] tracking-[0.35em] text-[#c9a96e] uppercase fade-in-up fade-in-up-2 mt-6 mb-2`}>
+      {/* Header Container */}
+      <header className="w-full pt-6 relative">
+        <div className="px-4 sm:px-6 md:px-16 lg:px-15 pb-4">
+          <div className={`${tenorSans.className} text-[10px] tracking-[0.35em] text-[#c9a96e] uppercase mt-2 mb-2`}>
             Atelier · Catalogue
           </div>
           <div className="flex flex-col space-y-1 max-w-4xl">
-            <h1 className="antialiased text-[90px] font-light leading-[1.1] text-[#fbf7f0] tracking-tight">
-              <span className="block fade-in-up fade-in-up-3 ">The Drawer.</span>
+            <h1 className="antialiased text-[42px] sm:text-[75px] md:text-[90px] font-light leading-[1.1] text-[#fbf7f0] tracking-tight">
+              <span className="block">The Drawer.</span>
             </h1>  
           </div>
-          <p className="italic font-nepali-serif tracking-wide text-[#e2d5c3] opacity-85 fade-in-up fade-in-up-4">
+          <p className="italic pb-5 font-nepali-serif tracking-wide text-[#e2d5c3] opacity-85">
             दराज — सबै गहना
           </p>
         </div>
-
-        {/* Filter Navigation Block */}
-        <div className={`flex flex-col w-full transition-all duration-300 ${isFixed ? 'gap-1 mt-0' : 'gap-3 mt-1'}`}>
-          
-          {/* Categories */}
-          <div className="flex flex-wrap gap-2 items-center">
-            {categories.map((cat) => {
-              const isSelected = activeCategories.includes(cat);
-              return (
-                <button
-                  key={cat}
-                  onClick={() => handleCategoryClick(cat)}
-                  className={`${tenorSans.className} px-3 py-1 text-[8px] hover:-translate-y-[2px] font-small tracking-widest transition-all border rounded-4xl uppercase ${
-                    isSelected ? 'border-[#cda274] text-[#c5b89d] bg-[#1a140f]' : 'border-[#2b2415] text-[#8e897e]'
-                  }`}
-                >
-                  {cat}
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Materials & Toggles */}
-          <div className="flex flex-wrap items-center justify-between gap-4 w-full">
-            
-            <div className="flex gap-4 text-[11px] font-semibold tracking-widest uppercase">
-              {materials.map((mat) => (
-                <button
-                  key={mat}
-                  onClick={() => setActiveMaterial(mat)}
-                  className={`${tenorSans.className} pb-0.5 border-b-2 transition-all ${
-                    activeMaterial === mat ? 'border-[#cda274] text-[#ebd3b4]' : 'border-transparent text-[#8e897e]'
-                  }`}
-                >
-                  {mat}
-                </button>
-              ))}
-            </div>
-
-            <div className="flex items-center gap-4 text-[11px] tracking-[0.2em] uppercase text-[#8e897e] ml-auto">
-              <span className={`${tenorSans.className} opacity-60 hidden sm:block`}>
-                {filteredProducts.length} Pieces
-              </span>
-
-              <div className="flex">
-                <button
-                  type="button"
-                  onClick={() => setViewMode('GRID')}
-                  className={`${tenorSans.className} px-3 py-1.5 text-[10px] tracking-[0.15em] transition-all duration-300 uppercase ${
-                    viewMode === 'GRID'
-                      ? 'bg-[#cda274] text-black font-semibold'
-                      : 'bg-transparent text-[#cda274] hover:bg-[#cda274]/10'
-                  }`}
-                >
-                  Grid
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setViewMode('LIST')}
-                  className={`${tenorSans.className} px-3 py-1.5 text-[10px] tracking-[0.15em] transition-all duration-300 uppercase ${
-                    viewMode === 'LIST'
-                      ? 'bg-[#cda274] text-black font-semibold'
-                      : 'bg-transparent text-[#cda274] hover:bg-[#cda274]/10'
-                  }`}
-                >
-                  List
-                </button>
-              </div>
-            </div>
-
-          </div>
-        </div>
       </header>
 
+      {/* STATIC HEIGHT GAP RECONCILER
+        Locks down a solid 97px placeholder layout space block. 
+        When the inside component goes "fixed", this box prevents the main grid from jumping underneath,
+        killing the race-condition layout glitch completely.
+      */}
+      <div 
+        ref={containerRef} 
+        className="w-full h-[97px] relative"
+      >
+        {/* Navigation Action Strip */}
+        <div 
+          className={`w-full bg-[#0f0d0a]/95 backdrop-blur-md pb-4 pt-4 border-b border-[#2b2415] px-4 sm:px-6 md:px-16 lg:px-15 left-0 right-0 ${
+            isFixed 
+              ? 'fixed top-[80px] z-[49] shadow-2xl' 
+              : 'absolute top-0'
+          }`}
+        >
+          <div className="flex flex-col gap-3 max-w-[100vw]">
+            {/* Categories - Mobile swipe friendly horizontal container */}
+            <div className="flex overflow-x-auto whitespace-nowrap gap-2 items-center no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0 py-1">
+              {categories.map((cat) => {
+                const isSelected = activeCategories.includes(cat);
+                return (
+                  <button
+                    key={cat}
+                    onClick={() => handleCategoryClick(cat)}
+                    className={`${tenorSans.className} inline-block px-3 py-1 text-[8px] hover:-translate-y-[2px] font-small tracking-widest transition-all border rounded-4xl uppercase shrink-0 ${
+                      isSelected ? 'border-[#cda274] text-[#c5b89d] bg-[#1a140f]' : 'border-[#2b2415] text-[#8e897e]'
+                    }`}
+                  >
+                    {cat}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Materials & Toggles */}
+            <div className="flex items-center justify-between gap-4 w-full">
+              <div className="flex gap-4 text-[11px] font-semibold tracking-widest uppercase">
+                {materials.map((mat) => (
+                  <button
+                    key={mat}
+                    onClick={() => setActiveMaterial(mat)}
+                    className={`${tenorSans.className} pb-0.5 border-b-2 transition-all ${
+                      activeMaterial === mat ? 'border-[#cda274] text-[#ebd3b4]' : 'border-transparent text-[#8e897e]'
+                    }`}
+                  >
+                    {mat}
+                  </button>
+                ))}
+              </div>
+
+              <div className="flex items-center gap-4 text-[11px] tracking-[0.2em] uppercase text-[#8e897e]">
+                <span className={`${tenorSans.className} opacity-60 hidden sm:block`}>
+                  {filteredProducts.length} Pieces
+                </span>
+
+                <div className="flex border border-[#2b2415]">
+                  <button
+                    type="button"
+                    onClick={() => setViewMode('GRID')}
+                    className={`${tenorSans.className} px-3 py-1.5 text-[10px] tracking-[0.15em] transition-all duration-300 uppercase ${
+                      viewMode === 'GRID'
+                        ? 'bg-[#cda274] text-black font-semibold'
+                        : 'bg-transparent text-[#cda274] hover:bg-[#cda274]/10'
+                    }`}
+                  >
+                    Grid
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setViewMode('LIST')}
+                    className={`${tenorSans.className} px-3 py-1.5 text-[10px] tracking-[0.15em] transition-all duration-300 uppercase ${
+                      viewMode === 'LIST'
+                        ? 'bg-[#cda274] text-black font-semibold'
+                        : 'bg-transparent text-[#cda274] hover:bg-[#cda274]/10'
+                    }`}
+                  >
+                    List
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Main Content Area */}
-      <main className={`px-6 md:px-16 lg:px-15 pb-32 ${isFixed ? 'pt-8' : ''}`}>
+      <main className="px-4 sm:px-6 md:px-16 lg:px-15 pb-32 mt-6">
         {filteredProducts.length === 0 ? (
           <div className={`${tenorSans.className} col-span-full text-center py-20 text-xs tracking-[4px] uppercase text-[#8e897e]`}>
             No bespoke designs found matching these selections.
           </div>
         ) : viewMode === 'GRID' ? (
-          /* GRID VIEW WITH WRAPPED LINKS */
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {filteredProducts.map((product) => (
               <Link
                 key={product.id}
-                href={`/catalogue/${product.id}`} // Links cleanly to dynamic routes handled by ProductPage component
+                href={`/catalogue/${product.id}`}
                 className="group relative flex flex-col bg-[#080605] border border-[#2b2415] overflow-hidden transition-all duration-500 ease-out hover:border-[#4a3d24] hover:-translate-y-2 hover:shadow-[0_15px_40px_-10px_rgba(0,0,0,0.7)] cursor-pointer"
               >
                 <div className="relative aspect-[3/4] w-full">
@@ -228,11 +233,8 @@ export default function CataloguePage() {
             ))}
           </div>
         ) : (
-          /* LIST VIEW CONVERTED TO TAILWIND GRID SO IT FITS NATIVE LINKS COMPLIANTLY */
           <div className="w-full overflow-x-auto">
             <div className="min-w-[700px]">
-              
-              {/* Table Header row */}
               <div className={`${tenorSans.className} border-b border-[#2b2415] text-[10px] tracking-[0.25em] text-[#6e695f] uppercase grid grid-cols-[64px_2fr_1fr_1fr_1fr_1fr_120px] pb-4 items-center font-medium`}>
                 <div></div>
                 <div className="pl-4">Piece</div>
@@ -243,12 +245,11 @@ export default function CataloguePage() {
                 <div></div>
               </div>
               
-              {/* Table Body rows container */}
               <div className="divide-y divide-[#1f1a10]">
                 {filteredProducts.map((product) => (
                   <Link 
                     key={product.id} 
-                    href={`/catalogue/${product.id}`} // Links layout rows directly to your dynamic page
+                    href={`/catalogue/${product.id}`}
                     className="group grid grid-cols-[64px_2fr_1fr_1fr_1fr_1fr_120px] items-center py-4 hover:bg-[#120e0a]/40 transition-colors cursor-pointer"
                   >
                     <div>
@@ -262,15 +263,15 @@ export default function CataloguePage() {
                       <div className="text-xs font-light text-[#8e897e] mt-1 opacity-80">{product.subTitle}</div>
                     </div>
                     
-                    <div className={`${tenorSans.className} text-sm font-thin text-[#ebd3b4] opacity-80`}>
+                    <div className="text-sm font-thin text-[#ebd3b4] opacity-80">
                       {product.type || product.category}
                     </div>
                     
-                    <div className={`${tenorSans.className} text-sm font-thin text-[#ebd3b4] opacity-80`}>
+                    <div className="text-sm font-thin text-[#ebd3b4] opacity-80">
                       {product.karat}
                     </div>
                     
-                    <div className={`${tenorSans.className} text-sm font-light text-[#ebd3b4] opacity-80`}>
+                    <div className="text-sm font-light text-[#ebd3b4] opacity-80">
                       {product.weight.toLowerCase()}
                     </div>
                     
@@ -279,14 +280,13 @@ export default function CataloguePage() {
                     </div>
                     
                     <div className="text-right">
-                      <span className={`${tenorSans.className} text-[10px] group/inner tracking-[0.2em] uppercase text-[#cda274] transition-colors flex items-center justify-end gap-1.5 mr-4 ml-auto`}>
+                      <span className="text-[10px] group/inner tracking-[0.2em] uppercase text-[#cda274] transition-colors flex items-center justify-end gap-1.5 mr-4 ml-auto">
                         View <span className='group-hover/inner:translate-x-2 transition-transform duration-200'>→</span>
                       </span>
                     </div>
                   </Link>
                 ))}
               </div>
-
             </div>
           </div>
         )}
