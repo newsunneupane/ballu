@@ -39,10 +39,8 @@ export default function CataloguePage() {
     const handleScroll = () => {
       if (!containerRef.current) return;
       
-      // Get the absolute position of our navigation gap placeholder relative to the screen view
       const rect = containerRef.current.getBoundingClientRect();
       
-      // If the top of our component hits or passes the bottom boundary of your top navbar (80px), lock it.
       if (rect.top <= 80) {
         setIsFixed(true);
       } else {
@@ -52,8 +50,6 @@ export default function CataloguePage() {
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     
-    // FIX: Delaying the initial calculation by one frame prevents the hydration 
-    // mismatch warning if a user refreshes the page while already scrolled down.
     const rafId = requestAnimationFrame(() => {
       handleScroll();
     });
@@ -111,11 +107,7 @@ export default function CataloguePage() {
         </div>
       </header>
 
-      {/* STATIC HEIGHT GAP RECONCILER
-        Locks down a solid 97px placeholder layout space block. 
-        When the inside component goes "fixed", this box prevents the main grid from jumping underneath,
-        killing the race-condition layout glitch completely.
-      */}
+      {/* STATIC HEIGHT GAP RECONCILER */}
       <div 
         ref={containerRef} 
         className="w-full h-[97px] relative"
@@ -129,7 +121,7 @@ export default function CataloguePage() {
           }`}
         >
           <div className="flex flex-col gap-3 max-w-[100vw]">
-            {/* Categories - Mobile swipe friendly horizontal container */}
+            {/* Categories */}
             <div className="flex overflow-x-auto whitespace-nowrap gap-2 items-center no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0 py-1">
               {categories.map((cat) => {
                 const isSelected = activeCategories.includes(cat);
@@ -238,14 +230,16 @@ export default function CataloguePage() {
             ))}
           </div>
         ) : (
-          <div className="w-full overflow-x-auto">
-            <div className="min-w-[700px]">
-              <div className={`${tenorSans.className} border-b border-[#2b2415] text-[10px] tracking-[0.25em] text-[#6e695f] uppercase grid grid-cols-[64px_2fr_1fr_1fr_1fr_1fr_120px] pb-4 items-center font-medium`}>
+          /* List View Area optimized to fit nicely on mobile layouts without scrolling */
+          <div className="w-full">
+            <div className="w-full">
+              {/* Header Grid System: Changes dynamically using responsive breakpoints */}
+              <div className={`${tenorSans.className} border-b border-[#2b2415] text-[10px] tracking-[0.25em] text-[#6e695f] uppercase grid grid-cols-[50px_2fr_1fr_100px] sm:grid-cols-[64px_2fr_1fr_1fr_1fr_1fr_120px] pb-4 items-center font-medium`}>
                 <div></div>
                 <div className="pl-4">Piece</div>
-                <div>Category</div>
-                <div>Purity</div>
-                <div>Weight</div>
+                <div className="hidden sm:block">Category</div>
+                <div className="hidden sm:block">Purity</div>
+                <div className="hidden sm:block">Weight</div>
                 <div>Price</div>
                 <div></div>
               </div>
@@ -255,38 +249,50 @@ export default function CataloguePage() {
                   <Link 
                     key={product.id} 
                     href={`/catalogue/${product.id}`}
-                    className="group grid grid-cols-[64px_2fr_1fr_1fr_1fr_1fr_120px] items-center py-4 hover:bg-[#120e0a]/40 transition-colors cursor-pointer"
+                    className="group grid grid-cols-[50px_2fr_1fr_100px] sm:grid-cols-[64px_2fr_1fr_1fr_1fr_1fr_120px] items-center py-4 hover:bg-[#120e0a]/40 transition-colors cursor-pointer"
                   >
+                    {/* Small Image Thumbnail Container */}
                     <div>
-                      <div className="w-12 h-12 bg-gradient-to-br from-[#423722] to-[#1a140f] rounded-sm relative border border-[#2b2415]">
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-[#423722] to-[#1a140f] rounded-sm relative border border-[#2b2415]">
                         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(235,211,180,0.15)_0%,transparent_70%)]" />
                       </div>
                     </div>
                     
-                    <div className="pl-4">
-                      <div className="text-[18px] text-[#ebd3b4] font-normal leading-tight tracking-wide">{product.title}</div>
-                      <div className="text-xs font-light text-[#8e897e] mt-1 opacity-80">{product.subTitle}</div>
+                    {/* Core Product Information */}
+                    <div className="pl-4 min-w-0">
+                      <div className="text-base sm:text-[18px] text-[#ebd3b4] font-normal leading-tight tracking-wide truncate">{product.title}</div>
+                      <div className="text-[10px] sm:text-xs font-light text-[#8e897e] mt-1 opacity-80 truncate">{product.subTitle}</div>
+                      
+                      {/* Secondary Metadata embedded directly under titles for mobile displays */}
+                      <div className="sm:hidden text-[10px] text-[#6e695f] tracking-wide mt-1">
+                        {product.karat} • {product.weight.toLowerCase()}
+                      </div>
                     </div>
                     
-                    <div className="text-sm font-thin text-[#ebd3b4] opacity-80">
+                    {/* Category Column (Desktop Only) */}
+                    <div className="text-sm font-thin text-[#ebd3b4] opacity-80 hidden sm:block">
                       {product.type || product.category}
                     </div>
                     
-                    <div className="text-sm font-thin text-[#ebd3b4] opacity-80">
+                    {/* Purity Column (Desktop Only) */}
+                    <div className="text-sm font-thin text-[#ebd3b4] opacity-80 hidden sm:block">
                       {product.karat}
                     </div>
                     
-                    <div className="text-sm font-light text-[#ebd3b4] opacity-80">
+                    {/* Weight Column (Desktop Only) */}
+                    <div className="text-sm font-light text-[#ebd3b4] opacity-80 hidden sm:block">
                       {product.weight.toLowerCase()}
                     </div>
                     
-                    <div className="text-[20px] text-[#cda274] font-medium tracking-wide">
+                    {/* Price Column */}
+                    <div className="text-base sm:text-[20px] text-[#cda274] font-medium tracking-wide">
                       {product.price}
                     </div>
                     
+                    {/* Navigation Trigger Button */}
                     <div className="text-right">
-                      <span className="text-[10px] group/inner tracking-[0.2em] uppercase text-[#cda274] transition-colors flex items-center justify-end gap-1.5 mr-4 ml-auto">
-                        View <span className='group-hover/inner:translate-x-2 transition-transform duration-200'>→</span>
+                      <span className="text-[10px] group/inner tracking-[0.2em] uppercase text-[#cda274] transition-colors flex items-center justify-end gap-1.5 mr-2 sm:mr-4 ml-auto">
+                        <span className="hidden sm:inline">View</span> <span className='group-hover/inner:translate-x-2 transition-transform duration-200'>→</span>
                       </span>
                     </div>
                   </Link>
