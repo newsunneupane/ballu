@@ -31,32 +31,11 @@ const BrandTrust = () => {
   return (
     <div className="bg-[#0e0b08] text-[#fbf7f0] w-full min-h-[60vh] flex flex-col justify-between relative overflow-hidden font-sans border-t border-white/5">
       
-      {/* SELF-CONTAINED ROTATION ENGINE */}
-      <style jsx global>{`
-        @keyframes spinClockwise {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-
-        @keyframes spinCounterClockwise {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(-360deg); }
-        }
-
-        .local-spin-clockwise {
-          animation: spinClockwise 45s linear infinite !important;
-        }
-
-        .local-spin-counter {
-          animation: spinCounterClockwise 45s linear infinite !important;
-        }
-      `}</style>
-
       {/* 1. UPPER TESTIMONIAL QUOTE SECTION */}
       <div className="max-w-7xl w-full mx-auto px-6 md:px-12 lg:px-16 pt-24 pb-20 flex flex-col items-center text-center relative overflow-hidden">
         
         {/* Editorial Star Icon Divider */}
-        <div className="text-[#dbb86b]  tracking-widest mb-6 opacity-80 relative z-10">
+        <div className="text-[#dbb86b] tracking-widest mb-6 opacity-80 relative z-10">
           ☆
         </div>
 
@@ -70,86 +49,81 @@ const BrandTrust = () => {
           — Ballu Suvedi, Master Karigar
         </span>
 
-     {/* ==========================================================
-   FIXED: EXACT LAYOUT MATCHING Screenshot 2026-06-17 161300.png
-   ========================================================== */}
-<div className="absolute right-[5%]  md:right-[15%] bottom-0 w-[420px] h-[420px] translate-y-[270px] pointer-events-none opacity-[0.14] select-none z-0">
-  
-  {/* GROUP 1: CLOCKWISE ROTATION (Ring 3 & Ring 4) */}
-  <div className="absolute inset-0  w-full h-full flex items-center justify-center local-spin-clockwise">
-    
-    {/* Ring 4: Outermost Ring (Fine SVG Dots) - [100%] */}
-    <div className="absolute inset-0 w-full h-full">
-      <svg className="w-full h-full  transform -rotate-90" viewBox="0 0 100 100">
-        <circle
-          cx="50"
-          cy="50"
-          r="49"
-          fill="none"
-          stroke="#dbb86b"
-          strokeWidth="0.2"
-          strokeDasharray="1 2" 
-          strokeLinecap="round"
+        {/* ==========================================================
+           FIXED: ENGINE REPLACED WITH SECURE TAILWIND ARBITRARY ANIMATIONS
+           ========================================================== */}
+        <div className="absolute right-[5%] md:right-[15%] bottom-0 w-[420px] h-[420px] translate-y-[270px] pointer-events-none opacity-[0.14] select-none z-0">
           
-        />
-      </svg>
-    </div>
-    
-    {/* Ring 3: Third From Center (Solid Line with Embedded Accent Beads) - [82%] */}
-    <div className="absolute w-[82%] h-[82%]">
-      <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-        {/* The solid track line */}
-        <circle
-          cx="50"
-          cy="50"
-          r="48"
-          fill="none"
-          stroke="#dbb86b"
-          strokeWidth="0.5"
-          className="opacity-70"
-        />
-        {/* The accent beads sitting directly on the line */}
-        <circle
-          cx="50"
-          cy="50"
-          r="48"
-          fill="none"
-          stroke="#dbb86b"
-          strokeWidth="1.8" /* Thicker weight to create the distinct beads */
-          strokeDasharray="0.1 24" /* 0.1 creates a round dot when combined with round linecap, 24 creates the large gap */
-          strokeLinecap="round"
-        />
-      </svg>
-    </div>
+          {/* GROUP 1: CLOCKWISE ROTATION (Ring 3 & Ring 4) */}
+          <div className="absolute inset-0 w-full h-full flex items-center justify-center animate-[spin_45s_linear_infinite]">
+            
+            {/* Ring 4: Outermost Ring (Fine SVG Dots) */}
+            <div className="absolute inset-0 w-full h-full">
+              <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="49"
+                  fill="none"
+                  stroke="#dbb86b"
+                  strokeWidth="0.2"
+                  strokeDasharray="1 2" 
+                  strokeLinecap="round"
+                />
+              </svg>
+            </div>
+            
+            {/* Ring 3: Third From Center (Solid Line with Embedded Accent Beads) */}
+            <div className="absolute w-[82%] h-[82%]">
+              <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="48"
+                  fill="none"
+                  stroke="#dbb86b"
+                  strokeWidth="0.5"
+                  className="opacity-70"
+                />
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="48"
+                  fill="none"
+                  stroke="#dbb86b"
+                  strokeWidth="1.8"
+                  strokeDasharray="0.1 24"
+                  strokeLinecap="round"
+                />
+              </svg>
+            </div>
+          </div>
 
-  </div>
+          {/* GROUP 2: COUNTER-CLOCKWISE ROTATION (Ring 1 & Ring 2) */}
+          {/* Uses Tailwind dynamic negative spin utility values via arbitrary config syntax */}
+          <div className="absolute inset-0 w-full h-full flex items-center justify-center animate-[spin_45s_linear_infinite_reverse]">
+            
+            {/* Ring 2: Second From Center (Clean Solid Line) */}
+            <div className="w-[64%] h-[64%] rounded-full border border-white/70" />
+            
+            {/* Ring 1: Innermost Ring (Fine SVG Dots) */}
+            <div className="absolute w-[42%] h-[42%]">
+              <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="48"
+                  fill="none"
+                  stroke="#dbb86b"
+                  strokeWidth="0.5"
+                  strokeDasharray="1.5 3.5" 
+                  strokeLinecap="round"
+                />
+              </svg>
+            </div>
+          </div>
 
-  {/* GROUP 2: COUNTER-CLOCKWISE ROTATION (Ring 1 & Ring 2) */}
-  <div className="absolute inset-0 w-full h-full flex items-center justify-center local-spin-counter">
-    
-    {/* Ring 2: Second From Center (Clean Solid Line) - [64%] */}
-    <div className="w-[64%] h-[64%] rounded-full border border-white/70" />
-    
-    {/* Ring 1: Innermost Ring (Fine SVG Dots) - [42%] */}
-    <div className="absolute w-[42%] h-[42%]">
-      <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-        <circle
-          cx="50"
-          cy="50"
-          r="48"
-          fill="none"
-          stroke="#dbb86b"
-          strokeWidth="0.5"
-          strokeDasharray="1.5 3.5" 
-          strokeLinecap="round"
-        />
-      </svg>
-    </div>
-
-  </div>
-
-</div>
-
+        </div>
       </div>
 
       {/* 2. LOWER VALUE PROPOSITION QUAD-GRID GRID SYSTEMS */}

@@ -51,11 +51,16 @@ export default function CataloguePage() {
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
-    // Run an initial check on mount in case the page loaded mid-scroll
-    handleScroll();
+    
+    // FIX: Delaying the initial calculation by one frame prevents the hydration 
+    // mismatch warning if a user refreshes the page while already scrolled down.
+    const rafId = requestAnimationFrame(() => {
+      handleScroll();
+    });
 
     return () => {
       window.removeEventListener('scroll', handleScroll);
+      cancelAnimationFrame(rafId);
     };
   }, []);
 
