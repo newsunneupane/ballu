@@ -1,5 +1,5 @@
 "use client";
-import React, { useRef, useState, useEffect } from 'react'; // ⚡ Added useState and useEffect
+import React, { useRef, useState, useEffect } from 'react';
 import { Cormorant_Garamond, Cormorant_SC } from 'next/font/google';
 
 const cormorant = Cormorant_Garamond({
@@ -52,25 +52,17 @@ const collections = [
 const Herodown = () => {
   const scrollContainerRef = useRef(null);
   
-  // ⚡ 1. Track whether there's remaining scrollable content on either side
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
 
-  // ⚡ 2. Function to check the container's scroll position
   const checkScrollPosition = () => {
     if (scrollContainerRef.current) {
       const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
-      
-      // If scrollLeft > 1, there are cards to the left
       setCanScrollLeft(scrollLeft > 1);
-      
-      // If scrollLeft + clientWidth is less than scrollWidth, there are cards to the right
-      // (Using a -2 margin of error to account for sub-pixel zooming precision issues)
       setCanScrollRight(scrollLeft + clientWidth < scrollWidth - 2);
     }
   };
 
-  // ⚡ 3. Check layout dimensions on mount or content shift
   useEffect(() => {
     checkScrollPosition();
     window.addEventListener('resize', checkScrollPosition);
@@ -93,39 +85,34 @@ const Herodown = () => {
   return (
     <div className="text-white min-h-[30vh] flex flex-col justify-end">
       
-    {/* SCOPED INJECTED CSS */}
-<style jsx global>{`
-  /* 1. HOVER ENTRY: Lifts up slightly, then shakes */
-  @keyframes subtleLiftThenVibrate {
-    0% { transform: scaleY(1) translateX(0); }
-    30% { transform: scaleY(0.985) translateX(0); }
-    45% { transform: scaleY(0.985) translateX(-1px); }
-    60% { transform: scaleY(0.985) translateX(1px); }
-    75% { transform: scaleY(0.985) translateX(-0.5px); }
-    90% { transform: scaleY(0.985) translateX(0.5px); }
-    100% { transform: scaleY(0.985) translateX(0); }
-  }
-
-  /* 2. MOUSE LEAVE: Shakes immediately while lifted, then drops down smoothly */
-  @keyframes vibrateThenSettleDown {
-    0% { transform: scaleY(0.985) translateX(0); }
-    15% { transform: scaleY(0.985) translateX(-1px); }
-    30% { transform: scaleY(0.985) translateX(1px); }
-    45% { transform: scaleY(0.985) translateX(-0.5px); }
-    60% { transform: scaleY(0.985) translateX(0); }
-    100% { transform: scaleY(1) translateX(0); }
-  }
-  
-  .vibrate-card-hover {
-    transform-origin: top !important; 
-    transition: shadow 0.3s ease-out;
-    animation: vibrateThenSettleDown 0.35s ease-out forwards;
-  }
-
-  .vibrate-card-hover:hover {
-    animation: subtleLiftThenVibrate 0.35s ease-out forwards !important;
-  }
-`}</style>
+      {/* ⚡ Dynamic Keyframe Injection: Using standard HTML style to prevent hydration hashes stripping */}
+      <style dangerouslySetInnerHTML={{__html: `
+        @keyframes subtleLiftThenVibrate {
+          0% { transform: scaleY(1) translateX(0); }
+          30% { transform: scaleY(0.985) translateX(0); }
+          45% { transform: scaleY(0.985) translateX(-1px); }
+          60% { transform: scaleY(0.985) translateX(1px); }
+          75% { transform: scaleY(0.985) translateX(-0.5px); }
+          90% { transform: scaleY(0.985) translateX(0.5px); }
+          100% { transform: scaleY(0.985) translateX(0); }
+        }
+        @keyframes vibrateThenSettleDown {
+          0% { transform: scaleY(0.985) translateX(0); }
+          15% { transform: scaleY(0.985) translateX(-1px); }
+          30% { transform: scaleY(0.985) translateX(1px); }
+          45% { transform: scaleY(0.985) translateX(-0.5px); }
+          60% { transform: scaleY(0.985) translateX(0); }
+          100% { transform: scaleY(1) translateX(0); }
+        }
+        .vibrate-card-hover {
+          transform-origin: top !important; 
+          transition: shadow 0.3s ease-out;
+          animation: vibrateThenSettleDown 0.35s ease-out forwards;
+        }
+        .vibrate-card-hover:hover {
+          animation: subtleLiftThenVibrate 0.35s ease-out forwards !important;
+        }
+      `}} />
 
       {/* SECTION HEADER BLOCK */}
       <div className="max-w-7xl w-full mx-auto px-6 md:px-12 lg:px-16 pt-16 pb-8">
@@ -142,17 +129,15 @@ const Herodown = () => {
             </h1>
           </div>
           
-          {/* Right Side: Navigation Slider Buttons */}
+          {/* Navigation Slider Buttons */}
           <div className="flex items-center gap-3 self-end md:self-auto pb-2">
-            
-            {/* ⚡ LEFT BUTTON: Glows gold when active, fades and defaults to dim white border when inactive */}
             <button 
               onClick={() => handleScroll('left')} 
               disabled={!canScrollLeft}
               className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${
                 canScrollLeft 
-                  ? 'bg-[#dbb86b] text-[#080808] cursor-pointer  shadow-[0_0_15px_rgba(219,184,107,0.4)] hover:bg-[#c9a65a] hover:scale-105' 
-                  : 'border border-white/10 text-white/30  opacity-40'
+                  ? 'bg-[#dbb86b] text-[#080808] cursor-pointer shadow-[0_0_15px_rgba(219,184,107,0.4)] hover:bg-[#c9a65a] hover:scale-105' 
+                  : 'border border-white/10 text-white/30 opacity-40'
               }`}
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -160,14 +145,13 @@ const Herodown = () => {
               </svg>
             </button>
             
-            {/* ⚡ RIGHT BUTTON: Glows gold when active, fades and defaults to dim white border when inactive */}
             <button 
               onClick={() => handleScroll('right')} 
               disabled={!canScrollRight}
               className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${
                 canScrollRight 
-                  ? 'bg-[#dbb86b] text-[#080808] cursor-pointer  shadow-[0_0_15px_rgba(219,184,107,0.4)] hover:bg-[#c9a65a] hover:scale-105' 
-                  : 'border border-white/10 text-white/30  opacity-40'
+                  ? 'bg-[#dbb86b] text-[#080808] cursor-pointer shadow-[0_0_15px_rgba(219,184,107,0.4)] hover:bg-[#c9a65a] hover:scale-105' 
+                  : 'border border-white/10 text-white/30 opacity-40'
               }`}
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -182,7 +166,6 @@ const Herodown = () => {
       <div className="w-full pb-20 overflow-hidden select-none">
         <div className="max-w-7xl w-full mx-auto px-6 md:px-12 lg:px-16">
           
-          {/* ⚡ Connected onScroll listener here */}
           <div 
             ref={scrollContainerRef} 
             onScroll={checkScrollPosition}
@@ -196,7 +179,6 @@ const Herodown = () => {
                   bg-[#13100d] border ${item.borderColor} relative overflow-hidden group 
                   flex flex-col justify-between p-6 md:p-8 
                   hover:shadow-2xl
-                  
                   vibrate-card-hover
                 `}
               >
@@ -235,7 +217,7 @@ const Herodown = () => {
                     </h3>
                   </div>
 
-                  <div className="flex items-center justify-between   text-[10px] tracking-[0.25em] text-white/40 font-sans">
+                  <div className="flex items-center justify-between text-[10px] tracking-[0.25em] text-white/40 font-sans">
                     <span>{item.pieces}</span>
                     <span className="group/inner flex items-center gap-1 text-[#dbb86b] transition-colors duration-300 tracking-widest ">
                       EXPLORE <span className="transform group-hover/inner:translate-x-1 transition-transform duration-300">→</span>
@@ -251,7 +233,7 @@ const Herodown = () => {
       </div>
 
     </div>
-  )
-}
+  );
+};
 
 export default Herodown;

@@ -22,6 +22,21 @@ const notoDevanagari = Noto_Serif_Devanagari({
   variable: '--font-nepali-serif',
 });
 
+// Structural properties to shape the drifting ambient gold particles
+const ambientParticles = [
+  { left: "93.0%", size: 3.4, speed: 22.0, delay: -0.7, opacity: 0.61 },
+  { left: "47.9%", size: 1.8, speed: 18.2, delay: -0.8, opacity: 0.35 },
+  { left: "13.0%", size: 2.6, speed: 14.1, delay: -4.7, opacity: 0.55 },
+  { left: "9.6%",  size: 1.8, speed: 27.0, delay: -12.5, opacity: 0.49 },
+  { left: "5.3%",  size: 3.0, speed: 23.2, delay: -4.8, opacity: 0.43 },
+  { left: "0.9%",  size: 3.3, speed: 24.6, delay: -4.7, opacity: 0.79 },
+  { left: "52.2%", size: 2.6, speed: 21.5, delay: -1.3, opacity: 0.53 },
+  { left: "56.2%", size: 3.4, speed: 22.5, delay: -4.2, opacity: 0.70 },
+  { left: "18.0%", size: 3.1, speed: 14.7, delay: -2.4, opacity: 0.37 },
+  { left: "3.6%",  size: 2.8, speed: 18.4, delay: -13.7, opacity: 0.72 },
+  { left: "38.8%", size: 2.4, speed: 21.7, delay: -2.8, opacity: 0.78 }
+];
+
 export default function HeroSection() {
   const buttonRef = useRef(null);
   const [transformStyle, setTransformStyle] = useState({ x: 0, y: 0 });
@@ -50,14 +65,117 @@ export default function HeroSection() {
   return (
     <div className={`${cormorant.variable} ${cormorantSC.variable} ${notoDevanagari.variable} min-h-screen w-full text-cream-luxury p-6 md:p-10 flex flex-col justify-between font-serif-editorial relative overflow-x-hidden`}>
       
-      {/* Rotating gradient SVG background */}
+      {/* Dynamic Keyframe Injection Block */}
+      <style dangerouslySetInnerHTML={{__html: `
+        @keyframes bj-dust {
+          0% {
+            transform: translateY(0);
+            opacity: 0;
+          }
+          10% {
+            opacity: var(--base-opacity, 0.5);
+          }
+          90% {
+            opacity: var(--base-opacity, 0.5);
+          }
+          100% {
+            transform: translateY(-105vh);
+            opacity: 0;
+          }
+        }
+        @keyframes bj-spin-clock {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+        @keyframes bj-spin-counter {
+          from { transform: rotate(360deg); }
+          to { transform: rotate(0deg); }
+        }
+        .bj-orbit-slow {
+          transform-origin: center;
+          animation: bj-spin-clock 80s linear infinite;
+        }
+        .bj-orbit-slow-rev {
+          transform-origin: center;
+          animation: bj-spin-counter 60s linear infinite;
+        }
+      `}} />
+
+      {/* Background Container Layer */}
       <div className="pointer-events-none absolute inset-0 -z-10 bg-[#0e0b08] overflow-hidden">
+        
+        {/* Ambient Golden Particle Layer */}
+        <div aria-hidden="true" className="absolute inset-0 pointer-events-none overflow-hidden z-10">
+          {ambientParticles.map((particle, idx) => (
+            <span
+              key={idx}
+              style={{
+                position: 'absolute',
+                left: particle.left,
+                bottom: '-20px',
+                width: `${particle.size}px`,
+                height: `${particle.size}px`,
+                borderRadius: '50%',
+                background: 'rgb(201, 169, 110)',
+                boxShadow: `0px 0px ${particle.size * 2}px rgb(201, 169, 110)`,
+                animation: `${particle.speed}s linear ${particle.delay}s infinite normal none running bj-dust`,
+                '--base-opacity': particle.opacity,
+              }}
+            />
+          ))}
+        </div>
+
+        {/* Dynamic Horizontal Gradient Mask Overlay */}
+        <div style={{
+          position: 'absolute',
+          inset: '0px',
+          background: 'linear-gradient(90deg, rgba(15, 13, 10, 0.95) 0%, rgba(15, 13, 10, 0.55) 50%, rgba(15, 13, 10, 0.35) 100%)',
+          zIndex: 5
+        }}></div>
+
+        {/* Custom Large Geometric Orbit Blueprint Layout Container */}
+        <div style={{
+          position: 'absolute',
+          right: '-180px',
+          top: '50px',
+          opacity: 0.55,
+          transform: 'translate3d(0px, 0px, 0px)',
+          zIndex: 2
+        }}>
+          <div aria-hidden="true" style={{ position: 'absolute', width: '720px', height: '720px', pointerEvents: 'none' }}>
+            <svg width="720" height="720" viewBox="0 0 100 100" className="bj-orbit-slow" style={{ position: 'absolute', inset: '0px' }}>
+              <circle cx="50" cy="50" r="48" fill="none" stroke="#c9a96e" strokeWidth="0.15" opacity="0.6" strokeDasharray="0.3 1.5"></circle>
+              <circle cx="50" cy="50" r="38" fill="none" stroke="#c9a96e" strokeWidth="0.2" opacity="0.5"></circle>
+              <g fill="#c9a96e" opacity="0.6">
+                <circle cx="88" cy="50" r="0.6"></circle>
+                <circle cx="82.90896534380867" cy="69" r="0.6"></circle>
+                <circle cx="69" cy="82.90896534380866" r="0.6"></circle>
+                <circle cx="50" cy="88" r="0.6"></circle>
+                <circle cx="31.000000000000007" cy="82.90896534380867" r="0.6"></circle>
+                <circle cx="17.091034656191326" cy="69" r="0.6"></circle>
+                <circle cx="12" cy="50.00000000000001" r="0.6"></circle>
+                <circle cx="17.091034656191333" cy="30.999999999999996" r="0.6"></circle>
+                <circle cx="30.999999999999982" cy="17.09103465619134" r="0.6"></circle>
+                <circle cx="49.99999999999999" cy="12" r="0.6"></circle>
+                <circle cx="69" cy="17.091034656191333" r="0.6"></circle>
+                <circle cx="82.90896534380866" cy="30.999999999999982" r="0.6"></circle>
+              </g>
+            </svg>
+            <svg width="720" height="720" viewBox="0 0 100 100" className="bj-orbit-slow-rev" style={{ position: 'absolute', inset: '0px' }}>
+              <circle cx="50" cy="50" r="28" fill="none" stroke="#c9a96e" strokeWidth="0.3" opacity="0.4"></circle>
+              <circle cx="50" cy="50" r="20" fill="none" stroke="#c9a96e" strokeWidth="0.25" opacity="0.35" strokeDasharray="0.5 1.2"></circle>
+            </svg>
+          </div>
+        </div>
+
+        {/* Rotating background base gradient SVG layer */}
         <svg
           className="absolute left-0 top-1/2 -translate-y-1/2 w-[180vw] max-w-none opacity-100 animate-bj-grad-shift"
           width="100%"
           height="100%"
           viewBox="0 0 100 125"
           preserveAspectRatio="xMinYMid slice"
+          style={{ zIndex: 1 }}
         >
           <defs>
             <radialGradient id="g1" cx="20%" cy="45%" r="95%">
@@ -89,7 +207,7 @@ export default function HeroSection() {
       </div>
 
       {/* Top Header Label */}
-      <div className="text-[11px] tracking-[0.4em] text-[#dbb86b] text-thin uppercase opacity-80 font-sans fade-in-up fade-in-up-1">
+      <div className="text-[11px] tracking-[0.4em] text-[#dbb86b] text-thin uppercase opacity-80 font-sans fade-in-up fade-in-up-1 z-10">
         <span className="inline-block animate-[float_4s_ease-in-out_infinite]">
           <span className="relative inline-block select-none">
             <span className="absolute inset-0 text-transparent [-webkit-text-stroke:1px_#d4b77a] pointer-events-none">
@@ -104,7 +222,7 @@ export default function HeroSection() {
       </div>
 
       {/* Main Content Area */}
-      <div className="grow flex items-end"> 
+      <div className="grow flex items-end z-10"> 
         {/* LEFT SIDE TEXT */}
         <div className="flex flex-col max-w-4xl lg:pr-380px w-full"> 
           
@@ -176,7 +294,7 @@ export default function HeroSection() {
       </div>
       
       {/* Bottom Center Indicator */}
-      <div className="flex flex-col items-center mx-auto space-y-2 font-sans opacity-50 pt-4">
+      <div className="flex flex-col items-center mx-auto space-y-2 font-sans opacity-50 pt-4 z-10">
         <span className="text-[9px] tracking-[0.4em] uppercase text-cream-luxury">SCROLL</span>
         <div className="w-[1px] h-7 bg-cream-luxury/60 animate-[bounce-y_3s_ease-in-out_infinite]"></div>
       </div>
