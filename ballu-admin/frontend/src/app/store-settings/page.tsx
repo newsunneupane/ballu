@@ -18,6 +18,7 @@ interface FormState {
   phoneNumbers: string[];
   timings: TimingSlot[];
   tickerItems: string[];
+  pieceOfTheWeek: { material: string; category: string; item: string };
 }
 
 const emptySlot = (): TimingSlot => ({ dayFrom: 'Mon', dayTo: 'Sat', timeFrom: '10', timeTo: '19' });
@@ -28,19 +29,44 @@ export default function StoreSettingsPage() {
     phoneNumbers: [''],
     timings: [emptySlot()],
     tickerItems: [''],
+    pieceOfTheWeek: { material: '', category: '', item: '' },
   });
   const [saved, setSaved] = useState(false);
+  const [materials, setMaterials] = useState<any[]>([]);
+  const [categories, setCategories] = useState<any[]>([]);
+  const [filteredItems, setFilteredItems] = useState<any[]>([]);
 
   useEffect(() => {
-    api.storeSettings.get().then((settings) => {
+    Promise.all([
+      api.materials.list(),
+      api.categories.list(),
+      api.storeSettings.get(),
+    ]).then(([mats, cats, settings]) => {
+      setMaterials(mats);
+      setCategories(cats);
+      const savedMaterial = settings.pieceOfTheWeek?.material?._id || settings.pieceOfTheWeek?.material || '';
+      const savedCategory = settings.pieceOfTheWeek?.category?._id || settings.pieceOfTheWeek?.category || '';
+      const gold = mats.find((m: any) => m.name?.en === 'Gold');
       setForm({
         contactEmail: settings.contactEmail || '',
         phoneNumbers: settings.phoneNumbers?.length ? settings.phoneNumbers : [''],
         timings: settings.timings?.length ? settings.timings : [emptySlot()],
         tickerItems: settings.tickerItems?.length ? settings.tickerItems : [''],
+        pieceOfTheWeek: {
+          material: savedMaterial || (gold ? gold._id : ''),
+          category: savedCategory || '',
+          item: settings.pieceOfTheWeek?.item?._id || settings.pieceOfTheWeek?.item || '',
+        },
       });
     });
   }, []);
+
+  useEffect(() => {
+    const params: Record<string, string> = {};
+    if (form.pieceOfTheWeek.material) params.material = form.pieceOfTheWeek.material;
+    if (form.pieceOfTheWeek.category) params.category = form.pieceOfTheWeek.category;
+    api.items.list(Object.keys(params).length ? params : undefined).then(setFilteredItems);
+  }, [form.pieceOfTheWeek.material, form.pieceOfTheWeek.category]);
 
   const updatePhone = (index: number, value: string) => {
     const phones = [...form.phoneNumbers];
@@ -89,6 +115,13 @@ export default function StoreSettingsPage() {
       phoneNumbers: form.phoneNumbers.filter(Boolean),
       timings: form.timings,
       tickerItems: form.tickerItems.filter(Boolean),
+      pieceOfTheWeek: form.pieceOfTheWeek.item
+        ? {
+            material: form.pieceOfTheWeek.material,
+            category: form.pieceOfTheWeek.category,
+            item: form.pieceOfTheWeek.item,
+          }
+        : null,
     });
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
@@ -179,6 +212,82 @@ export default function StoreSettingsPage() {
               </div>
             ))}
             <button onClick={addTickerItem} className="text-[#dbb86b] text-xs hover:underline">+ Add ticker item</button>
+          </div>
+        </div>
+
+        <div className="border-t border-[#1f1a10] pt-6">
+          <h2 className="text-sm font-semibold text-[#fbf7f0] mb-4">Piece of the Week</h2>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-[10px] tracking-[0.2em] uppercase text-[#6e695f] mb-1.5">Material</label>
+              <select
+                value={form.pieceOfTheWeek.material}
+                onChange={(e) => setForm({ ...form, pieceOfTheWeek: { material: e.target.value, category: '', item: '' } })}
+                className="w-full bg-[#0f0c0a] border border-[#1f1a10] rounded px-3 py-2 text-sm text-[#e5e5e0] focus:outline-none focus:border-[#dbb86b]"
+              >
+                <option value="">All Materials</option>
+                {materials.map((m: any) => (
+                  <option key={m._id} value={m._id}>{m.name.en}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-[10px] tracking-[0.2em] uppercase text-[#6e695f] mb-1.5">Category</label>
+              <select
+                value={form.pieceOfTheWeek.category}
+                onChange={(e) => setForm({ ...form, pieceOfTheWeek: { ...form.pieceOfTheWeek, category: e.target.value, item: '' } })}
+                className="w-full bg-[#0f0c0a] border border-[#1f1a10] rounded px-3 py-2 text-sm text-[#e5e5e0] focus:outline-none focus:border-[#dbb86b]"
+              >
+                <option value="">All Categories</option>
+                {categories.map((c: any) => (
+                  <option key={c._id} value={c._id}>{c.name.en}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-[10px] tracking-[0.2em] uppercase text-[#6e695f] mb-1.5">Item</label>
+              <select
+                value={form.pieceOfTheWeek.item}
+                onChange={(e) => {
+                    const itemId = e.target.value;
+                    const selectedItem = filteredItems.find((i: any) => i._id === itemId);
+                    const catId = selectedItem?.category?._id || selectedItem?.category || '';
+                    setForm({ ...form, pieceOfTheWeek: { ...form.pieceOfTheWeek, item: itemId, category: catId } });
+                  }}
+                className="w-full bg-[#0f0c0a] border border-[#1f1a10] rounded px-3 py-2 text-sm text-[#e5e5e0] focus:outline-none focus:border-[#dbb86b]"
+              >
+                <option value="">All Items</option>
+                {filteredItems.map((i: any) => (
+                  <option key={i._id} value={i._id}>
+                    {i.name?.en} {i.purity ? `· ${i.purity}` : ''} {i.weightGrams ? `· ${i.weightGrams}g` : ''}
+                  </option>
+                ))}
+              </select>
+            </div>
+            {form.pieceOfTheWeek.item && filteredItems.length > 0 && (
+              <div className="flex items-center gap-3 bg-[#0f0c0a] border border-[#1f1a10] rounded-lg p-3">
+                {(() => {
+                  const selected = filteredItems.find((i) => i._id === form.pieceOfTheWeek.item);
+                  return selected ? (
+                    <>
+                      {selected.images?.[0] ? (
+                        <img src={selected.images[0]} alt="" className="w-14 h-14 object-cover rounded border border-[#1f1a10]" />
+                      ) : (
+                        <div className="w-14 h-14 rounded border border-[#1f1a10] bg-[#0a0806]" />
+                      )}
+                      <div>
+                        <p className="text-sm text-[#fbf7f0] font-medium">{selected.name?.en}</p>
+                        <p className="text-[10px] text-[#6e695f] mt-0.5">
+                          {selected.purity ? `${selected.purity} · ` : ''}
+                          {selected.weightGrams ? `${selected.weightGrams}g` : ''}
+                          {selected.finalPrice != null ? ` · Rs ${selected.finalPrice.toLocaleString()}` : ''}
+                        </p>
+                      </div>
+                    </>
+                  ) : null;
+                })()}
+              </div>
+            )}
           </div>
         </div>
 

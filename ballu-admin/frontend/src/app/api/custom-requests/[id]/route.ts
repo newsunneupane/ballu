@@ -13,8 +13,10 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     const { id } = await params;
     await connectDB();
     const request = await CustomRequest.findById(id).populate('category', 'name').populate('material', 'name');
-    if (!request) return NextResponse.json({ error: 'CustomRequest not found' }, { status: 404 });
-    return NextResponse.json(request);
+    if (!request) return NextResponse.json({ error: 'CustomRequest not found' }, { status: 404, headers: { 'Cache-Control': 'no-store' } });
+    return NextResponse.json(request, {
+      headers: { 'Cache-Control': 'no-store' },
+    });
   } catch (err) {
     return errorResponse(err);
   }
@@ -28,8 +30,10 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     await connectDB();
     const body = await req.json();
     const request = await CustomRequest.findByIdAndUpdate(id, body, { new: true, runValidators: true }).populate('category', 'name').populate('material', 'name');
-    if (!request) return NextResponse.json({ error: 'CustomRequest not found' }, { status: 404 });
-    return NextResponse.json(request);
+    if (!request) return NextResponse.json({ error: 'CustomRequest not found' }, { status: 404, headers: { 'Cache-Control': 'no-store' } });
+    return NextResponse.json(request, {
+      headers: { 'Cache-Control': 'no-store' },
+    });
   } catch (err) {
     return errorResponse(err);
   }
@@ -42,8 +46,10 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     const { id } = await params;
     await connectDB();
     const request = await CustomRequest.findByIdAndDelete(id);
-    if (!request) return NextResponse.json({ error: 'CustomRequest not found' }, { status: 404 });
-    return NextResponse.json({ message: 'CustomRequest deleted' });
+    if (!request) return NextResponse.json({ error: 'CustomRequest not found' }, { status: 404, headers: { 'Cache-Control': 'no-store' } });
+    return NextResponse.json({ message: 'CustomRequest deleted' }, {
+      headers: { 'Cache-Control': 'no-store' },
+    });
   } catch (err) {
     return errorResponse(err);
   }

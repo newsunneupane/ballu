@@ -35,9 +35,6 @@ export const api = {
   customRequests: {
     create: (data: any) => request<any>('/custom-requests', { method: 'POST', body: JSON.stringify(data) }),
   },
-  itemInquiries: {
-    create: (data: any) => request<any>('/item-inquiries', { method: 'POST', body: JSON.stringify(data) }),
-  },
   storeSettings: {
     get: () => request<any>('/store-settings'),
   },

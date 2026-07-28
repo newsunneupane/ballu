@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { api } from '@/lib/api';
-import { Plus, Pencil, Trash2, X } from 'lucide-react';
+import { Plus, Pencil, Trash2, X, Upload, Database } from 'lucide-react';
 
 export default function ItemsPage() {
   const [items, setItems] = useState<any[]>([]);
@@ -16,12 +16,22 @@ export default function ItemsPage() {
     makingCharges: '', boutiqueDeduction: '', diamondValue: '',
     stonesDetails: '', karigarName: '', images: '',
   });
+  const [showBulk, setShowBulk] = useState(false);
+  const [bulkJson, setBulkJson] = useState('');
+  const [bulkResult, setBulkResult] = useState<string | null>(null);
+  const [seeding, setSeeding] = useState(false);
+  const [seedResult, setSeedResult] = useState<string | null>(null);
+  const [filterCategory, setFilterCategory] = useState('');
+  const [filterMaterial, setFilterMaterial] = useState('');
 
   const load = useCallback(() => {
-    api.items.list().then(setItems);
+    const params: Record<string, string> = {};
+    if (filterCategory) params.category = filterCategory;
+    if (filterMaterial) params.material = filterMaterial;
+    api.items.list(Object.keys(params).length ? params : undefined).then(setItems);
     api.materials.list().then(setMaterials);
     api.categories.list().then(setCategories);
-  }, []);
+  }, [filterCategory, filterMaterial]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -84,15 +94,83 @@ export default function ItemsPage() {
     load();
   };
 
+  const handleBulkUpload = async () => {
+    setBulkResult(null);
+    try {
+      const data = JSON.parse(bulkJson);
+      const arr = Array.isArray(data) ? data : data.items;
+      if (!Array.isArray(arr) || arr.length === 0) throw new Error('Provide an array of items');
+      const res = await api.items.bulkCreate(arr);
+      setBulkResult(`Created ${res.count} items successfully`);
+      setBulkJson('');
+      load();
+    } catch (err: any) {
+      setBulkResult(`Error: ${err.message}`);
+    }
+  };
+
+  const handleSeed = async () => {
+    if (!confirm('This will seed 40 random items. Continue?')) return;
+    setSeeding(true);
+    setSeedResult(null);
+    try {
+      const token = localStorage.getItem('bj_token');
+      const res = await fetch('/api/seed', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+        body: JSON.stringify({ seedItems: true }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      setSeedResult(data.created?.join(', ') || `${data.itemCount} items seeded`);
+      load();
+    } catch (err: any) {
+      setSeedResult(`Error: ${err.message}`);
+    } finally {
+      setSeeding(false);
+    }
+  };
+
   const tags = ['new-arrival', 'best-seller', 'limited-edition', 'sale', 'bestseller', 'trending'];
 
   return (
     <div>
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-2xl font-semibold text-[#fbf7f0]">Items</h1>
-        <button onClick={openNew} className="flex items-center gap-2 bg-[#dbb86b] text-[#0a0806] px-4 py-2 rounded text-sm font-medium hover:bg-[#c9a96e] transition-colors">
-          <Plus size={16} /> Add Item
-        </button>
+        <div className="flex gap-2">
+          <button onClick={() => { setBulkJson(''); setBulkResult(null); setShowBulk(true); }} className="flex items-center gap-2 bg-[#0f0c0a] border border-[#1f1a10] text-[#e5e5e0] px-4 py-2 rounded text-sm font-medium hover:border-[#dbb86b] transition-colors">
+            <Upload size={16} /> Bulk Upload
+          </button>
+          <button onClick={handleSeed} disabled={seeding} className="flex items-center gap-2 bg-[#0f0c0a] border border-[#1f1a10] text-[#e5e5e0] px-4 py-2 rounded text-sm font-medium hover:border-[#dbb86b] transition-colors disabled:opacity-50">
+            <Database size={16} /> {seeding ? 'Seeding...' : 'Seed 40 Items'}
+          </button>
+          <button onClick={openNew} className="flex items-center gap-2 bg-[#dbb86b] text-[#0a0806] px-4 py-2 rounded text-sm font-medium hover:bg-[#c9a96e] transition-colors">
+            <Plus size={16} /> Add Item
+          </button>
+        </div>
+      </div>
+
+      <div className="flex gap-3 mb-4">
+        <select
+          value={filterCategory}
+          onChange={(e) => setFilterCategory(e.target.value)}
+          className="bg-[#0f0c0a] border border-[#1f1a10] rounded px-3 py-2 text-xs text-[#e5e5e0] focus:outline-none focus:border-[#dbb86b]"
+        >
+          <option value="">All Categories</option>
+          {categories.map((c: any) => (
+            <option key={c._id} value={c._id}>{c.name.en}</option>
+          ))}
+        </select>
+        <select
+          value={filterMaterial}
+          onChange={(e) => setFilterMaterial(e.target.value)}
+          className="bg-[#0f0c0a] border border-[#1f1a10] rounded px-3 py-2 text-xs text-[#e5e5e0] focus:outline-none focus:border-[#dbb86b]"
+        >
+          <option value="">All Materials</option>
+          {materials.map((m: any) => (
+            <option key={m._id} value={m._id}>{m.name.en}</option>
+          ))}
+        </select>
       </div>
 
       <div className="bg-[#0f0c0a] border border-[#1f1a10] rounded-lg overflow-x-auto">
@@ -201,7 +279,7 @@ export default function ItemsPage() {
               </div>
               <div>
                 <label className="block text-[10px] tracking-[0.2em] uppercase text-[#6e695f] mb-1.5">Diamond Value (Rs)</label>
-                <input type="number" value={form.diamondValue} onChange={(e) => setForm({ ...form, diamondValue: e.target.value })} className="w-full bg-[#0a0806] border border-[#1f1a10] rounded px-3 py-2 text-sm text-[#e5e5e0] focus:outline-none focus:border-[#dbb86b]" />
+                <input type="number" value={form.diamondValue} onChange={(e) => setForm({ ...form, diamondValue: e.target.value })} className="w-full bg-[#0a0806] border border-[#1f1a10" />
               </div>
               <div>
                 <label className="block text-[10px] tracking-[0.2em] uppercase text-[#6e695f] mb-1.5">Karigar Name</label>
@@ -219,6 +297,47 @@ export default function ItemsPage() {
             <button onClick={save} className="w-full bg-[#dbb86b] text-[#0a0806] py-2.5 rounded text-sm font-medium hover:bg-[#c9a96e] transition-colors mt-5">
               {editing ? 'Update Item' : 'Create Item'}
             </button>
+          </div>
+        </div>
+      )}
+
+      {showBulk && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 overflow-y-auto py-8" onClick={() => setShowBulk(false)}>
+          <div className="bg-[#0f0c0a] border border-[#1f1a10] rounded-lg p-6 w-full max-w-2xl mx-4 my-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="text-lg font-semibold text-[#fbf7f0]">Bulk Upload Items</h2>
+              <button onClick={() => setShowBulk(false)} className="text-[#6e695f] hover:text-[#e5e5e0]"><X size={18} /></button>
+            </div>
+            <p className="text-xs text-[#6e695f] mb-3">Paste a JSON array of items. Each item needs <span className="text-[#dbb86b]">category</span>, <span className="text-[#dbb86b]">material</span> (IDs), <span className="text-[#dbb86b]">name</span> (object with <span className="text-[#dbb86b]">en</span>/<span className="text-[#dbb86b]">np</span>), and <span className="text-[#dbb86b]">weightGrams</span>.</p>
+            <textarea
+              value={bulkJson}
+              onChange={(e) => setBulkJson(e.target.value)}
+              rows={12}
+              className="w-full bg-[#0a0806] border border-[#1f1a10] rounded px-3 py-2 text-sm text-[#e5e5e0] font-mono focus:outline-none focus:border-[#dbb86b]"
+              placeholder='[{&quot;category&quot;: &quot;...&quot;, &quot;material&quot;: &quot;...&quot;, &quot;name&quot;: {&quot;en&quot;: &quot;Item Name&quot;, &quot;np&quot;: &quot;...&quot;}, &quot;weightGrams&quot;: 10}]'
+            />
+            {bulkResult && (
+              <div className={`mt-3 text-sm px-3 py-2 rounded ${bulkResult.startsWith('Error') ? 'text-red-400 bg-red-400/10' : 'text-green-400 bg-green-400/10'}`}>
+                {bulkResult}
+              </div>
+            )}
+            <div className="flex gap-2 mt-4">
+              <button onClick={handleBulkUpload} className="flex-1 bg-[#dbb86b] text-[#0a0806] py-2.5 rounded text-sm font-medium hover:bg-[#c9a96e] transition-colors">
+                Upload Items
+              </button>
+              <button onClick={() => { setBulkJson(''); setBulkResult(null); }} className="bg-[#1f1a10] text-[#e5e5e0] px-4 py-2.5 rounded text-sm hover:bg-[#2a2418] transition-colors">
+                Clear
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {seedResult && (
+        <div className="fixed bottom-6 right-6 max-w-md bg-[#0f0c0a] border border-[#1f1a10] rounded-lg p-4 shadow-xl z-50">
+          <div className="flex items-start justify-between gap-3">
+            <p className={`text-sm ${seedResult.startsWith('Error') ? 'text-red-400' : 'text-green-400'}`}>{seedResult}</p>
+            <button onClick={() => setSeedResult(null)} className="text-[#6e695f] hover:text-[#e5e5e0] shrink-0"><X size={14} /></button>
           </div>
         </div>
       )}

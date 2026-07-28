@@ -4,6 +4,8 @@ import ItemInquiry from '@/lib/models/ItemInquiry';
 import { requireAuth } from '@/lib/auth/middleware';
 import { errorResponse } from '@/lib/api-utils';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(req: NextRequest) {
   try {
     const authError = requireAuth(req);
@@ -15,7 +17,9 @@ export async function GET(req: NextRequest) {
     if (status) filter.status = status;
 
     const inquiries = await ItemInquiry.find(filter).populate('item', 'name images').sort({ createdAt: -1 });
-    return NextResponse.json(inquiries);
+    return NextResponse.json(inquiries, {
+      headers: { 'Cache-Control': 'no-store' },
+    });
   } catch (err) {
     return errorResponse(err);
   }
@@ -27,7 +31,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const inquiry = await ItemInquiry.create(body);
     const populated = await inquiry.populate('item', 'name images');
-    return NextResponse.json(populated, { status: 201 });
+    return NextResponse.json(populated, { status: 201, headers: { 'Cache-Control': 'no-store' } });
   } catch (err) {
     return errorResponse(err);
   }

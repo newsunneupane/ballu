@@ -1,5 +1,7 @@
 import DailyRate from '@/lib/models/DailyRate';
 
+const rateCache = new Map<string, Awaited<ReturnType<typeof DailyRate.findOne>>>();
+
 export async function calculateFinalPrice(params: {
   materialId: string;
   weightGrams: number;
@@ -10,9 +12,13 @@ export async function calculateFinalPrice(params: {
 }): Promise<{ finalPrice: number; goldValue: number; wastage: number; making: number; deduction: number }> {
   const { materialId, weightGrams, wastageGrams, makingCharges, boutiqueDeduction, diamondValue } = params;
 
-  const latestRate = await DailyRate.findOne({ material: materialId })
-    .sort({ date: -1 })
-    .lean();
+  let latestRate = rateCache.get(materialId);
+  if (!latestRate) {
+    latestRate = await DailyRate.findOne({ material: materialId })
+      .sort({ date: -1 })
+      .lean();
+    if (latestRate) rateCache.set(materialId, latestRate);
+  }
 
   if (!latestRate) {
     throw new Error(`No daily rate found for material ${materialId}`);

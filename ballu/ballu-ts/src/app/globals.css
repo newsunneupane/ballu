@@ -31,10 +31,9 @@ html {
   --color-cream-luxury: #f4edd9;
 }
 
-html,
-body {
+html, body {
   min-height: 100%;
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 body {

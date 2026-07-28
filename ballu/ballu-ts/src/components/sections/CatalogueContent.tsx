@@ -44,7 +44,7 @@ export default function CatalogueContent({
   );
   const [activeMaterial, setActiveMaterial] = useState('ALL');
   const [viewMode, setViewMode] = useState<'GRID' | 'LIST'>('GRID');
-  const { containerRef, isFixed } = useFilterSticky(56);
+  const { containerRef, isFixed } = useFilterSticky(50);
   const dataReady = useProductData();
 
   const handleCategoryClick = (cat: string) => {
@@ -108,7 +108,7 @@ export default function CatalogueContent({
       <div ref={containerRef} className="w-full h-[97px] relative">
         <div
           className={`w-full bg-[#0f0d0a]/95 backdrop-blur-md pb-4 pt-4 border-b border-[#2b2415] px-4 sm:px-6 md:px-16 lg:px-15 left-0 right-0 ${
-            isFixed ? 'fixed top-[56px] md:top-[68px] z-[49] shadow-2xl' : 'absolute top-0'
+            isFixed ? 'fixed top-[50px] z-[49] shadow-2xl' : 'absolute top-0'
           }`}
         >
           <div className="flex flex-col gap-3 max-w-[100vw]">

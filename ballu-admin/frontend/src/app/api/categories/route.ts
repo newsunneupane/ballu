@@ -4,11 +4,17 @@ import Category from '@/lib/models/Category';
 import { requireAuth } from '@/lib/auth/middleware';
 import { errorResponse } from '@/lib/api-utils';
 
-export async function GET() {
+export const dynamic = 'force-dynamic';
+
+export async function GET(req: NextRequest) {
   try {
+    const authResult = requireAuth(req);
+    if (authResult) return authResult;
     await connectDB();
     const categories = await Category.find().sort({ createdAt: -1 });
-    return NextResponse.json(categories);
+    return NextResponse.json(categories, {
+      headers: { 'Cache-Control': 'no-store' },
+    });
   } catch (err) {
     return errorResponse(err);
   }
@@ -21,7 +27,7 @@ export async function POST(req: NextRequest) {
     await connectDB();
     const body = await req.json();
     const category = await Category.create(body);
-    return NextResponse.json(category, { status: 201 });
+    return NextResponse.json(category, { status: 201, headers: { 'Cache-Control': 'no-store' } });
   } catch (err) {
     return errorResponse(err);
   }

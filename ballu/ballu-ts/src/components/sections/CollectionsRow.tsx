@@ -20,6 +20,13 @@ const cormorantSC = Cormorant_SC({
   variable: '--font-serif-title',
 });
 
+const MATERIAL_COLORS: Record<string, string> = {
+  GOLD: 'bg-[#dbb86b]',
+  SILVER: 'bg-[#c8c8c8]',
+  PLATINUM: 'bg-[#e5e4e2]',
+  DIAMOND: 'bg-[#b9f2ff]',
+};
+
 export default function CollectionsRow() {
   const dataReady = useProductData();
   const collections = productService.getCategoryCollections();
@@ -161,19 +168,13 @@ export default function CollectionsRow() {
                         <span className="transform group-hover/inner:translate-x-1 transition-transform duration-300">→</span>
                       </span>
                     </div>
-                    <div className="flex items-center gap-3 text-[9px] tracking-[0.2em] uppercase font-sans">
-                      {item.goldCount > 0 && (
-                        <span className="flex items-center gap-1.5">
-                          <span className="w-2 h-2 rounded-full bg-[#dbb86b]" />
-                          {item.goldCount} GOLD
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[9px] tracking-[0.2em] uppercase font-sans">
+                      {item.materialCounts.map((mc) => (
+                        <span key={mc.material} className="flex items-center gap-1.5">
+                          <span className={`w-2 h-2 rounded-full ${MATERIAL_COLORS[mc.material] || 'bg-white/40'}`} />
+                          {mc.count} {mc.material}
                         </span>
-                      )}
-                      {item.silverCount > 0 && (
-                        <span className="flex items-center gap-1.5">
-                          <span className="w-2 h-2 rounded-full bg-[#c8c8c8]" />
-                          {item.silverCount} SILVER
-                        </span>
-                      )}
+                      ))}
                     </div>
                   </div>
                 </div>

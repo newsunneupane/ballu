@@ -5,8 +5,12 @@ import { calculateFinalPrice } from '@/lib/utils/priceCalculator';
 import { requireAuth } from '@/lib/auth/middleware';
 import { errorResponse } from '@/lib/api-utils';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(req: NextRequest) {
   try {
+    const authResult = requireAuth(req);
+    if (authResult) return authResult;
     await connectDB();
     const { searchParams } = new URL(req.url);
     const filter: Record<string, unknown> = {};
@@ -41,7 +45,9 @@ export async function GET(req: NextRequest) {
       })
     );
 
-    return NextResponse.json(itemsWithPrice);
+    return NextResponse.json(itemsWithPrice, {
+      headers: { 'Cache-Control': 'no-store' },
+    });
   } catch (err) {
     return errorResponse(err);
   }
@@ -55,7 +61,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const item = await Item.create(body);
     const populated = await item.populate(['category', 'material']);
-    return NextResponse.json(populated, { status: 201 });
+    return NextResponse.json(populated, { status: 201, headers: { 'Cache-Control': 'no-store' } });
   } catch (err) {
     return errorResponse(err);
   }

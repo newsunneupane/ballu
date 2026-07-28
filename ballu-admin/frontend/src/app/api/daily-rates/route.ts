@@ -4,8 +4,12 @@ import DailyRate from '@/lib/models/DailyRate';
 import { requireAuth } from '@/lib/auth/middleware';
 import { errorResponse } from '@/lib/api-utils';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(req: NextRequest) {
   try {
+    const authResult = requireAuth(req);
+    if (authResult) return authResult;
     await connectDB();
     const { searchParams } = new URL(req.url);
     const filter: Record<string, unknown> = {};
@@ -13,7 +17,9 @@ export async function GET(req: NextRequest) {
     if (material) filter.material = material;
 
     const rates = await DailyRate.find(filter).populate('material', 'name').sort({ date: -1 }).lean();
-    return NextResponse.json(rates);
+    return NextResponse.json(rates, {
+      headers: { 'Cache-Control': 'no-store' },
+    });
   } catch (err) {
     return errorResponse(err);
   }
@@ -27,7 +33,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const rate = await DailyRate.create(body);
     const populated = await rate.populate('material', 'name');
-    return NextResponse.json(populated, { status: 201 });
+    return NextResponse.json(populated, { status: 201, headers: { 'Cache-Control': 'no-store' } });
   } catch (err) {
     return errorResponse(err);
   }

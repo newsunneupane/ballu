@@ -7,6 +7,7 @@ import { FiSearch, FiMenu, FiX } from 'react-icons/fi';
 import { FaWhatsapp } from 'react-icons/fa';
 import { useScrollPosition } from '@/hooks/useScrollPosition';
 import { NAV_LINKS, SITE, WHATSAPP_URL } from '@/lib/constants';
+import SearchOverlay from '@/components/layout/SearchOverlay';
 
 const cormorantSC = Cormorant_SC({
   subsets: ['latin'],
@@ -21,27 +22,25 @@ const cormorant = Cormorant_Garamond({
 export default function Navbar() {
   const { isPinned, isShrunk } = useScrollPosition();
   const [isOpen, setIsOpen] = useState(false);
+  const [showSearch, setShowSearch] = useState(false);
+  const [tickerOffset, setTickerOffset] = useState(32);
+
+  useEffect(() => {
+    const updateOffset = () => {
+      const tickerH = window.innerWidth >= 768 ? 24 : 32;
+      setTickerOffset(Math.max(0, tickerH - window.scrollY));
+    };
+    window.addEventListener('scroll', updateOffset, { passive: true });
+    updateOffset();
+    return () => window.removeEventListener('scroll', updateOffset);
+  }, []);
 
   return (
-    <nav className={`${cormorant.className} bg-black text-[#dbb86b] w-full relative z-50`}>
-      <style>{`
-        @keyframes tickerScroll {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
-        }
-        .animate-ticker { animation: tickerScroll 40s linear infinite; will-change: transform; backface-visibility: hidden; }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-      `}</style>
-
-      <GoldTicker />
-
-      {isPinned && <div className="h-[56px] md:h-[68px] w-full bg-transparent" />}
-
+    <div className={`${cormorant.className} bg-black text-[#dbb86b] w-full fixed z-50`} style={{ top: tickerOffset }}>
       <div
         className={`
-          bg-[#0e0b08] border-b border-[#2b2415] w-full left-0 right-0 transition-all duration-500 ease-in-out
-          ${isPinned ? 'fixed top-0 z-50 shadow-xl' : 'relative'}
+          bg-[#0e0b08] border-b border-[#2b2415] w-full
+          ${isPinned ? 'shadow-xl' : ''}
         `}
       >
         <div
@@ -73,10 +72,13 @@ export default function Navbar() {
             </div>
 
             <div className="flex items-center gap-4 md:gap-6 ml-0 md:ml-4">
-              <span className="relative inline-flex cursor-pointer group text-[rgb(218,206,183)] hover:text-[#d4b77a] transition-all duration-300">
-                <FiSearch size={14} />
-                <span className="absolute left-0 -bottom-1 h-px w-0 bg-[#d4b77a] transition-all duration-500 group-hover:w-full" />
-              </span>
+              <span
+  onClick={() => setShowSearch(true)}
+  className="relative inline-flex cursor-pointer group text-[rgb(218,206,183)] hover:text-[#d4b77a] transition-all duration-300"
+>
+  <FiSearch size={14} />
+  <span className="absolute left-0 -bottom-1 h-px w-0 bg-[#d4b77a] transition-all duration-500 group-hover:w-full" />
+</span>
 
               <a
                 href={WHATSAPP_URL}
@@ -93,54 +95,8 @@ export default function Navbar() {
       </div>
 
       <MobileMenu isOpen={isOpen} onClose={() => setIsOpen(false)} />
-    </nav>
-  );
-}
 
-function GoldTicker() {
-  const [rates, setRates] = useState<{ name: string; ratePerGramNrs: number }[]>([]);
-  const [tickerItems, setTickerItems] = useState<string[]>([]);
-  const [phone, setPhone] = useState('+977 9842 000 000');
-
-  useEffect(() => {
-    fetch('/api/rates/current')
-      .then((r) => r.ok ? r.json() : null)
-      .then((data) => {
-        if (data?.rates) setRates(data.rates);
-      })
-      .catch(() => {});
-    fetch('/api/store-settings')
-      .then((r) => r.ok ? r.json() : null)
-      .then((data) => {
-        if (data) {
-          setTickerItems(data.tickerItems || []);
-          if (data.phoneNumbers?.length) setPhone(data.phoneNumbers[0]);
-        }
-      })
-      .catch(() => {});
-  }, []);
-
-  const rateItems = rates.map((r) => `${r.name.toUpperCase()} ₨ ${r.ratePerGramNrs.toLocaleString('en-IN')}/G`);
-
-  const parts = ['TODAY', ...rateItems, ...tickerItems.filter(Boolean), `WHATSAPP ${phone}`];
-  const text = parts.join(' · ');
-
-  const content = (
-    <span className="inline-flex items-center shrink-0">
-      <span>{text}</span>
-      <span className="inline-block w-32" />
-    </span>
-  );
-
-  return (
-    <div className="bg-black border-b border-[#2b2415]/30">
-      <div className="w-full mx-auto h-8 md:h-6 flex items-center text-[11px] tracking-[4px] uppercase [font-variant-numeric:lining-nums] overflow-hidden">
-        <div className="flex w-full whitespace-nowrap overflow-hidden relative">
-          <div className="animate-ticker inline-flex shrink-0">
-            {content}{content}
-          </div>
-        </div>
-      </div>
+      {showSearch && <SearchOverlay onClose={() => setShowSearch(false)} />}
     </div>
   );
 }
@@ -193,7 +149,7 @@ function MobileMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
   return (
     <div
       className={`md:hidden fixed inset-x-0 bottom-0 bg-[#0e0b08]/98 border-t border-[#2b2415] backdrop-blur-lg transition-all duration-500 ease-in-out overflow-y-auto z-40 no-scrollbar ${
-        isOpen ? 'top-[88px] opacity-100 visible' : 'top-[100%] opacity-0 invisible'
+        isOpen ? 'top-[56px] md:top-[68px] opacity-100 visible' : 'top-[100%] opacity-0 invisible'
       }`}
     >
       <div className="flex flex-col items-center justify-center space-y-6 min-h-full pb-24 text-[16px] tracking-[6px] uppercase text-[rgb(218,206,183)] px-6">

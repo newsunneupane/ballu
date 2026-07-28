@@ -1,10 +1,14 @@
+export interface MaterialCount {
+  material: string;
+  count: number;
+}
+
 export interface Collection {
   id: string;
   nepaliTitle: string;
   englishTitle: string;
   pieces: string;
-  goldCount: number;
-  silverCount: number;
+  materialCounts: MaterialCount[];
   glowStyle: string;
   borderColor: string;
   slug: string;

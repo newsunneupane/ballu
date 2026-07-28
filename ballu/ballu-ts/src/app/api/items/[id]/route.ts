@@ -7,7 +7,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
   const { id } = await params;
   await connectDB();
   const item = await Item.findById(id).populate('category', 'name').populate('material', 'name').lean();
-  if (!item) return NextResponse.json({ error: 'Item not found' }, { status: 404 });
+  if (!item) return NextResponse.json({ error: 'Item not found' }, { status: 404, headers: { 'Cache-Control': 'public, max-age=300' } });
 
   try {
     const pricing = await calculateFinalPrice({
@@ -18,8 +18,12 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
       boutiqueDeduction: item.boutiqueDeduction,
       diamondValue: item.diamondValue,
     });
-    return NextResponse.json({ ...item, pricing });
+    return NextResponse.json({ ...item, pricing }, {
+      headers: { 'Cache-Control': 'public, max-age=300' },
+    });
   } catch {
-    return NextResponse.json({ ...item, pricing: null });
+    return NextResponse.json({ ...item, pricing: null }, {
+      headers: { 'Cache-Control': 'public, max-age=300' },
+    });
   }
 }

@@ -3,6 +3,10 @@ import { connectDB } from '@/lib/db';
 import Item from '@/lib/models/Item';
 import { calculateFinalPrice } from '@/lib/utils/priceCalculator';
 
+function isValidObjectId(id: string): boolean {
+  return /^[a-f\d]{24}$/i.test(id);
+}
+
 export async function GET(req: NextRequest) {
   await connectDB();
   const { searchParams } = new URL(req.url);
@@ -10,9 +14,24 @@ export async function GET(req: NextRequest) {
   const category = searchParams.get('category');
   const material = searchParams.get('material');
   const tag = searchParams.get('tag');
-  if (category) filter.category = category;
-  if (material) filter.material = material;
-  if (tag) filter.tag = tag;
+  if (category) {
+    if (!isValidObjectId(category)) {
+      return NextResponse.json({ error: 'Invalid category parameter' }, { status: 400 });
+    }
+    filter.category = category;
+  }
+  if (material) {
+    if (!isValidObjectId(material)) {
+      return NextResponse.json({ error: 'Invalid material parameter' }, { status: 400 });
+    }
+    filter.material = material;
+  }
+  if (tag) {
+    if (typeof tag !== 'string' || tag.length > 100 || /[<>$]/.test(tag)) {
+      return NextResponse.json({ error: 'Invalid tag parameter' }, { status: 400 });
+    }
+    filter.tag = tag;
+  }
 
   const items = await Item.find(filter)
     .populate('category', 'name')
@@ -38,5 +57,7 @@ export async function GET(req: NextRequest) {
     })
   );
 
-  return NextResponse.json(itemsWithPricing);
+  return NextResponse.json(itemsWithPricing, {
+    headers: { 'Cache-Control': 'public, max-age=300' },
+  });
 }

@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema, Document, Types } from 'mongoose';
 
 export interface ITimingSlot {
   dayFrom: string;
@@ -12,6 +12,11 @@ export interface IStoreSettings extends Document {
   phoneNumbers: string[];
   timings: ITimingSlot[];
   tickerItems: string[];
+  pieceOfTheWeek?: {
+    material: Types.ObjectId;
+    category: Types.ObjectId;
+    item: Types.ObjectId;
+  };
 }
 
 const TimingSlotSchema = new Schema<ITimingSlot>(
@@ -30,6 +35,14 @@ const StoreSettingsSchema = new Schema<IStoreSettings>(
     phoneNumbers: [{ type: String }],
     timings: { type: [TimingSlotSchema], default: [] },
     tickerItems: [{ type: String }],
+    pieceOfTheWeek: {
+      type: {
+        material: { type: Schema.Types.ObjectId, ref: 'Material' },
+        category: { type: Schema.Types.ObjectId, ref: 'Category' },
+        item: { type: Schema.Types.ObjectId, ref: 'Item' },
+      },
+      default: undefined,
+    },
   },
   { timestamps: true }
 );

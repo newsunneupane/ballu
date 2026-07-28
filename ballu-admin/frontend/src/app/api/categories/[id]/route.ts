@@ -4,13 +4,19 @@ import Category from '@/lib/models/Category';
 import { requireAuth } from '@/lib/auth/middleware';
 import { errorResponse } from '@/lib/api-utils';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const authResult = requireAuth(_req);
+    if (authResult) return authResult;
     const { id } = await params;
     await connectDB();
     const category = await Category.findById(id);
-    if (!category) return NextResponse.json({ error: 'Category not found' }, { status: 404 });
-    return NextResponse.json(category);
+    if (!category) return NextResponse.json({ error: 'Category not found' }, { status: 404, headers: { 'Cache-Control': 'no-store' } });
+    return NextResponse.json(category, {
+      headers: { 'Cache-Control': 'no-store' },
+    });
   } catch (err) {
     return errorResponse(err);
   }
@@ -24,8 +30,10 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     await connectDB();
     const body = await req.json();
     const category = await Category.findByIdAndUpdate(id, body, { new: true, runValidators: true });
-    if (!category) return NextResponse.json({ error: 'Category not found' }, { status: 404 });
-    return NextResponse.json(category);
+    if (!category) return NextResponse.json({ error: 'Category not found' }, { status: 404, headers: { 'Cache-Control': 'no-store' } });
+    return NextResponse.json(category, {
+      headers: { 'Cache-Control': 'no-store' },
+    });
   } catch (err) {
     return errorResponse(err);
   }
@@ -38,8 +46,10 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     const { id } = await params;
     await connectDB();
     const category = await Category.findByIdAndDelete(id);
-    if (!category) return NextResponse.json({ error: 'Category not found' }, { status: 404 });
-    return NextResponse.json({ message: 'Category deleted' });
+    if (!category) return NextResponse.json({ error: 'Category not found' }, { status: 404, headers: { 'Cache-Control': 'no-store' } });
+    return NextResponse.json({ message: 'Category deleted' }, {
+      headers: { 'Cache-Control': 'no-store' },
+    });
   } catch (err) {
     return errorResponse(err);
   }

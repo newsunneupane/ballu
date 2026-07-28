@@ -5,12 +5,16 @@ import { calculateFinalPrice } from '@/lib/utils/priceCalculator';
 import { requireAuth } from '@/lib/auth/middleware';
 import { errorResponse } from '@/lib/api-utils';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const authResult = requireAuth(_req);
+    if (authResult) return authResult;
     const { id } = await params;
     await connectDB();
     const item = await Item.findById(id).populate('category', 'name').populate('material', 'name').lean();
-    if (!item) return NextResponse.json({ error: 'Item not found' }, { status: 404 });
+    if (!item) return NextResponse.json({ error: 'Item not found' }, { status: 404, headers: { 'Cache-Control': 'no-store' } });
 
     try {
       const finalPrice = await calculateFinalPrice({
@@ -21,9 +25,13 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
         boutiqueDeduction: item.boutiqueDeduction,
         diamondValue: item.diamondValue,
       });
-      return NextResponse.json({ ...item, finalPrice });
+      return NextResponse.json({ ...item, finalPrice }, {
+        headers: { 'Cache-Control': 'no-store' },
+      });
     } catch {
-      return NextResponse.json({ ...item, finalPrice: null });
+      return NextResponse.json({ ...item, finalPrice: null }, {
+        headers: { 'Cache-Control': 'no-store' },
+      });
     }
   } catch (err) {
     return errorResponse(err);
@@ -38,8 +46,10 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     await connectDB();
     const body = await req.json();
     const item = await Item.findByIdAndUpdate(id, body, { new: true, runValidators: true }).populate(['category', 'material']);
-    if (!item) return NextResponse.json({ error: 'Item not found' }, { status: 404 });
-    return NextResponse.json(item);
+    if (!item) return NextResponse.json({ error: 'Item not found' }, { status: 404, headers: { 'Cache-Control': 'no-store' } });
+    return NextResponse.json(item, {
+      headers: { 'Cache-Control': 'no-store' },
+    });
   } catch (err) {
     return errorResponse(err);
   }
@@ -52,8 +62,10 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     const { id } = await params;
     await connectDB();
     const item = await Item.findByIdAndDelete(id);
-    if (!item) return NextResponse.json({ error: 'Item not found' }, { status: 404 });
-    return NextResponse.json({ message: 'Item deleted' });
+    if (!item) return NextResponse.json({ error: 'Item not found' }, { status: 404, headers: { 'Cache-Control': 'no-store' } });
+    return NextResponse.json({ message: 'Item deleted' }, {
+      headers: { 'Cache-Control': 'no-store' },
+    });
   } catch (err) {
     return errorResponse(err);
   }

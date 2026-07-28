@@ -4,11 +4,17 @@ import Material from '@/lib/models/Material';
 import { requireAuth } from '@/lib/auth/middleware';
 import { errorResponse } from '@/lib/api-utils';
 
-export async function GET() {
+export const dynamic = 'force-dynamic';
+
+export async function GET(req: NextRequest) {
   try {
+    const authResult = requireAuth(req);
+    if (authResult) return authResult;
     await connectDB();
     const materials = await Material.find().sort({ createdAt: -1 });
-    return NextResponse.json(materials);
+    return NextResponse.json(materials, {
+      headers: { 'Cache-Control': 'no-store' },
+    });
   } catch (err) {
     return errorResponse(err);
   }
@@ -21,7 +27,7 @@ export async function POST(req: NextRequest) {
     await connectDB();
     const body = await req.json();
     const material = await Material.create(body);
-    return NextResponse.json(material, { status: 201 });
+    return NextResponse.json(material, { status: 201, headers: { 'Cache-Control': 'no-store' } });
   } catch (err) {
     return errorResponse(err);
   }

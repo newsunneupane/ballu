@@ -5,5 +5,7 @@ import Material from '@/lib/models/Material';
 export async function GET() {
   await connectDB();
   const materials = await Material.find().sort({ createdAt: -1 });
-  return NextResponse.json(materials);
+  return NextResponse.json(materials, {
+    headers: { 'Cache-Control': 'public, max-age=3600' },
+  });
 }

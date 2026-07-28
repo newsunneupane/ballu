@@ -48,6 +48,7 @@ export const api = {
     create: (data: any) => request<any>('/items', { method: 'POST', body: JSON.stringify(data) }),
     update: (id: string, data: any) => request<any>(`/items/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
     delete: (id: string) => request<any>(`/items/${id}`, { method: 'DELETE' }),
+    bulkCreate: (items: any[]) => request<{ count: number; items: any[] }>('/items/bulk', { method: 'POST', body: JSON.stringify(items) }),
   },
   dailyRates: {
     list: (material?: string) => {

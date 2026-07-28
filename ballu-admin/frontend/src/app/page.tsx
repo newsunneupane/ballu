@@ -5,27 +5,35 @@ import { api } from '@/lib/api';
 import { Package, Gem, Tag, MessageSquare, PhoneCall } from 'lucide-react';
 
 export default function DashboardPage() {
-  const [stats, setStats] = useState<any>({});
+  const [stats, setStats] = useState<any>(null);
 
   useEffect(() => {
-    Promise.all([
+    Promise.allSettled([
       api.items.list(),
       api.materials.list(),
       api.categories.list(),
       api.customRequests.list(),
       api.itemInquiries.list(),
     ]).then(([items, materials, categories, customRequests, itemInquiries]) => {
+      const val = (r: any) => (r.status === 'fulfilled' ? r.value : []);
       setStats({
-        items: items.length,
-        materials: materials.length,
-        categories: categories.length,
-        customRequests: customRequests.length,
-        pendingRequests: customRequests.filter((r: any) => r.status === 'Pending').length,
-        itemInquiries: itemInquiries.length,
-        pendingInquiries: itemInquiries.filter((i: any) => i.status === 'Pending').length,
+        items: val(items).length,
+        materials: val(materials).length,
+        categories: val(categories).length,
+        customRequests: val(customRequests).length,
+        pendingRequests: val(customRequests).filter((r: any) => r.status === 'Pending').length,
+        itemInquiries: val(itemInquiries).length,
+        pendingInquiries: val(itemInquiries).filter((i: any) => i.status === 'Pending').length,
       });
     });
   }, []);
+
+  if (!stats) return (
+    <div>
+      <h1 className="text-2xl font-semibold text-[#fbf7f0] mb-8">Dashboard</h1>
+      <p className="text-[#6e695f] text-xs tracking-widest uppercase">Loading...</p>
+    </div>
+  );
 
   const cards = [
     { label: 'Items', value: stats.items, icon: Package, color: 'text-blue-400' },

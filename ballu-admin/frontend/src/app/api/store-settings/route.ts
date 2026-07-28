@@ -4,10 +4,14 @@ import StoreSettings from '@/lib/models/StoreSettings';
 import { requireAuth } from '@/lib/auth/middleware';
 import { errorResponse } from '@/lib/api-utils';
 
-export async function GET() {
+export const dynamic = 'force-dynamic';
+
+export async function GET(req: NextRequest) {
   try {
+    const authResult = requireAuth(req);
+    if (authResult) return authResult;
     await connectDB();
-    let settings = await StoreSettings.findOne();
+    let settings = await StoreSettings.findOne().populate('pieceOfTheWeek.item', 'name images purity weightGrams');
     if (!settings) {
       settings = await StoreSettings.create({
         contactEmail: '',
@@ -18,7 +22,9 @@ export async function GET() {
         ],
       });
     }
-    return NextResponse.json(settings);
+    return NextResponse.json(settings, {
+      headers: { 'Cache-Control': 'no-store' },
+    });
   } catch (err) {
     return errorResponse(err);
   }
@@ -30,14 +36,14 @@ export async function PUT(req: NextRequest) {
     if (authError) return authError;
     await connectDB();
     const body = await req.json();
-    let settings = await StoreSettings.findOne();
-    if (!settings) {
-      settings = await StoreSettings.create(body);
-    } else {
-      Object.assign(settings, body);
-      await settings.save();
-    }
-    return NextResponse.json(settings);
+    const settings = await StoreSettings.findOneAndUpdate({}, body, {
+      upsert: true,
+      new: true,
+      runValidators: true,
+    }).populate('pieceOfTheWeek.item', 'name images purity weightGrams');
+    return NextResponse.json(settings, {
+      headers: { 'Cache-Control': 'no-store' },
+    });
   } catch (err) {
     return errorResponse(err);
   }

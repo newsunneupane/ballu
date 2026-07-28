@@ -4,6 +4,8 @@ import CustomRequest from '@/lib/models/CustomRequest';
 import { requireAuth } from '@/lib/auth/middleware';
 import { errorResponse } from '@/lib/api-utils';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(req: NextRequest) {
   try {
     const authError = requireAuth(req);
@@ -15,7 +17,9 @@ export async function GET(req: NextRequest) {
     if (status) filter.status = status;
 
     const requests = await CustomRequest.find(filter).populate('category', 'name').populate('material', 'name').sort({ createdAt: -1 });
-    return NextResponse.json(requests);
+    return NextResponse.json(requests, {
+      headers: { 'Cache-Control': 'no-store' },
+    });
   } catch (err) {
     return errorResponse(err);
   }
@@ -29,7 +33,7 @@ export async function POST(req: NextRequest) {
     const toPopulate: string[] = ['category'];
     if (body.material) toPopulate.push('material');
     const populated = await request.populate(toPopulate);
-    return NextResponse.json(populated, { status: 201 });
+    return NextResponse.json(populated, { status: 201, headers: { 'Cache-Control': 'no-store' } });
   } catch (err) {
     return errorResponse(err);
   }
