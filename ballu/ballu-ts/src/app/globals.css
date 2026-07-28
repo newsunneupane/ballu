@@ -1,0 +1,220 @@
+@import "tailwindcss";
+
+::-webkit-scrollbar {
+  display: none;
+}
+html {
+  scrollbar-width: none;
+}
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+@theme {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  
+  --font-sans: var(--font-geist-sans), sans-serif;
+  --font-mono: var(--font-geist-mono), monospace;
+
+  --font-serif-editorial: var(--font-serif-editorial), serif;
+  --font-nepali-serif: var(--font-nepali-serif), serif;
+  --color-cream-luxury: #f4edd9;
+}
+
+html,
+body {
+  min-height: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+}
+
+.animate-bj-grad-shift {
+  animation: bj-grad-rotate 80s linear infinite !important;
+  transform-origin: left center !important;
+  will-change: transform;
+}
+
+@keyframes bj-grad-rotate {
+  0% {
+    transform: rotate(0deg) scale(1.2);
+  }
+  100% {
+    transform: rotate(360deg) scale(1.2);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-bj-grad-shift {
+    animation: none !important;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(100px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.fade-in-up {
+  animation: fadeInUp 0.6s ease-out forwards;
+  opacity: 0;
+}
+
+.slide-in-left {
+  animation: slideInLeft 0.8s ease-out forwards;
+  opacity: 0;
+}
+
+.fade-in-up-1 { animation-delay: 0.2s; }
+.fade-in-up-2 { animation-delay: 0.4s; }
+.fade-in-up-3 { animation-delay: 0.6s; }
+.fade-in-up-4 { animation-delay: 0.8s; }
+.fade-in-up-5 { animation-delay: 1.0s; }
+.fade-in-up-6 { animation-delay: 1.2s; }
+.fade-in-up-7 { animation-delay: 1.4s; }
+
+.slide-in-left-delay { animation-delay: 1.2s; }
+
+@keyframes bounce-y {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+@utility animate-bounce-y {
+  animation: bounce-y 2s ease-in-out infinite;
+}
+
+.btn-hover-move {
+  transition: transform 0.3s ease;
+  transform: translateX(0);
+}
+
+.btn-hover-move:hover {
+  transform: translateX(0.5rem);
+}
+
+.btn-exit-right {
+  transition: transform 0.3s ease;
+  transform: translateX(0.5rem);
+}
+
+.btn-exit-right:hover {
+  transform: translateX(0);
+}
+
+.btn-hover-move-soft {
+  transition: transform 0.3s ease;
+  transform: translateX(0);
+}
+
+.btn-hover-move-soft:hover {
+  transform: translateX(0.25rem);
+}
+
+@layer utilities {
+  .view-piece-link .arrow {
+    display: inline-block !important;
+    transition: transform 0.3s ease-in-out !important;
+  }
+
+  .view-piece-link:hover .arrow {
+    transform: translateX(6px) !important;
+  }
+}
+
+@layer utilities {
+  @keyframes infiniteZoom {
+    0%, 100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.6);
+    }
+  }
+
+  .animate-infinite-zoom {
+    animation: infiniteZoom 4s ease-in-out infinite;
+    display: inline-block;
+  }
+}
+
+@layer utilities{
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-5px);
+    }
+  }
+
+  @keyframes shimmerLeft {
+    from {
+      background-position: 100% 0%;
+    }
+    to {
+      background-position: -100% 0%;
+    }
+  }
+
+  @keyframes shimmerRight {
+    from {
+      background-position: -100% 0%;
+    }
+    to {
+      background-position: 100% 0%;
+    }
+  }
+}
+ 
+@layer utilities {
+  @keyframes spinClockwise {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  @keyframes spinCounterClockwise {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(-360deg); }
+  }
+
+  .animate-spin-clockwise {
+    animation: spinClockwise 40s linear infinite;
+  }
+
+  .animate-spin-counter {
+    animation: spinCounterClockwise 40s linear infinite;
+  }
+}
