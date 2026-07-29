@@ -2,7 +2,8 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/context/AuthContext';
 import { api } from '@/lib/api';
 import {
@@ -25,8 +26,8 @@ const navItems = [
   { href: '/categories', label: 'Categories', icon: Tag },
   { href: '/items', label: 'Items', icon: Package },
   { href: '/daily-rates', label: 'Daily Rates', icon: DollarSign },
-  { href: '/custom-requests', label: 'Custom Requests', icon: MessageSquare, badgeKey: 'pendingRequests' },
-  { href: '/item-inquiries', label: 'Item Inquiries', icon: PhoneCall, badgeKey: 'pendingInquiries' },
+  { href: '/custom-requests', label: 'Custom Requests', icon: MessageSquare, badgeKey: 'pendingRequests' as const },
+  { href: '/item-inquiries', label: 'Item Inquiries', icon: PhoneCall, badgeKey: 'pendingInquiries' as const },
   { href: '/store-settings', label: 'Store Settings', icon: Settings },
 ];
 
@@ -34,26 +35,19 @@ export default function Sidebar() {
   const pathname = usePathname();
   const { user, logout } = useAuth();
   const router = useRouter();
-  const [pendingCounts, setPendingCounts] = useState<Record<string, number>>({});
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  useEffect(() => {
-    const fetchCounts = async () => {
-      try {
-        const [customData, inquiryData] = await Promise.all([
-          api.customRequests.list('Pending').catch(() => []),
-          api.itemInquiries.list('Pending').catch(() => []),
-        ]);
-        setPendingCounts({
-          pendingRequests: customData.length,
-          pendingInquiries: inquiryData.length,
-        });
-      } catch {}
-    };
-    fetchCounts();
-    const interval = setInterval(fetchCounts, 30000);
-    return () => clearInterval(interval);
-  }, []);
+  const { data: pendingCounts = {} as Record<string, number> } = useQuery({
+    queryKey: ['pending-counts'],
+    queryFn: async () => {
+      const [customData, inquiryData] = await Promise.all([
+        api.customRequests.list('Pending').catch(() => []),
+        api.itemInquiries.list('Pending').catch(() => []),
+      ]);
+      return { pendingRequests: customData.length, pendingInquiries: inquiryData.length };
+    },
+    refetchInterval: 30000,
+  });
 
   const closeMobile = () => setMobileOpen(false);
 

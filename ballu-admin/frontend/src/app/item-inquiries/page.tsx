@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
 import { Trash2 } from 'lucide-react';
 
@@ -11,24 +12,25 @@ const statusColors: Record<string, string> = {
 };
 
 export default function ItemInquiriesPage() {
-  const [inquiries, setInquiries] = useState<any[]>([]);
+  const queryClient = useQueryClient();
   const [statusFilter, setStatusFilter] = useState('');
 
-  const load = useCallback(() => {
-    api.itemInquiries.list(statusFilter || undefined).then(setInquiries);
-  }, [statusFilter]);
+  const { data: inquiries = [] } = useQuery({
+    queryKey: ['item-inquiries', statusFilter || undefined],
+    queryFn: () => api.itemInquiries.list(statusFilter || undefined),
+  });
 
-  useEffect(() => { load(); }, [load]);
+  const invalidate = () => queryClient.invalidateQueries({ queryKey: ['item-inquiries'] });
 
   const updateStatus = async (id: string, status: string) => {
     await api.itemInquiries.update(id, { status });
-    load();
+    invalidate();
   };
 
   const remove = async (id: string) => {
     if (!confirm('Delete this inquiry?')) return;
     await api.itemInquiries.delete(id);
-    load();
+    invalidate();
   };
 
   return (
@@ -44,7 +46,7 @@ export default function ItemInquiriesPage() {
       </div>
 
       <div className="space-y-3">
-        {inquiries.map((inq) => (
+        {inquiries.map((inq: any) => (
           <div key={inq._id} className="bg-[#0f0c0a] border border-[#1f1a10] rounded-lg p-5">
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1 min-w-0">

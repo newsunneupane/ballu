@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
 import { Trash2 } from 'lucide-react';
 
@@ -11,24 +12,25 @@ const statusColors: Record<string, string> = {
 };
 
 export default function CustomRequestsPage() {
-  const [requests, setRequests] = useState<any[]>([]);
+  const queryClient = useQueryClient();
   const [statusFilter, setStatusFilter] = useState('');
 
-  const load = useCallback(() => {
-    api.customRequests.list(statusFilter || undefined).then(setRequests);
-  }, [statusFilter]);
+  const { data: requests = [] } = useQuery({
+    queryKey: ['custom-requests', statusFilter || undefined],
+    queryFn: () => api.customRequests.list(statusFilter || undefined),
+  });
 
-  useEffect(() => { load(); }, [load]);
+  const invalidate = () => queryClient.invalidateQueries({ queryKey: ['custom-requests'] });
 
   const updateStatus = async (id: string, status: string) => {
     await api.customRequests.update(id, { status });
-    load();
+    invalidate();
   };
 
   const remove = async (id: string) => {
     if (!confirm('Delete this request?')) return;
     await api.customRequests.delete(id);
-    load();
+    invalidate();
   };
 
   return (
@@ -44,7 +46,7 @@ export default function CustomRequestsPage() {
       </div>
 
       <div className="space-y-3">
-        {requests.map((r) => (
+        {requests.map((r: any) => (
           <div key={r._id} className="bg-[#0f0c0a] border border-[#1f1a10] rounded-lg p-5">
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1 min-w-0">

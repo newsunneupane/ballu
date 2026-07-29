@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
 import { Save, Plus, X } from 'lucide-react';
 
@@ -24,6 +25,7 @@ interface FormState {
 const emptySlot = (): TimingSlot => ({ dayFrom: 'Mon', dayTo: 'Sat', timeFrom: '10', timeTo: '19' });
 
 export default function StoreSettingsPage() {
+  const queryClient = useQueryClient();
   const [form, setForm] = useState<FormState>({
     contactEmail: '',
     phoneNumbers: [''],
@@ -32,41 +34,49 @@ export default function StoreSettingsPage() {
     pieceOfTheWeek: { material: '', category: '', item: '' },
   });
   const [saved, setSaved] = useState(false);
-  const [materials, setMaterials] = useState<any[]>([]);
-  const [categories, setCategories] = useState<any[]>([]);
-  const [filteredItems, setFilteredItems] = useState<any[]>([]);
 
-  useEffect(() => {
-    Promise.all([
-      api.materials.list(),
-      api.categories.list(),
-      api.storeSettings.get(),
-    ]).then(([mats, cats, settings]) => {
-      setMaterials(mats);
-      setCategories(cats);
-      const savedMaterial = settings.pieceOfTheWeek?.material?._id || settings.pieceOfTheWeek?.material || '';
-      const savedCategory = settings.pieceOfTheWeek?.category?._id || settings.pieceOfTheWeek?.category || '';
-      const gold = mats.find((m: any) => m.name?.en === 'Gold');
-      setForm({
-        contactEmail: settings.contactEmail || '',
-        phoneNumbers: settings.phoneNumbers?.length ? settings.phoneNumbers : [''],
-        timings: settings.timings?.length ? settings.timings : [emptySlot()],
-        tickerItems: settings.tickerItems?.length ? settings.tickerItems : [''],
-        pieceOfTheWeek: {
-          material: savedMaterial || (gold ? gold._id : ''),
-          category: savedCategory || '',
-          item: settings.pieceOfTheWeek?.item?._id || settings.pieceOfTheWeek?.item || '',
-        },
-      });
+  const { data: materials = [] } = useQuery({
+    queryKey: ['materials'],
+    queryFn: api.materials.list,
+  });
+  const { data: categories = [] } = useQuery({
+    queryKey: ['categories'],
+    queryFn: api.categories.list,
+  });
+  const { data: settings } = useQuery({
+    queryKey: ['store-settings'],
+    queryFn: api.storeSettings.get,
+  });
+
+  const { data: filteredItems = [] } = useQuery({
+    queryKey: ['items', { material: form.pieceOfTheWeek.material, category: form.pieceOfTheWeek.category }],
+    queryFn: () => {
+      const params: Record<string, string> = {};
+      if (form.pieceOfTheWeek.material) params.material = form.pieceOfTheWeek.material;
+      if (form.pieceOfTheWeek.category) params.category = form.pieceOfTheWeek.category;
+      return api.items.list(Object.keys(params).length ? params : undefined);
+    },
+  });
+
+  const initForm = () => {
+    if (!settings) return;
+    const savedMaterial = settings.pieceOfTheWeek?.material?._id || settings.pieceOfTheWeek?.material || '';
+    const savedCategory = settings.pieceOfTheWeek?.category?._id || settings.pieceOfTheWeek?.category || '';
+    const gold = materials.find((m: any) => m.name?.en === 'Gold');
+    setForm({
+      contactEmail: settings.contactEmail || '',
+      phoneNumbers: settings.phoneNumbers?.length ? settings.phoneNumbers : [''],
+      timings: settings.timings?.length ? settings.timings : [emptySlot()],
+      tickerItems: settings.tickerItems?.length ? settings.tickerItems : [''],
+      pieceOfTheWeek: {
+        material: savedMaterial || (gold ? gold._id : ''),
+        category: savedCategory || '',
+        item: settings.pieceOfTheWeek?.item?._id || settings.pieceOfTheWeek?.item || '',
+      },
     });
-  }, []);
+  };
 
-  useEffect(() => {
-    const params: Record<string, string> = {};
-    if (form.pieceOfTheWeek.material) params.material = form.pieceOfTheWeek.material;
-    if (form.pieceOfTheWeek.category) params.category = form.pieceOfTheWeek.category;
-    api.items.list(Object.keys(params).length ? params : undefined).then(setFilteredItems);
-  }, [form.pieceOfTheWeek.material, form.pieceOfTheWeek.category]);
+  if (settings && !form.contactEmail && settings.contactEmail) initForm();
 
   const updatePhone = (index: number, value: string) => {
     const phones = [...form.phoneNumbers];
@@ -124,6 +134,7 @@ export default function StoreSettingsPage() {
         : null,
     });
     setSaved(true);
+    queryClient.invalidateQueries({ queryKey: ['store-settings'] });
     setTimeout(() => setSaved(false), 2000);
   };
 
@@ -267,7 +278,7 @@ export default function StoreSettingsPage() {
             {form.pieceOfTheWeek.item && filteredItems.length > 0 && (
               <div className="flex items-center gap-3 bg-[#0f0c0a] border border-[#1f1a10] rounded-lg p-3">
                 {(() => {
-                  const selected = filteredItems.find((i) => i._id === form.pieceOfTheWeek.item);
+                  const selected = filteredItems.find((i: any) => i._id === form.pieceOfTheWeek.item);
                   return selected ? (
                     <>
                       {selected.images?.[0] ? (

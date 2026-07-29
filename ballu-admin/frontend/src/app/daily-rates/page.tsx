@@ -1,21 +1,24 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
 import { Plus, Trash2, X } from 'lucide-react';
 
 export default function DailyRatesPage() {
-  const [rates, setRates] = useState<any[]>([]);
-  const [materials, setMaterials] = useState<any[]>([]);
+  const queryClient = useQueryClient();
+  const { data: rates = [] } = useQuery({
+    queryKey: ['daily-rates'],
+    queryFn: () => api.dailyRates.list(),
+  });
+  const { data: materials = [] } = useQuery({
+    queryKey: ['materials'],
+    queryFn: api.materials.list,
+  });
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ material: '', ratePerGramNrs: '', ratePerGramInr: '' });
 
-  const load = useCallback(() => {
-    api.dailyRates.list().then(setRates);
-    api.materials.list().then(setMaterials);
-  }, []);
-
-  useEffect(() => { load(); }, [load]);
+  const invalidateRates = () => queryClient.invalidateQueries({ queryKey: ['daily-rates'] });
 
   const openNew = () => {
     setForm({ material: materials[0]?._id || '', ratePerGramNrs: '', ratePerGramInr: '' });
@@ -29,13 +32,13 @@ export default function DailyRatesPage() {
       ratePerGramInr: Number(form.ratePerGramInr),
     });
     setShowForm(false);
-    load();
+    invalidateRates();
   };
 
   const remove = async (id: string) => {
     if (!confirm('Delete this rate entry?')) return;
     await api.dailyRates.delete(id);
-    load();
+    invalidateRates();
   };
 
   return (
@@ -59,7 +62,7 @@ export default function DailyRatesPage() {
             </tr>
           </thead>
           <tbody>
-            {rates.map((r) => (
+            {rates.map((r: any) => (
               <tr key={r._id} className="border-b border-[#1f1a10]/50 last:border-0 hover:bg-white/[0.02]">
                 <td className="px-5 py-3 text-[#e5e5e0]">{r.material?.name?.en || 'Unknown'}</td>
                 <td className="px-5 py-3 text-right text-[#e5e5e0] tabular-nums">{r.ratePerGramNrs?.toLocaleString()}</td>
@@ -89,7 +92,7 @@ export default function DailyRatesPage() {
                 <label className="block text-[10px] tracking-[0.2em] uppercase text-[#6e695f] mb-1.5">Material</label>
                 <select value={form.material} onChange={(e) => setForm({ ...form, material: e.target.value })} className="w-full bg-[#0a0806] border border-[#1f1a10] rounded px-3 py-2 text-sm text-[#e5e5e0] focus:outline-none focus:border-[#dbb86b]">
                   <option value="">Select material</option>
-                  {materials.map((m) => <option key={m._id} value={m._id}>{m.name.en}</option>)}
+                  {materials.map((m: any) => <option key={m._id} value={m._id}>{m.name.en}</option>)}
                 </select>
               </div>
               <div>

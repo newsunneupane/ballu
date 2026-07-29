@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useRef, useCallback, useEffect } from "react";
+import React, { useState, useRef, useCallback } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Cormorant_Garamond, Cormorant_SC, Tenor_Sans } from "next/font/google";
 import { FiStar, FiX, FiCheck } from "react-icons/fi";
 import Button from "@/components/ui/Button";
@@ -23,10 +24,8 @@ const tenorSans = Tenor_Sans({
 export default function CommissionPage() {
   const [categories, setCategories] = useState<any[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>("");
-  const [items, setItems] = useState<any[]>([]);
   const [pieceType, setPieceType] = useState("");
   const [customPieceType, setCustomPieceType] = useState("");
-  const [materials, setMaterials] = useState<any[]>([]);
   const [selectedMaterial, setSelectedMaterial] = useState<string>("");
   const [budget, setBudget] = useState(500000);
   const [name, setName] = useState("");
@@ -39,21 +38,32 @@ export default function CommissionPage() {
   const [error, setError] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    Promise.all([
-      fetch("/api/categories").then((r) => r.ok ? r.json() : []),
-      fetch("/api/materials").then((r) => r.ok ? r.json() : []),
-      fetch("/api/items").then((r) => r.ok ? r.json() : []),
-    ])
-      .then(([cats, mats, itms]) => {
-        setCategories(cats);
-        if (cats.length > 0) setSelectedCategory(cats[0]._id);
-        setMaterials(mats);
-        if (mats.length > 0) setSelectedMaterial(mats[0]._id);
-        setItems(itms);
-      })
-      .catch(() => {});
-  }, []);
+  const { data: cats = [] } = useQuery({
+    queryKey: ['categories'],
+    queryFn: async () => {
+      const r = await fetch('/api/categories');
+      return r.ok ? r.json() : [];
+    },
+  });
+
+  const { data: mats = [] } = useQuery({
+    queryKey: ['materials'],
+    queryFn: async () => {
+      const r = await fetch('/api/materials');
+      return r.ok ? r.json() : [];
+    },
+  });
+
+  const { data: items = [] } = useQuery({
+    queryKey: ['items'],
+    queryFn: async () => {
+      const r = await fetch('/api/items');
+      return r.ok ? r.json() : [];
+    },
+  });
+
+  if (cats.length > 0 && !selectedCategory) setSelectedCategory(cats[0]._id);
+  if (mats.length > 0 && !selectedMaterial) setSelectedMaterial(mats[0]._id);
 
   const MAX_IMAGE_SIZE = 2 * 1024 * 1024;
 
@@ -204,7 +214,7 @@ export default function CommissionPage() {
                 style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238e897e' d='M6 8L1 3h10z'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center' }}
               >
                 <option value="" disabled className="bg-[#0a0806]">Select a piece type</option>
-                {items.map((item) => (
+                {items.map((item: any) => (
                   <option key={item._id} value={item.name?.en || ''} className="bg-[#0a0806]">{item.name?.en || 'Untitled'}</option>
                 ))}
                 <option value="other" className="bg-[#0a0806]">Other (custom)</option>
@@ -225,7 +235,7 @@ export default function CommissionPage() {
                 Material
               </label>
               <div className="flex flex-wrap gap-2 sm:gap-3">
-                {materials.map((mat) => (
+                {mats.map((mat: any) => (
                   <button
                     key={mat._id}
                     onClick={() => setSelectedMaterial(mat._id)}
@@ -238,7 +248,7 @@ export default function CommissionPage() {
                     {mat.name?.en || "Material"}
                   </button>
                 ))}
-                {materials.length === 0 && (
+                {mats.length === 0 && (
                   <span className={`${tenorSans.className} text-[10px] text-[#6e695f]`}>Loading materials...</span>
                 )}
               </div>

@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Cormorant_Garamond, Cormorant_SC, Tenor_Sans } from "next/font/google";
 import { FiStar } from "react-icons/fi";
 import Button from "@/components/ui/Button";
@@ -52,14 +53,14 @@ function formatTiming(slot: TimingSlot): string {
 }
 
 export default function AboutContactPage() {
-  const [settings, setSettings] = useState<StoreSettings | null>(null);
-
-  useEffect(() => {
-    fetch('/api/store-settings')
-      .then((r) => r.json())
-      .then(setSettings)
-      .catch(() => {});
-  }, []);
+  const { data: settings } = useQuery({
+    queryKey: ['store-settings'],
+    queryFn: async () => {
+      const res = await fetch('/api/store-settings');
+      if (!res.ok) return null;
+      return res.json() as Promise<StoreSettings>;
+    },
+  });
 
   return (
     <>
@@ -96,8 +97,8 @@ export default function AboutContactPage() {
                 Hours
               </h3>
               <p className={`${cormorant.className} text-[18px] text-[#ebd3b4] text-center leading-relaxed opacity-90`}>
-                {settings?.timings?.length
-                  ? settings.timings.map((s, i) => <React.Fragment key={i}>{formatTiming(s)}<br /></React.Fragment>)
+                {(settings as StoreSettings)?.timings?.length
+                  ? (settings as StoreSettings).timings.map((s, i) => <React.Fragment key={i}>{formatTiming(s)}<br /></React.Fragment>)
                   : <>Mon–Sat 10–7<br />Sun 11–5</>}
               </p>
             </div>
@@ -107,8 +108,8 @@ export default function AboutContactPage() {
                 Phone
               </h3>
               <p className={`${cormorant.className} text-[18px] text-[#ebd3b4] text-center leading-relaxed opacity-90 [font-variant-numeric:lining-nums]`}>
-                {settings?.phoneNumbers?.length
-                  ? settings.phoneNumbers.map((p, i) => <React.Fragment key={i}>{p}<br /></React.Fragment>)
+                {(settings as StoreSettings)?.phoneNumbers?.length
+                  ? (settings as StoreSettings).phoneNumbers.map((p, i) => <React.Fragment key={i}>{p}<br /></React.Fragment>)
                   : <>+977 9842 000 000<br />023-562-118</>}
               </p>
             </div>
@@ -118,7 +119,7 @@ export default function AboutContactPage() {
                 Email
               </h3>
               <p className={`${cormorant.className} text-[18px] text-[#ebd3b4] text-center leading-relaxed opacity-90`}>
-                {settings?.contactEmail || 'aalu@ballujewellers.np'}
+                {(settings as StoreSettings)?.contactEmail || 'aalu@ballujewellers.np'}
               </p>
             </div>
 

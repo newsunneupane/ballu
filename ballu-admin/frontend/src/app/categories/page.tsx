@@ -1,20 +1,21 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
 import { Plus, Pencil, Trash2, X } from 'lucide-react';
 
 export default function CategoriesPage() {
-  const [categories, setCategories] = useState<any[]>([]);
+  const queryClient = useQueryClient();
+  const { data: categories = [] } = useQuery({
+    queryKey: ['categories'],
+    queryFn: api.categories.list,
+  });
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<any>(null);
   const [form, setForm] = useState({ nameEn: '', nameNp: '', description: '' });
 
-  const load = useCallback(() => {
-    api.categories.list().then(setCategories);
-  }, []);
-
-  useEffect(() => { load(); }, [load]);
+  const invalidate = () => queryClient.invalidateQueries({ queryKey: ['categories'] });
 
   const openNew = () => {
     setEditing(null);
@@ -36,13 +37,13 @@ export default function CategoriesPage() {
       await api.categories.create(payload);
     }
     setShowForm(false);
-    load();
+    invalidate();
   };
 
   const remove = async (id: string) => {
     if (!confirm('Delete this category?')) return;
     await api.categories.delete(id);
-    load();
+    invalidate();
   };
 
   return (
@@ -65,7 +66,7 @@ export default function CategoriesPage() {
             </tr>
           </thead>
           <tbody>
-            {categories.map((c) => (
+            {categories.map((c: any) => (
               <tr key={c._id} className="border-b border-[#1f1a10]/50 last:border-0 hover:bg-white/[0.02]">
                 <td className="px-5 py-3 text-[#e5e5e0]">{c.name.en}</td>
                 <td className="px-5 py-3 text-[#e5e5e0]">{c.name.np}</td>

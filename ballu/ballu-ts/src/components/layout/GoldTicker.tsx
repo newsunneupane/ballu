@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Cormorant_Garamond } from 'next/font/google';
 
 const cormorant = Cormorant_Garamond({
@@ -10,29 +11,31 @@ const cormorant = Cormorant_Garamond({
 });
 
 export default function GoldTicker() {
-  const [rates, setRates] = useState<{ name: string; ratePerGramNrs: number }[]>([]);
-  const [tickerItems, setTickerItems] = useState<string[]>([]);
-  const [phone, setPhone] = useState('+977 9842 000 000');
+  const { data: rates = [] } = useQuery({
+    queryKey: ['rates-current'],
+    queryFn: async () => {
+      const res = await fetch('/api/rates/current');
+      if (!res.ok) return [];
+      const data = await res.json();
+      return data?.rates || [];
+    },
+  });
 
-  useEffect(() => {
-    fetch('/api/rates/current')
-      .then((r) => r.ok ? r.json() : null)
-      .then((data) => {
-        if (data?.rates) setRates(data.rates);
-      })
-      .catch(() => {});
-    fetch('/api/store-settings')
-      .then((r) => r.ok ? r.json() : null)
-      .then((data) => {
-        if (data) {
-          setTickerItems(data.tickerItems || []);
-          if (data.phoneNumbers?.length) setPhone(data.phoneNumbers[0]);
-        }
-      })
-      .catch(() => {});
-  }, []);
+  const { data: settings } = useQuery({
+    queryKey: ['store-settings'],
+    queryFn: async () => {
+      const res = await fetch('/api/store-settings');
+      if (!res.ok) return null;
+      return res.json();
+    },
+  });
 
-  const rateItems = rates.map((r) => `${r.name.toUpperCase()} ₨ ${r.ratePerGramNrs.toLocaleString('en-IN')}/G`);
+  const tickerItems: string[] = settings?.tickerItems || [];
+  const phone: string = settings?.phoneNumbers?.[0] || '+977 9842 000 000';
+
+  const rateItems = (rates as { name: string; ratePerGramNrs: number }[]).map(
+    (r) => `${r.name.toUpperCase()} ₨ ${r.ratePerGramNrs.toLocaleString('en-IN')}/G`
+  );
 
   const parts = ['TODAY', ...rateItems, ...tickerItems.filter(Boolean), `WHATSAPP ${phone}`];
   const text = parts.join(' · ');

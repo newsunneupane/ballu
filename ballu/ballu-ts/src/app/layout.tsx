@@ -2,6 +2,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import GoldTicker from "@/components/layout/GoldTicker";
 import Navbar from "@/components/layout/Navbar";
+import QueryProvider from "@/components/QueryProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,13 +26,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       className={`${geistSans.variable} ${geistMono.variable} antialiased`}
     >
       <body className="bg-black text-white min-h-screen">
-        <GoldTicker />
-        <header className="w-full">
-          <Navbar />
-        </header>
-        <main className="relative pt-[56px] md:pt-[68px]">
-          {children}
-        </main>
+        <QueryProvider>
+          <GoldTicker />
+          <header className="w-full">
+            <Navbar />
+          </header>
+          <main className="relative pt-[56px] md:pt-[68px]">
+            {children}
+          </main>
+        </QueryProvider>
       </body>
     </html>
   );

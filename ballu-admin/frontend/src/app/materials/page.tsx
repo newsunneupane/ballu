@@ -1,20 +1,21 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
 import { Plus, Pencil, Trash2, X } from 'lucide-react';
 
 export default function MaterialsPage() {
-  const [materials, setMaterials] = useState<any[]>([]);
+  const queryClient = useQueryClient();
+  const { data: materials = [] } = useQuery({
+    queryKey: ['materials'],
+    queryFn: api.materials.list,
+  });
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<any>(null);
   const [form, setForm] = useState({ nameEn: '', nameNp: '' });
 
-  const load = useCallback(() => {
-    api.materials.list().then(setMaterials);
-  }, []);
-
-  useEffect(() => { load(); }, [load]);
+  const invalidate = () => queryClient.invalidateQueries({ queryKey: ['materials'] });
 
   const openNew = () => {
     setEditing(null);
@@ -36,13 +37,13 @@ export default function MaterialsPage() {
       await api.materials.create(payload);
     }
     setShowForm(false);
-    load();
+    invalidate();
   };
 
   const remove = async (id: string) => {
     if (!confirm('Delete this material?')) return;
     await api.materials.delete(id);
-    load();
+    invalidate();
   };
 
   return (
@@ -64,7 +65,7 @@ export default function MaterialsPage() {
             </tr>
           </thead>
           <tbody>
-            {materials.map((m) => (
+            {materials.map((m: any) => (
               <tr key={m._id} className="border-b border-[#1f1a10]/50 last:border-0 hover:bg-white/[0.02]">
                 <td className="px-5 py-3 text-[#e5e5e0]">{m.name.en}</td>
                 <td className="px-5 py-3 text-[#e5e5e0]">{m.name.np}</td>

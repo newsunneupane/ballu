@@ -25,6 +25,7 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
 }
 
 export const api = {
+  request: <T>(path: string, options?: RequestInit) => request<T>(path, options),
   materials: {
     list: () => request<any[]>('/materials'),
     get: (id: string) => request<any>(`/materials/${id}`),

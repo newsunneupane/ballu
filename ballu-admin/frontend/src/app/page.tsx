@@ -1,34 +1,20 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { api } from '@/lib/api';
 import { Package, Gem, Tag, MessageSquare, PhoneCall } from 'lucide-react';
 
 export default function DashboardPage() {
-  const [stats, setStats] = useState<any>(null);
+  const { data: stats, isLoading } = useQuery({
+    queryKey: ['dashboard-stats'],
+    queryFn: () => api.request<{
+      items: number; materials: number; categories: number;
+      customRequests: number; pendingRequests: number;
+      itemInquiries: number; pendingInquiries: number;
+    }>('/dashboard/stats'),
+  });
 
-  useEffect(() => {
-    Promise.allSettled([
-      api.items.list(),
-      api.materials.list(),
-      api.categories.list(),
-      api.customRequests.list(),
-      api.itemInquiries.list(),
-    ]).then(([items, materials, categories, customRequests, itemInquiries]) => {
-      const val = (r: any) => (r.status === 'fulfilled' ? r.value : []);
-      setStats({
-        items: val(items).length,
-        materials: val(materials).length,
-        categories: val(categories).length,
-        customRequests: val(customRequests).length,
-        pendingRequests: val(customRequests).filter((r: any) => r.status === 'Pending').length,
-        itemInquiries: val(itemInquiries).length,
-        pendingInquiries: val(itemInquiries).filter((i: any) => i.status === 'Pending').length,
-      });
-    });
-  }, []);
-
-  if (!stats) return (
+  if (isLoading) return (
     <div>
       <h1 className="text-2xl font-semibold text-[#fbf7f0] mb-8">Dashboard</h1>
       <p className="text-[#6e695f] text-xs tracking-widest uppercase">Loading...</p>
@@ -36,12 +22,12 @@ export default function DashboardPage() {
   );
 
   const cards = [
-    { label: 'Items', value: stats.items, icon: Package, color: 'text-blue-400' },
-    { label: 'Materials', value: stats.materials, icon: Gem, color: 'text-emerald-400' },
-    { label: 'Categories', value: stats.categories, icon: Tag, color: 'text-purple-400' },
-    { label: 'Custom Requests', value: stats.customRequests, icon: MessageSquare, color: 'text-amber-400' },
-    { label: 'Pending Requests', value: stats.pendingRequests, icon: MessageSquare, color: 'text-red-400' },
-    { label: 'Item Inquiries', value: stats.itemInquiries, icon: PhoneCall, color: 'text-cyan-400' },
+    { label: 'Items', value: stats?.items, icon: Package, color: 'text-blue-400' },
+    { label: 'Materials', value: stats?.materials, icon: Gem, color: 'text-emerald-400' },
+    { label: 'Categories', value: stats?.categories, icon: Tag, color: 'text-purple-400' },
+    { label: 'Custom Requests', value: stats?.customRequests, icon: MessageSquare, color: 'text-amber-400' },
+    { label: 'Pending Requests', value: stats?.pendingRequests, icon: MessageSquare, color: 'text-red-400' },
+    { label: 'Item Inquiries', value: stats?.itemInquiries, icon: PhoneCall, color: 'text-cyan-400' },
   ];
 
   return (

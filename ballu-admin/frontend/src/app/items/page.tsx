@@ -1,13 +1,12 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
 import { Plus, Pencil, Trash2, X, Upload, Database } from 'lucide-react';
 
 export default function ItemsPage() {
-  const [items, setItems] = useState<any[]>([]);
-  const [materials, setMaterials] = useState<any[]>([]);
-  const [categories, setCategories] = useState<any[]>([]);
+  const queryClient = useQueryClient();
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<any>(null);
   const [form, setForm] = useState({
@@ -24,16 +23,25 @@ export default function ItemsPage() {
   const [filterCategory, setFilterCategory] = useState('');
   const [filterMaterial, setFilterMaterial] = useState('');
 
-  const load = useCallback(() => {
-    const params: Record<string, string> = {};
-    if (filterCategory) params.category = filterCategory;
-    if (filterMaterial) params.material = filterMaterial;
-    api.items.list(Object.keys(params).length ? params : undefined).then(setItems);
-    api.materials.list().then(setMaterials);
-    api.categories.list().then(setCategories);
-  }, [filterCategory, filterMaterial]);
+  const params: Record<string, string> = {};
+  if (filterCategory) params.category = filterCategory;
+  if (filterMaterial) params.material = filterMaterial;
+  const qKey = Object.keys(params).length ? params : undefined;
 
-  useEffect(() => { load(); }, [load]);
+  const { data: items = [] } = useQuery({
+    queryKey: ['items', qKey],
+    queryFn: () => api.items.list(qKey),
+  });
+  const { data: materials = [] } = useQuery({
+    queryKey: ['materials'],
+    queryFn: api.materials.list,
+  });
+  const { data: categories = [] } = useQuery({
+    queryKey: ['categories'],
+    queryFn: api.categories.list,
+  });
+
+  const invalidateItems = () => queryClient.invalidateQueries({ queryKey: ['items'] });
 
   const openNew = () => {
     setEditing(null);
@@ -85,13 +93,13 @@ export default function ItemsPage() {
       await api.items.create(payload);
     }
     setShowForm(false);
-    load();
+    invalidateItems();
   };
 
   const remove = async (id: string) => {
     if (!confirm('Delete this item?')) return;
     await api.items.delete(id);
-    load();
+    invalidateItems();
   };
 
   const handleBulkUpload = async () => {
@@ -103,7 +111,7 @@ export default function ItemsPage() {
       const res = await api.items.bulkCreate(arr);
       setBulkResult(`Created ${res.count} items successfully`);
       setBulkJson('');
-      load();
+      invalidateItems();
     } catch (err: any) {
       setBulkResult(`Error: ${err.message}`);
     }
@@ -123,7 +131,7 @@ export default function ItemsPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
       setSeedResult(data.created?.join(', ') || `${data.itemCount} items seeded`);
-      load();
+      invalidateItems();
     } catch (err: any) {
       setSeedResult(`Error: ${err.message}`);
     } finally {
@@ -187,7 +195,7 @@ export default function ItemsPage() {
             </tr>
           </thead>
           <tbody>
-            {items.map((item) => (
+            {items.map((item: any) => (
               <tr key={item._id} className="border-b border-[#1f1a10]/50 last:border-0 hover:bg-white/[0.02]">
                 <td className="px-4 py-3">
                   {item.images?.[0] ? (
@@ -240,14 +248,14 @@ export default function ItemsPage() {
                 <label className="block text-[10px] tracking-[0.2em] uppercase text-[#6e695f] mb-1.5">Category</label>
                 <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className="w-full bg-[#0a0806] border border-[#1f1a10] rounded px-3 py-2 text-sm text-[#e5e5e0] focus:outline-none focus:border-[#dbb86b]">
                   <option value="">Select</option>
-                  {categories.map((c) => <option key={c._id} value={c._id}>{c.name.en}</option>)}
+                  {categories.map((c: any) => <option key={c._id} value={c._id}>{c.name.en}</option>)}
                 </select>
               </div>
               <div>
                 <label className="block text-[10px] tracking-[0.2em] uppercase text-[#6e695f] mb-1.5">Material</label>
                 <select value={form.material} onChange={(e) => setForm({ ...form, material: e.target.value })} className="w-full bg-[#0a0806] border border-[#1f1a10] rounded px-3 py-2 text-sm text-[#e5e5e0] focus:outline-none focus:border-[#dbb86b]">
                   <option value="">Select</option>
-                  {materials.map((m) => <option key={m._id} value={m._id}>{m.name.en}</option>)}
+                  {materials.map((m: any) => <option key={m._id} value={m._id}>{m.name.en}</option>)}
                 </select>
               </div>
               <div>
@@ -279,7 +287,7 @@ export default function ItemsPage() {
               </div>
               <div>
                 <label className="block text-[10px] tracking-[0.2em] uppercase text-[#6e695f] mb-1.5">Diamond Value (Rs)</label>
-                <input type="number" value={form.diamondValue} onChange={(e) => setForm({ ...form, diamondValue: e.target.value })} className="w-full bg-[#0a0806] border border-[#1f1a10" />
+                <input type="number" value={form.diamondValue} onChange={(e) => setForm({ ...form, diamondValue: e.target.value })} className="w-full bg-[#0a0806] border border-[#1f1a10] rounded px-3 py-2 text-sm text-[#e5e5e0] focus:outline-none focus:border-[#dbb86b]" />
               </div>
               <div>
                 <label className="block text-[10px] tracking-[0.2em] uppercase text-[#6e695f] mb-1.5">Karigar Name</label>
