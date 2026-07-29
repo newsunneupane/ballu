@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
+import { api } from '@/lib/api';
 import {
   LayoutDashboard,
   Gem,
@@ -39,18 +40,14 @@ export default function Sidebar() {
   useEffect(() => {
     const fetchCounts = async () => {
       try {
-        const [customRes, inquiryRes] = await Promise.all([
-          fetch('/api/custom-requests?status=Pending'),
-          fetch('/api/item-inquiries?status=Pending'),
+        const [customData, inquiryData] = await Promise.all([
+          api.customRequests.list('Pending').catch(() => []),
+          api.itemInquiries.list('Pending').catch(() => []),
         ]);
-        if (customRes.ok) {
-          const data = await customRes.json();
-          setPendingCounts((prev) => ({ ...prev, pendingRequests: data.length }));
-        }
-        if (inquiryRes.ok) {
-          const data = await inquiryRes.json();
-          setPendingCounts((prev) => ({ ...prev, pendingInquiries: data.length }));
-        }
+        setPendingCounts({
+          pendingRequests: customData.length,
+          pendingInquiries: inquiryData.length,
+        });
       } catch {}
     };
     fetchCounts();

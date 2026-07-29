@@ -28,7 +28,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0806] flex items-center justify-center px-4">
+    <div className="min-h-screen w-full bg-[#0a0806] flex items-center justify-center px-4">
       <div className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg">
         <div className="text-center mb-6 md:mb-10">
           <h1 className="text-[#dbb86b] text-xl md:text-3xl lg:text-4xl font-semibold tracking-wider">BALLU ADMIN</h1>
