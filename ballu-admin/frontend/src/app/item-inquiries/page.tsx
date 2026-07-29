@@ -20,7 +20,10 @@ export default function ItemInquiriesPage() {
     queryFn: () => api.itemInquiries.list(statusFilter || undefined),
   });
 
-  const invalidate = () => queryClient.invalidateQueries({ queryKey: ['item-inquiries'] });
+  const invalidate = () => {
+    queryClient.invalidateQueries({ queryKey: ['item-inquiries'] });
+    queryClient.invalidateQueries({ queryKey: ['pending-counts'] });
+  };
 
   const updateStatus = async (id: string, status: string) => {
     await api.itemInquiries.update(id, { status });

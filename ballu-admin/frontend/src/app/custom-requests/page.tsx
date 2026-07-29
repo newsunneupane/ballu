@@ -20,7 +20,10 @@ export default function CustomRequestsPage() {
     queryFn: () => api.customRequests.list(statusFilter || undefined),
   });
 
-  const invalidate = () => queryClient.invalidateQueries({ queryKey: ['custom-requests'] });
+  const invalidate = () => {
+    queryClient.invalidateQueries({ queryKey: ['custom-requests'] });
+    queryClient.invalidateQueries({ queryKey: ['pending-counts'] });
+  };
 
   const updateStatus = async (id: string, status: string) => {
     await api.customRequests.update(id, { status });
