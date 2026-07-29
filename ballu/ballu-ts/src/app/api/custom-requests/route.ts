@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import CustomRequest from '@/lib/models/CustomRequest';
 
-const ALLOWED_FIELDS = ['username', 'phoneNumber', 'category', 'material', 'budget', 'description', 'images'];
+const ALLOWED_FIELDS = ['username', 'phoneNumber', 'category', 'material', 'pieceType', 'budgetNrs', 'description', 'images'];
 
 function sanitizeBody(body: Record<string, unknown>) {
   const allowed: Record<string, unknown> = {};
@@ -19,8 +19,8 @@ function validateBody(body: Record<string, unknown>): string | null {
   if (!body.phoneNumber || typeof body.phoneNumber !== 'string' || !/^\+?[\d\s\-()]{7,20}$/.test(body.phoneNumber)) {
     return 'Valid phone number is required';
   }
-  if (body.budget && typeof body.budget !== 'string') {
-    return 'Budget must be a string';
+  if (body.budgetNrs != null && typeof body.budgetNrs !== 'number') {
+    return 'Budget must be a number';
   }
   if (body.description && typeof body.description !== 'string') {
     return 'Description must be a string';
