@@ -48,13 +48,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: validationError }, { status: 400, headers: { 'Cache-Control': 'no-store' } });
     }
 
-    if (req.body) {
-      const rawText = await req.clone().text();
-      if (new Blob([rawText]).size > 5 * 1024 * 1024) {
-        return NextResponse.json({ error: 'Request body too large (max 5MB)' }, { status: 413, headers: { 'Cache-Control': 'no-store' } });
-      }
-    }
-
     await connectDB();
     const request = await CustomRequest.create(sanitized);
     const toPopulate: string[] = ['category'];
