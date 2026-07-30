@@ -57,7 +57,7 @@ export default function CollectionsRow() {
   };
 
   return (
-    <div className="text-white min-h-[30vh] flex flex-col justify-end bg-[#0e0b08]">
+    <div className="text-bj-text-heading min-h-[30vh] flex flex-col justify-end bg-bj-bg-secondary">
       <style>{`
         @keyframes subtleLiftThenVibrate {
           0% { transform: scaleY(1) translateX(0); }
@@ -84,16 +84,42 @@ export default function CollectionsRow() {
         .vibrate-card-hover:hover {
           animation: subtleLiftThenVibrate 0.35s ease-out forwards !important;
         }
+        .card-luxury-svg { display: none; }
+        [data-theme="light"] .card-luxury-svg { display: block; }
+        [data-theme="light"] .collection-card {
+          background: radial-gradient(ellipse at 50% 40%, #f7efe0 0%, #ede0cc 50%, #e5d5bb 100%);
+          border-color: #dbb86b !important;
+          box-shadow: 0 1px 2px rgba(219,184,107,0.12);
+        }
+        [data-theme="light"] .collection-card:hover {
+          box-shadow: 0 8px 30px rgba(219,184,107,0.3), 0 2px 8px rgba(219,184,107,0.12);
+        }
+        [data-theme="light"] .collection-card .card-circle,
+        [data-theme="light"] .collection-card .card-circle > div {
+          border-color: #dbb86b !important;
+        }
+        [data-theme="light"] .collection-card .card-circle {
+          opacity: 0.35;
+        }
+        [data-theme="light"] .collection-card .card-badge {
+          background: rgba(219,184,107,0.12);
+          border-color: rgba(219,184,107,0.25);
+          color: #6b4f2a;
+        }
+        [data-theme="light"] .collection-card .card-glow {
+          mix-blend-mode: normal;
+          opacity: 0.04;
+        }
       `}</style>
 
       <div className="max-w-7xl w-full mx-auto px-6 md:px-12 lg:px-16 pt-16 pb-8">
-        <div className="text-[11px] tracking-[0.4em] text-[#dbb86b] uppercase font-thin opacity-80 mb-6 font-sans">
+        <div className="text-[11px] tracking-[0.4em] text-bj-gold uppercase font-thin opacity-80 mb-6 font-sans">
           The collections
         </div>
 
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-8">
           <div className="flex flex-col space-y-3 max-w-4xl">
-            <h1 className={`${cormorantSC.variable} ${cormorant.variable} antialiased text-[clamp(1.8rem,5vw,3.5rem)] font-light leading-[1.1] text-[#fbf7f0] tracking-tight font-serif-editorial`}>
+            <h1 className={`${cormorantSC.variable} ${cormorant.variable} antialiased text-[clamp(1.8rem,5vw,3.5rem)] font-light leading-[1.1] text-bj-text-heading tracking-tight font-serif-editorial`}>
               <span className="block fade-in-up" style={{ animationDelay: '0ms' }}>
                 Curated, never crowded.
               </span>
@@ -124,17 +150,32 @@ export default function CollectionsRow() {
                 href={`/${item.slug}`}
                 className={`
                   flex-none w-[82vw] sm:w-[45vw] lg:w-[355px] aspect-[3/4]
-                  bg-[#13100d] border ${item.borderColor} relative overflow-hidden group 
+                  collection-card bg-bj-bg-card border ${item.borderColor} relative overflow-hidden group 
                   flex flex-col justify-between p-6 md:p-8 
                   hover:shadow-2xl vibrate-card-hover
                 `}
               >
                 <div
-                  className="absolute inset-0 pointer-events-none mix-blend-screen opacity-90 transition-opacity duration-500 group-hover:opacity-100"
+                  className="card-glow absolute inset-0 pointer-events-none mix-blend-screen opacity-90 transition-opacity duration-500 group-hover:opacity-100"
                   style={{ backgroundImage: item.glowStyle }}
                 />
 
-                <div className="absolute top-[40%] left-[40%] -translate-x-1/2 -translate-y-1/2 pointer-events-none opacity-[0.12] group-hover:opacity-[0.22] transition-opacity duration-500">
+                <div className="card-luxury-svg absolute inset-0 pointer-events-none" aria-hidden="true">
+                  <svg className="w-full h-full" viewBox="0 0 355 473" preserveAspectRatio="xMidYMid slice" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                      <pattern id={`mv-${item.id}`} x="0" y="0" width="240" height="240" patternUnits="userSpaceOnUse">
+                        <path d="M0 50 Q60 30 120 60 T240 40" stroke="#dbb86b" strokeWidth="0.3" opacity="0.07" fill="none"/>
+                        <path d="M0 110 Q80 130 140 95 T240 115" stroke="#dbb86b" strokeWidth="0.2" opacity="0.05" fill="none"/>
+                        <path d="M0 170 Q50 160 100 185 T240 175" stroke="#dbb86b" strokeWidth="0.2" opacity="0.04" fill="none"/>
+                        <path d="M60 0 Q40 60 70 120 T50 240" stroke="#dbb86b" strokeWidth="0.2" opacity="0.05" fill="none"/>
+                        <path d="M170 0 Q190 70 150 130 T180 240" stroke="#dbb86b" strokeWidth="0.15" opacity="0.04" fill="none"/>
+                      </pattern>
+                    </defs>
+                    <rect width="100%" height="100%" fill={`url(#mv-${item.id})`}/>
+                  </svg>
+                </div>
+
+                <div className="card-circle absolute top-[40%] left-[40%] -translate-x-1/2 -translate-y-1/2 pointer-events-none opacity-[0.12] group-hover:opacity-[0.22] transition-opacity duration-500">
                   <div className="w-[140px] h-[140px] rounded-full border border-white flex items-center justify-center">
                     <div className="w-[110px] h-[110px] rounded-full border border-white flex items-center justify-center">
                       <div className="w-[80px] h-[80px] rounded-full border border-white flex items-center justify-center">
@@ -145,25 +186,25 @@ export default function CollectionsRow() {
                 </div>
 
                 <div className="relative z-10 self-start">
-                  <span className="text-[10px] tracking-widest text-white/40 bg-white/5 border border-white/10 px-2.5 py-1 font-sans">
+                  <span className="card-badge text-[10px] tracking-widest text-bj-text-heading/40 bg-white/5 border border-white/10 px-2.5 py-1 font-sans">
                     {item.id}
                   </span>
                 </div>
 
                 <div className="relative z-10 flex flex-col space-y-4 pt-12">
                   <div>
-                    <p className="font-nepali-serif italic text-[#dbb86b] text-xs tracking-wide font-light mb-1 opacity-90">
+                    <p className="font-nepali-serif italic text-bj-gold text-xs tracking-wide font-light mb-1 opacity-90">
                       {item.nepaliTitle}
                     </p>
-                    <h3 className={`${cormorant.variable} text-2xl inline-block scale-y-[1.2] md:text-2xl font-light font-serif-editorial text-[#fbf7f0] tracking-wide`}>
+                    <h3 className={`${cormorant.variable} text-2xl inline-block scale-y-[1.2] md:text-2xl font-light font-serif-editorial text-bj-text-heading tracking-wide`}>
                       {item.englishTitle}
                     </h3>
                   </div>
 
                   <div className="flex flex-col gap-2">
-                    <div className="flex items-center justify-between text-[10px] tracking-[0.25em] text-white/40 font-sans">
+                    <div className="flex items-center justify-between text-[10px] tracking-[0.25em] text-bj-text-heading/40 font-sans">
                       <span>{item.pieces}</span>
-                      <span className="group/inner flex items-center gap-1 text-[#dbb86b] transition-colors duration-300 tracking-widest">
+                      <span className="group/inner flex items-center gap-1 text-bj-gold transition-colors duration-300 tracking-widest">
                         EXPLORE{' '}
                         <span className="transform group-hover/inner:translate-x-1 transition-transform duration-300">→</span>
                       </span>

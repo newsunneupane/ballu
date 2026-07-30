@@ -19,6 +19,20 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Provide an array of items' }, { status: 400, headers: { 'Cache-Control': 'no-store' } });
     }
 
+    const conditions = items
+      .filter((i: any) => i.name?.en && i.name?.np)
+      .map((i: any) => ({
+        category: i.category,
+        material: i.material,
+        'name.en': { $regex: new RegExp(`^${i.name.en.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') },
+        'name.np': i.name.np,
+      }));
+    const existing = await Item.find({ $or: conditions });
+    if (existing.length > 0) {
+      const dupes = existing.map((i: any) => i.name?.en).filter(Boolean).join(', ');
+      return NextResponse.json({ error: `Duplicate items already exist: ${dupes}` }, { status: 409, headers: { 'Cache-Control': 'no-store' } });
+    }
+
     const created = await Item.insertMany(items, { ordered: false });
     return NextResponse.json({ count: created.length, items: created }, { status: 201, headers: { 'Cache-Control': 'no-store' } });
   } catch (err) {

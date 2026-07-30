@@ -29,21 +29,35 @@ export default function MaterialsPage() {
     setShowForm(true);
   };
 
+  const [error, setError] = useState('');
+
   const save = async () => {
+    setError('');
     const payload = { name: { en: form.nameEn, np: form.nameNp } };
-    if (editing) {
-      await api.materials.update(editing._id, payload);
-    } else {
-      await api.materials.create(payload);
+    try {
+      if (editing) {
+        await api.materials.update(editing._id, payload);
+      } else {
+        await api.materials.create(payload);
+      }
+      setShowForm(false);
+      invalidate();
+    } catch (err: any) {
+      setError(err.message);
     }
-    setShowForm(false);
-    invalidate();
   };
+
+  const [deleteError, setDeleteError] = useState('');
 
   const remove = async (id: string) => {
     if (!confirm('Delete this material?')) return;
-    await api.materials.delete(id);
-    invalidate();
+    try {
+      setDeleteError('');
+      await api.materials.delete(id);
+      invalidate();
+    } catch (err: any) {
+      setDeleteError(err.message);
+    }
   };
 
   return (
@@ -78,6 +92,9 @@ export default function MaterialsPage() {
             {materials.length === 0 && (
               <tr><td colSpan={3} className="px-5 py-8 text-center text-[#6e695f]">No materials yet</td></tr>
             )}
+            {deleteError && (
+              <tr><td colSpan={3} className="px-5 py-3 text-center text-red-400 text-sm bg-red-400/5">{deleteError}</td></tr>
+            )}
           </tbody>
         </table>
       </div>
@@ -98,6 +115,9 @@ export default function MaterialsPage() {
                 <label className="block text-[10px] tracking-[0.2em] uppercase text-[#6e695f] mb-1.5">Name (Nepali)</label>
                 <input value={form.nameNp} onChange={(e) => setForm({ ...form, nameNp: e.target.value })} className="w-full bg-[#0a0806] border border-[#1f1a10] rounded px-3 py-2 text-sm text-[#e5e5e0] focus:outline-none focus:border-[#dbb86b]" />
               </div>
+              {error && (
+                <div className="text-red-400 text-sm px-3 py-2 rounded bg-red-400/10">{error}</div>
+              )}
               <button onClick={save} className="w-full bg-[#dbb86b] text-[#0a0806] py-2 rounded text-sm font-medium hover:bg-[#c9a96e] transition-colors mt-2">
                 {editing ? 'Update' : 'Create'}
               </button>

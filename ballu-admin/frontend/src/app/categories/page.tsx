@@ -29,21 +29,35 @@ export default function CategoriesPage() {
     setShowForm(true);
   };
 
+  const [error, setError] = useState('');
+
   const save = async () => {
+    setError('');
     const payload = { name: { en: form.nameEn, np: form.nameNp }, description: form.description };
-    if (editing) {
-      await api.categories.update(editing._id, payload);
-    } else {
-      await api.categories.create(payload);
+    try {
+      if (editing) {
+        await api.categories.update(editing._id, payload);
+      } else {
+        await api.categories.create(payload);
+      }
+      setShowForm(false);
+      invalidate();
+    } catch (err: any) {
+      setError(err.message);
     }
-    setShowForm(false);
-    invalidate();
   };
+
+  const [deleteError, setDeleteError] = useState('');
 
   const remove = async (id: string) => {
     if (!confirm('Delete this category?')) return;
-    await api.categories.delete(id);
-    invalidate();
+    try {
+      setDeleteError('');
+      await api.categories.delete(id);
+      invalidate();
+    } catch (err: any) {
+      setDeleteError(err.message);
+    }
   };
 
   return (
@@ -80,6 +94,9 @@ export default function CategoriesPage() {
             {categories.length === 0 && (
               <tr><td colSpan={4} className="px-5 py-8 text-center text-[#6e695f]">No categories yet</td></tr>
             )}
+            {deleteError && (
+              <tr><td colSpan={4} className="px-5 py-3 text-center text-red-400 text-sm bg-red-400/5">{deleteError}</td></tr>
+            )}
           </tbody>
         </table>
       </div>
@@ -104,6 +121,9 @@ export default function CategoriesPage() {
                 <label className="block text-[10px] tracking-[0.2em] uppercase text-[#6e695f] mb-1.5">Description</label>
                 <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={2} className="w-full bg-[#0a0806] border border-[#1f1a10] rounded px-3 py-2 text-sm text-[#e5e5e0] focus:outline-none focus:border-[#dbb86b]" />
               </div>
+              {error && (
+                <div className="text-red-400 text-sm px-3 py-2 rounded bg-red-400/10">{error}</div>
+              )}
               <button onClick={save} className="w-full bg-[#dbb86b] text-[#0a0806] py-2 rounded text-sm font-medium hover:bg-[#c9a96e] transition-colors mt-2">
                 {editing ? 'Update' : 'Create'}
               </button>

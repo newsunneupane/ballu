@@ -3,11 +3,12 @@
 import Link from 'next/link';
 import React, { useState, useEffect } from 'react';
 import { Cormorant_Garamond, Cormorant_SC } from 'next/font/google';
-import { FiSearch, FiMenu, FiX } from 'react-icons/fi';
+import { FiSearch, FiMenu, FiX, FiSun, FiMoon } from 'react-icons/fi';
 import { FaWhatsapp } from 'react-icons/fa';
 import { useScrollPosition } from '@/hooks/useScrollPosition';
 import { NAV_LINKS, SITE, WHATSAPP_URL } from '@/lib/constants';
 import SearchOverlay from '@/components/layout/SearchOverlay';
+import { useTheme } from '@/components/layout/ThemeProvider';
 
 const cormorantSC = Cormorant_SC({
   subsets: ['latin'],
@@ -24,6 +25,7 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const [tickerOffset, setTickerOffset] = useState(32);
+  const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
     const updateOffset = () => {
@@ -36,10 +38,10 @@ export default function Navbar() {
   }, []);
 
   return (
-    <div className={`${cormorant.className} bg-black text-[#dbb86b] w-full fixed z-50`} style={{ top: tickerOffset }}>
+    <div className={`${cormorant.className} bg-bj-bg-ticker text-[#dbb86b] w-full fixed z-50`} style={{ top: tickerOffset }}>
       <div
         className={`
-          bg-[#0e0b08] border-b border-[#2b2415] w-full
+          bg-bj-bg-secondary border-b border-bj-border w-full
           ${isPinned ? 'shadow-xl' : ''}
         `}
       >
@@ -50,7 +52,7 @@ export default function Navbar() {
         >
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden text-[rgb(218,206,183)] hover:text-[#d4b77a] focus:outline-none transition-colors p-1"
+            className="md:hidden text-bj-text-nav hover:font-semibold focus:outline-none transition-colors p-1"
             aria-label="Toggle menu"
           >
             {isOpen ? <FiX size={18} /> : <FiMenu size={18} />}
@@ -60,21 +62,30 @@ export default function Navbar() {
 
           <Logo isShrunk={isShrunk} />
 
-          <div className="flex items-center gap-3 md:gap-5 text-[13px] text-[rgb(218,206,183)]">
+          <div className="flex items-center gap-3 md:gap-5 text-[13px] text-bj-text-nav">
             <div className="hidden md:flex gap-5 tracking-[8px]">
               <NavLink href="/bridal">Bridal</NavLink>
               <NavLink href="/journal">Stories</NavLink>
               <NavLink href="/visit">Visit</NavLink>
             </div>
 
-            <div className="hidden md:block text-[13px] text-[#4e4226]">
+            <div className="hidden md:block text-[13px] text-bj-text-separator">
               <span>|</span>
             </div>
 
             <div className="flex items-center gap-4 md:gap-6 ml-0 md:ml-4">
               <span
+  onClick={toggleTheme}
+  className="relative inline-flex cursor-pointer group text-bj-text-nav transition-all duration-300"
+  title={theme === 'dark' ? 'Light mode' : 'Dark mode'}
+>
+  {theme === 'dark' ? <FiSun size={14} /> : <FiMoon size={14} />}
+  <span className="absolute left-0 -bottom-1 h-px w-0 bg-[#d4b77a] transition-all duration-500 group-hover:w-full" />
+</span>
+
+              <span
   onClick={() => setShowSearch(true)}
-  className="relative inline-flex cursor-pointer group text-[rgb(218,206,183)] hover:text-[#d4b77a] transition-all duration-300"
+  className="relative inline-flex cursor-pointer group text-bj-text-nav transition-all duration-300"
 >
   <FiSearch size={14} />
   <span className="absolute left-0 -bottom-1 h-px w-0 bg-[#d4b77a] transition-all duration-500 group-hover:w-full" />
@@ -84,7 +95,7 @@ export default function Navbar() {
                 href={WHATSAPP_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="relative inline-flex cursor-pointer group text-[rgb(218,206,183)] hover:text-[#d4b77a] transition-all duration-300"
+                className="relative inline-flex cursor-pointer group text-bj-text-nav transition-all duration-300"
               >
                 <FaWhatsapp size={14} />
                 <span className="absolute left-0 -bottom-1 h-px w-0 bg-[#d4b77a] transition-all duration-500 group-hover:w-full" />
@@ -103,7 +114,7 @@ export default function Navbar() {
 
 function DesktopNav({ links }: { links: readonly { href: string; label: string }[] }) {
   return (
-    <div className="hidden md:flex gap-5 text-[13px] text-[rgb(218,206,183)] tracking-[4px] uppercase">
+    <div className="hidden md:flex gap-5 text-[13px] text-bj-text-nav tracking-[4px] uppercase">
       {links.map((link) => (
         <NavLink key={link.href} href={link.href}>{link.label}</NavLink>
       ))}
@@ -115,8 +126,8 @@ function NavLink({ href, children }: { href: string; children: React.ReactNode }
   return (
     <Link
       href={href}
-      className="relative text-[13px] tracking-[4px] uppercase text-[rgb(218,206,183)] hover:text-[#d4b77a] active:text-[#b99755] transition-colors duration-300 after:content-[''] after:absolute after:left-0 after:-bottom-1 after:h-[1px] after:w-0 after:bg-[#d4b77a] after:transition-all after:duration-500 hover:after:w-full"
-    >
+      className="relative nav-link text-[13px] tracking-[4px] uppercase text-bj-text-nav hover:font-semibold active:text-[#b99755] transition-colors duration-300"
+      >
       {children}
     </Link>
   );
@@ -126,14 +137,14 @@ function Logo({ isShrunk }: { isShrunk: boolean }) {
   return (
     <div className="text-center flex flex-row space-x-2 items-baseline">
       <div
-        className={`italic text-[rgb(218,206,183)] leading-none transition-all duration-500 ease-in-out ${
+        className={`italic text-bj-text-nav leading-none transition-all duration-500 ease-in-out ${
           isShrunk ? 'text-[22px] md:text-[23px]' : 'text-[24px] md:text-[25px]'
         }`}
       >
         {SITE.name}
       </div>
       <div
-        className={`${cormorantSC.className} tracking-[0.35em] leading-none [font-variant:small-caps] transition-all duration-500 ease-in-out ${
+        className={`${cormorantSC.className} jewellers-text text-bj-gold-rich tracking-[0.35em] leading-none [font-variant:small-caps] transition-all duration-500 ease-in-out ${
           isShrunk ? 'text-[18px] md:text-[20px]' : 'text-[20px] md:text-[23px]'
         }`}
       >
@@ -148,13 +159,13 @@ function MobileMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
 
   return (
     <div
-      className={`md:hidden fixed inset-x-0 bottom-0 bg-[#0e0b08]/98 border-t border-[#2b2415] backdrop-blur-lg transition-all duration-500 ease-in-out overflow-y-auto z-40 no-scrollbar ${
+      className={`md:hidden fixed inset-x-0 bottom-0 bg-bj-bg-secondary/98 border-t border-bj-border backdrop-blur-lg transition-all duration-500 ease-in-out overflow-y-auto z-40 no-scrollbar ${
         isOpen ? 'top-[56px] md:top-[68px] opacity-100 visible' : 'top-[100%] opacity-0 invisible'
       }`}
     >
-      <div className="flex flex-col items-center justify-center space-y-6 min-h-full pb-24 text-[16px] tracking-[6px] uppercase text-[rgb(218,206,183)] px-6">
+      <div className="flex flex-col items-center justify-center space-y-6 min-h-full pb-24 text-[16px] tracking-[6px] uppercase text-bj-text-nav px-6">
         {allLinks.map((link) => (
-          <Link key={link.href} href={link.href} onClick={onClose} className="hover:text-[#d4b77a] py-2 transition-all">
+          <Link key={link.href} href={link.href} onClick={onClose} className="hover:font-semibold py-2 transition-all">
             {link.label}
           </Link>
         ))}

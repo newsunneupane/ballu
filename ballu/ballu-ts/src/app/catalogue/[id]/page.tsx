@@ -34,17 +34,17 @@ export default function ProductDetail() {
 
   if (!dataReady) {
     return (
-      <div className="min-h-screen bg-[#0a0806] text-[#e5e5e0] flex items-center justify-center p-6">
-        <p className={`${tenorSans.className} text-xs tracking-widest text-[#8e897e] uppercase`}>Loading ...</p>
+      <div className="min-h-screen bg-bj-bg text-bj-text-alt flex items-center justify-center p-6">
+        <p className={`${tenorSans.className} text-xs tracking-widest text-bj-text-muted uppercase`}>Loading ...</p>
       </div>
     );
   }
 
   if (!product) {
     return (
-      <div className="min-h-screen bg-[#0a0806] text-[#e5e5e0] flex flex-col items-center justify-center p-6">
-        <h2 className={`${cormorant.className} text-2xl mb-4 text-[#cda274]`}>Design Specimen Not Found</h2>
-        <p className={`${tenorSans.className} text-xs tracking-widest text-[#8e897e] uppercase`}>
+      <div className="min-h-screen bg-bj-bg text-bj-text-alt flex flex-col items-center justify-center p-6">
+        <h2 className={`${cormorant.className} text-2xl mb-4 text-bj-gold-alt`}>Design Specimen Not Found</h2>
+        <p className={`${tenorSans.className} text-xs tracking-widest text-bj-text-muted uppercase`}>
           The requested archive ID ({id || "none"}) does not exist in this drawer.
         </p>
       </div>
@@ -52,26 +52,26 @@ export default function ProductDetail() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0806] text-[#e5e5e0] antialiased p-6 md:p-12 lg:p-16 flex justify-center">
+    <div className="min-h-screen bg-bj-bg text-bj-text-alt antialiased p-6 md:p-12 lg:p-16 flex justify-center">
       <div className="max-w-[1200px] w-full">
-        <nav className={`${tenorSans.className} text-[9px] tracking-[0.3em] uppercase text-[#8e897e] mb-8 lg:mb-12 flex flex-wrap gap-2`}>
-          <Link href="/" className="hover:text-[#cda274] cursor-pointer transition-colors">Home</Link>
+        <nav className={`${tenorSans.className} text-[9px] tracking-[0.3em] uppercase text-breadcrumb mb-8 lg:mb-12 flex flex-wrap gap-2`}>
+          <Link href="/" className="hover:text-bj-gold-alt cursor-pointer transition-colors">Home</Link>
           <span>·</span>
-          <Link href="/catalogue" className="hover:text-[#cda274] cursor-pointer transition-colors">Catalogue</Link>
+          <Link href="/catalogue" className="hover:text-bj-gold-alt cursor-pointer transition-colors">Catalogue</Link>
           <span>·</span>
-          <span className="hover:text-[#cda274] cursor-pointer transition-colors">{product.category}</span>
+          <span className="hover:text-bj-gold-alt cursor-pointer transition-colors">{product.category}</span>
           <span>·</span>
-          <span className="text-[#cda274]">{product.title}</span>
+          <span>{product.title}</span>
         </nav>
 
         <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_1fr] gap-10 lg:gap-20">
-          <div className="w-full bg-[#110e0b] p-4 lg:p-6 rounded-sm border border-[#1f1a10]">
+          <div className="w-full bg-bj-bg-elevated p-4 lg:p-6 rounded-sm border border-bj-border-light">
             <div className="relative w-full aspect-[4/5] bg-[radial-gradient(circle_at_35%_40%,_#fbe4b5_0%,_#cda274_25%,_#6e5229_60%,_#2b210a_100%)] overflow-hidden shadow-inner">
               <div className="absolute top-[40%] left-[35%] -translate-x-1/2 -translate-y-1/2 w-[30%] h-[30%] rounded-full border border-white/20" />
               <div className="absolute top-[40%] left-[35%] -translate-x-1/2 -translate-y-1/2 w-[55%] h-[55%] rounded-full border border-white/10" />
               <div className="absolute top-[40%] left-[35%] -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] rounded-full border border-white/5" />
 
-              <div className="absolute top-4 right-4 border border-[#cda274] bg-[#000000]/40 backdrop-blur-md text-[#cda274] px-3 py-1.5 flex items-center gap-2">
+              <div className="absolute top-4 right-4 border border-bj-gold-alt bg-bj-bg-ticker/40 backdrop-blur-md text-bj-gold-alt px-3 py-1.5 flex items-center gap-2">
                 <span className="text-[8px]">✦</span>
                 <span className={`${tenorSans.className} text-[8px] tracking-[0.25em] uppercase font-semibold`}>
                   Hallmarked 916
@@ -79,96 +79,96 @@ export default function ProductDetail() {
               </div>
 
               <div className="absolute bottom-6 left-6 flex gap-1.5">
-                <div className="w-6 h-[2px] bg-[#cda274]" />
-                <div className="w-6 h-[2px] bg-[#8e897e]/40" />
-                <div className="w-6 h-[2px] bg-[#8e897e]/40" />
-                <div className="w-6 h-[2px] bg-[#8e897e]/40" />
+                <div className="w-6 h-[2px] bg-bj-gold-alt" />
+                <div className="w-6 h-[2px] bg-bj-text-muted/40" />
+                <div className="w-6 h-[2px] bg-bj-text-muted/40" />
+                <div className="w-6 h-[2px] bg-bj-text-muted/40" />
               </div>
             </div>
           </div>
 
           <div className="flex flex-col justify-center py-4">
-            <div className={`${tenorSans.className} text-[#cda274] text-[9px] tracking-[0.3em] uppercase mb-5`}>
+            <div className={`${tenorSans.className} text-bj-gold-alt text-[9px] tracking-[0.3em] uppercase mb-5`}>
               Atelier Archive · {product.tag || "COLLECTION"}
             </div>
 
-            <h1 className={`${cormorant.className} text-4xl lg:text-5xl leading-none text-[#fbf7f0] mb-2 font-light tracking-wide`}>
+            <h1 className={`${cormorant.className} text-4xl lg:text-5xl leading-none text-bj-text-heading mb-2 font-light tracking-wide`}>
               {product.title}
             </h1>
 
-            <p className="text-[#ebd3b4] opacity-80 text-[17px] italic mb-8 font-serif tracking-wide">
+            <p className="text-bj-text-gold opacity-80 text-[17px] italic mb-8 font-serif tracking-wide">
               {product.subTitle}
             </p>
 
             <div className="flex items-baseline gap-4 mb-8">
-              <span className={`${cormorant.className} text-4xl lg:text-[40px] text-[#cda274] tracking-wide`}>
+              <span className={`${cormorant.className} text-4xl lg:text-[40px] text-bj-gold-alt tracking-wide`}>
                 {product.price}
               </span>
-              <span className={`${tenorSans.className} text-[9px] tracking-[0.2em] text-[#8e897e] uppercase`}>
+              <span className={`${tenorSans.className} text-[9px] tracking-[0.2em] text-bj-text-muted uppercase`}>
                 Incl. Making
               </span>
             </div>
 
             {product.description && (
-              <p className={`${tenorSans.className} text-[13px] text-[#a8a397] leading-[1.8] mb-10 pr-4`}>
+              <p className={`${tenorSans.className} text-[13px] text-bj-text-description leading-[1.8] mb-10 pr-4`}>
                 {product.description}
               </p>
             )}
 
-            <div className="w-full h-px bg-[#2b2415] mb-8" />
+            <div className="w-full h-px bg-bj-border mb-8" />
 
             {product.pricing && (
               <>
                 <div className="mb-10">
-                  <h3 className={`${tenorSans.className} text-[9px] tracking-[0.3em] uppercase text-[#8e897e] mb-6`}>
+                  <h3 className={`${tenorSans.className} text-[9px] tracking-[0.3em] uppercase text-bj-text-muted mb-6`}>
                     Transparent Pricing
                   </h3>
 
-                  <div className={`${tenorSans.className} flex flex-col gap-3 text-[12px] text-[#a8a397] mb-5`}>
+                  <div className={`${tenorSans.className} flex flex-col gap-3 text-[12px] text-bj-text-description mb-5`}>
                     <div className="flex justify-between">
                       <span>Gold value ({product.purity} - {product.weight} @ Rs14,260/g)</span>
-                      <span className={`${cormorant.className} text-[15px] italic text-[#e5e5e0]`}>{product.pricing.goldValue}</span>
+                      <span className={`${cormorant.className} text-[15px] italic text-bj-text-alt`}>{product.pricing.goldValue}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Wastage (8%)</span>
-                      <span className={`${cormorant.className} text-[15px] italic text-[#e5e5e0]`}>{product.pricing.wastage}</span>
+                      <span className={`${cormorant.className} text-[15px] italic text-bj-text-alt`}>{product.pricing.wastage}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Making charges</span>
-                      <span className={`${cormorant.className} text-[15px] italic text-[#e5e5e0]`}>{product.pricing.making}</span>
+                      <span className={`${cormorant.className} text-[15px] italic text-bj-text-alt`}>{product.pricing.making}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Less: boutique deduction</span>
-                      <span className={`${cormorant.className} text-[15px] italic text-[#e5e5e0]`}>{product.pricing.discount}</span>
+                      <span className={`${cormorant.className} text-[15px] italic text-bj-text-alt`}>{product.pricing.discount}</span>
                     </div>
                   </div>
 
-                  <div className="flex justify-between pt-5 border-t border-[#2b2415]">
-                    <span className={`${tenorSans.className} text-[12px] text-[#cda274]`}>Total</span>
-                    <span className={`${cormorant.className} text-xl text-[#cda274]`}>{product.price}</span>
+                  <div className="flex justify-between pt-5 border-t border-bj-border">
+                    <span className={`${tenorSans.className} text-[12px] text-bj-gold-alt`}>Total</span>
+                    <span className={`${cormorant.className} text-xl text-bj-gold-alt`}>{product.price}</span>
                   </div>
                 </div>
 
-                <div className="w-full h-px bg-[#2b2415] mb-8" />
+                <div className="w-full h-px bg-bj-border mb-8" />
               </>
             )}
 
             <div className="grid grid-cols-4 gap-4 mb-10">
               <div>
-                <div className={`${tenorSans.className} text-[8px] tracking-[0.25em] uppercase text-[#8e897e] mb-2`}>Purity</div>
-                <div className={`${cormorant.className} text-[17px] text-[#e5e5e0]`}>{product.purity || product.karat}</div>
+                <div className={`${tenorSans.className} text-[8px] tracking-[0.25em] uppercase text-bj-text-muted mb-2`}>Purity</div>
+                <div className={`${cormorant.className} text-[17px] text-bj-text-alt`}>{product.purity || product.karat}</div>
               </div>
               <div>
-                <div className={`${tenorSans.className} text-[8px] tracking-[0.25em] uppercase text-[#8e897e] mb-2`}>Weight</div>
-                <div className={`${cormorant.className} text-[17px] text-[#e5e5e0]`}>{product.weight}</div>
+                <div className={`${tenorSans.className} text-[8px] tracking-[0.25em] uppercase text-bj-text-muted mb-2`}>Weight</div>
+                <div className={`${cormorant.className} text-[17px] text-bj-text-alt`}>{product.weight}</div>
               </div>
               <div>
-                <div className={`${tenorSans.className} text-[8px] tracking-[0.25em] uppercase text-[#8e897e] mb-2`}>Stones</div>
-                <div className={`${cormorant.className} text-[17px] text-[#e5e5e0]`}>{product.stones || 'None'}</div>
+                <div className={`${tenorSans.className} text-[8px] tracking-[0.25em] uppercase text-bj-text-muted mb-2`}>Stones</div>
+                <div className={`${cormorant.className} text-[17px] text-bj-text-alt`}>{product.stones || 'None'}</div>
               </div>
               <div>
-                <div className={`${tenorSans.className} text-[8px] tracking-[0.25em] uppercase text-[#8e897e] mb-2`}>Karigar</div>
-                <div className={`${cormorant.className} text-[17px] text-[#e5e5e0]`}>{product.karigar || '—'}</div>
+                <div className={`${tenorSans.className} text-[8px] tracking-[0.25em] uppercase text-bj-text-muted mb-2`}>Karigar</div>
+                <div className={`${cormorant.className} text-[17px] text-bj-text-alt`}>{product.karigar || '—'}</div>
               </div>
             </div>
 

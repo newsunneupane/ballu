@@ -1,43 +1,10 @@
 import { Product, ProductFilters } from '@/types/product';
 import { Collection } from '@/types/collection';
-import { products } from '@/data/products';
 import { categoryConfigMap, categorySlugMap, categoryFromSlug, categoryPageConfig } from '@/data/collections';
-import { api } from './api';
 
-let productStore: Product[] = [...products];
-let loaded = false;
-let loadingPromise: Promise<void> | null = null;
-
+let productStore: Product[] = [];
 let categoryStore: any[] = [];
-let categoriesLoaded = false;
-let categoriesLoadingPromise: Promise<void> | null = null;
-
 let materialStore: any[] = [];
-let materialsLoaded = false;
-let materialsLoadingPromise: Promise<void> | null = null;
-
-const REFRESH_INTERVAL = 5 * 60 * 1000;
-let lastRefreshed = 0;
-
-function isStale(): boolean {
-  return Date.now() - lastRefreshed > REFRESH_INTERVAL;
-}
-
-async function refresh(): Promise<void> {
-  loaded = false;
-  categoriesLoaded = false;
-  materialsLoaded = false;
-  loadingPromise = null;
-  categoriesLoadingPromise = null;
-  materialsLoadingPromise = null;
-  await Promise.all([loadFromApi(), loadCategoriesFromApi(), loadMaterialsFromApi()]);
-}
-
-function refreshIfStale(): void {
-  if (isStale()) {
-    refresh().catch(() => {});
-  }
-}
 
 function formatCurrency(amount: number): string {
   return `Rs ${amount.toLocaleString('en-IN')}`;
@@ -80,107 +47,77 @@ function transformApiItem(item: any): Product {
 }
 
 async function loadFromApi(): Promise<void> {
-  if (loaded) return;
-  if (loadingPromise) return loadingPromise;
-
-  loadingPromise = (async () => {
-    try {
-      const res = await fetch('/api/items');
-      if (res.ok) {
-        const items = await res.json();
-        productStore = items.map(transformApiItem);
-        lastRefreshed = Date.now();
-      }
-    } catch {
-      productStore = [...products];
+  try {
+    const res = await fetch('/api/items');
+    if (res.ok) {
+      const items = await res.json();
+      productStore = items.map(transformApiItem);
+      return;
     }
-    loaded = true;
-  })();
-
-  return loadingPromise;
+  } catch {
+    /* ignore */
+  }
+  productStore = [];
 }
 
 async function loadCategoriesFromApi(): Promise<void> {
-  if (categoriesLoaded) return;
-  if (categoriesLoadingPromise) return categoriesLoadingPromise;
-
-  categoriesLoadingPromise = (async () => {
-    try {
-      const res = await fetch('/api/categories');
-      if (res.ok) {
-        categoryStore = await res.json();
-        lastRefreshed = Date.now();
-      }
-    } catch {
-      categoryStore = [];
+  try {
+    const res = await fetch('/api/categories');
+    if (res.ok) {
+      categoryStore = await res.json();
+      return;
     }
-    categoriesLoaded = true;
-  })();
-
-  return categoriesLoadingPromise;
+  } catch {
+    /* ignore */
+  }
+  categoryStore = [];
 }
 
 async function loadMaterialsFromApi(): Promise<void> {
-  if (materialsLoaded) return;
-  if (materialsLoadingPromise) return materialsLoadingPromise;
-
-  materialsLoadingPromise = (async () => {
-    try {
-      const res = await fetch('/api/materials');
-      if (res.ok) {
-        materialStore = await res.json();
-        lastRefreshed = Date.now();
-      }
-    } catch {
-      materialStore = [];
+  try {
+    const res = await fetch('/api/materials');
+    if (res.ok) {
+      materialStore = await res.json();
+      return;
     }
-    materialsLoaded = true;
-  })();
-
-  return materialsLoadingPromise;
+  } catch {
+    /* ignore */
+  }
+  materialStore = [];
 }
-
-setInterval(refresh, REFRESH_INTERVAL);
 
 export const productService = {
   async ensureLoaded(): Promise<void> {
-    refreshIfStale();
     await Promise.all([loadFromApi(), loadCategoriesFromApi(), loadMaterialsFromApi()]);
   },
 
   isLoaded(): boolean {
-    return loaded;
+    return true;
   },
 
   getCategoriesList(): any[] {
-    refreshIfStale();
     return [...categoryStore];
   },
 
   getMaterialsList(): any[] {
-    refreshIfStale();
     return [...materialStore];
   },
 
   getAll(): Product[] {
-    refreshIfStale();
     return [...productStore];
   },
 
   getById(id: string | number): Product | undefined {
-    refreshIfStale();
     return productStore.find((p) => String(p.id) === String(id));
   },
 
   getBySlug(slug: string): Product | undefined {
-    refreshIfStale();
     return productStore.find(
       (p) => p.title.toLowerCase().replace(/\s+/g, '-') === slug
     );
   },
 
   getFiltered(filters: Partial<ProductFilters>): Product[] {
-    refreshIfStale();
     return productStore.filter((product) => {
       const matchesCategory =
         !filters.categories ||
@@ -195,7 +132,6 @@ export const productService = {
   },
 
   search(query: string): Product[] {
-    refreshIfStale();
     const keywords = query.toLowerCase().trim().split(/\s+/).filter(Boolean);
     if (keywords.length === 0) return [];
     return productStore.filter((p) =>
@@ -214,12 +150,10 @@ export const productService = {
   },
 
   getCategories(): string[] {
-    refreshIfStale();
     return [...new Set(productStore.map((p) => p.category))];
   },
 
   getCategoryBySlug(slug: string): { category: string; config: typeof categoryPageConfig[keyof typeof categoryPageConfig] } | null {
-    refreshIfStale();
     const category = categoryFromSlug[slug];
     if (!category) return null;
     const config = categoryPageConfig[category];
@@ -228,7 +162,6 @@ export const productService = {
   },
 
   getCategoryCollections(): Collection[] {
-    refreshIfStale();
     const totals: Record<string, number> = {};
     const materialCounts: Record<string, Record<string, number>> = {};
     for (const p of productStore) {
@@ -237,16 +170,27 @@ export const productService = {
       materialCounts[p.category][p.material] = (materialCounts[p.category][p.material] || 0) + 1;
     }
 
+    const catLookup: Record<string, any> = {};
+    for (const c of categoryStore) {
+      const key = c.name?.en?.toUpperCase() || '';
+      catLookup[key] = c;
+    }
+
+    if (!('OTHERS' in totals)) {
+      totals.OTHERS = 0;
+    }
+
     let idx = 0;
-    return Object.entries(totals)
-      .filter(([category]) => categoryConfigMap[category])
-      .map(([category, count]) => {
-        idx++;
-        const config = categoryConfigMap[category];
-        const matCounts = Object.entries(materialCounts[category] || {})
-          .sort(([, a], [, b]) => b - a)
-          .slice(0, 4)
-          .map(([material, cnt]) => ({ material, count: cnt }));
+    return Object.entries(totals).map(([category, count]) => {
+      idx++;
+      const config = categoryConfigMap[category];
+      const catData = catLookup[category];
+      const matCounts = Object.entries(materialCounts[category] || {})
+        .sort(([, a], [, b]) => b - a)
+        .slice(0, 4)
+        .map(([material, cnt]) => ({ material, count: cnt }));
+
+      if (config) {
         return {
           id: String(idx).padStart(2, '0'),
           nepaliTitle: config.nepaliTitle,
@@ -257,11 +201,22 @@ export const productService = {
           borderColor: config.borderColor,
           slug: categorySlugMap[category] || category.toLowerCase().replace(/\s+/g, '-'),
         };
-      });
+      }
+
+      return {
+        id: String(idx).padStart(2, '0'),
+        nepaliTitle: catData?.name?.np || category,
+        englishTitle: catData?.name?.en || category,
+        pieces: `${count} ${count === 1 ? 'PIECE' : 'PIECES'}`,
+        materialCounts: matCounts,
+        glowStyle: 'radial-gradient(circle at 40% 40%, rgba(213,165,96,0.18) 0%, rgba(14,11,8,0) 70%)',
+        borderColor: 'border-amber-900/20',
+        slug: category.toLowerCase().replace(/\s+/g, '-'),
+      };
+    });
   },
 
   getMaterials(): string[] {
-    refreshIfStale();
     return [...new Set(productStore.map((p) => p.material))];
   },
 
@@ -323,14 +278,8 @@ export const productService = {
   },
 
   reset(): void {
-    productStore = [...products];
-    loaded = false;
-    loadingPromise = null;
+    productStore = [];
     categoryStore = [];
-    categoriesLoaded = false;
-    categoriesLoadingPromise = null;
     materialStore = [];
-    materialsLoaded = false;
-    materialsLoadingPromise = null;
   },
 };

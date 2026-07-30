@@ -24,7 +24,7 @@ export default function Card({
   return (
     <Component
       onClick={onClick}
-      className={`bg-[#080605] border border-[#2b2415] overflow-hidden ${hoverStyles} ${className}`}
+      className={`bg-bj-bg-card border border-bj-border overflow-hidden ${hoverStyles} ${className}`}
       {...props}
     >
       {children}
@@ -37,9 +37,9 @@ export function CardHeader({ children, className = '' }: { children: React.React
 }
 
 export function CardBody({ children, className = '' }: { children: React.ReactNode; className?: string }) {
-  return <div className={`px-5 pb-[10px] pt-[23px] bg-[#0b0806] ${className}`}>{children}</div>;
+  return <div className={`px-5 pb-[10px] pt-[23px] bg-bj-bg-card-body ${className}`}>{children}</div>;
 }
 
 export function CardFooter({ children, className = '' }: { children: React.ReactNode; className?: string }) {
-  return <div className={`border-t border-[#2b2415] pt-3 ${className}`}>{children}</div>;
+  return <div className={`border-t border-bj-border pt-3 ${className}`}>{children}</div>;
 }

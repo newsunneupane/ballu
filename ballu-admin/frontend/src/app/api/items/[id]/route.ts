@@ -45,6 +45,32 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     const { id } = await params;
     await connectDB();
     const body = await req.json();
+
+    if (!body.category) {
+      return NextResponse.json({ error: 'Category is required' }, { status: 400, headers: { 'Cache-Control': 'no-store' } });
+    }
+    if (!body.name?.en || !body.name?.np) {
+      return NextResponse.json({ error: 'Name (English & Nepali) is required' }, { status: 400, headers: { 'Cache-Control': 'no-store' } });
+    }
+    if (!body.weightGrams || body.weightGrams <= 0) {
+      return NextResponse.json({ error: 'Valid weight is required' }, { status: 400, headers: { 'Cache-Control': 'no-store' } });
+    }
+
+    if (body.name?.en || body.name?.np) {
+      const existing = await Item.findOne({
+        _id: { $ne: id },
+        category: body.category,
+        material: body.material,
+        $or: [
+          ...(body.name?.en ? [{ 'name.en': { $regex: new RegExp(`^${body.name.en.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') } }] : []),
+          ...(body.name?.np ? [{ 'name.np': body.name.np }] : []),
+        ],
+      });
+      if (existing) {
+        return NextResponse.json({ error: 'An item with this name already exists in this category & material' }, { status: 409, headers: { 'Cache-Control': 'no-store' } });
+      }
+    }
+
     const item = await Item.findByIdAndUpdate(id, body, { new: true, runValidators: true }).populate(['category', 'material']);
     if (!item) return NextResponse.json({ error: 'Item not found' }, { status: 404, headers: { 'Cache-Control': 'no-store' } });
     return NextResponse.json(item, {

@@ -9,4 +9,7 @@ const MaterialSchema = new Schema<IMaterial>(
   { timestamps: true }
 );
 
+MaterialSchema.index({ 'name.en': 1 }, { unique: true });
+MaterialSchema.index({ 'name.np': 1 }, { unique: true });
+
 export default mongoose.models.Material || mongoose.model<IMaterial>('Material', MaterialSchema);

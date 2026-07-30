@@ -29,6 +29,20 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     const { id } = await params;
     await connectDB();
     const body = await req.json();
+
+    if (body.name?.en || body.name?.np) {
+      const existing = await Material.findOne({
+        _id: { $ne: id },
+        $or: [
+          ...(body.name?.en ? [{ 'name.en': { $regex: new RegExp(`^${body.name.en.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') } }] : []),
+          ...(body.name?.np ? [{ 'name.np': body.name.np }] : []),
+        ],
+      });
+      if (existing) {
+        return NextResponse.json({ error: 'A material with this name already exists' }, { status: 409, headers: { 'Cache-Control': 'no-store' } });
+      }
+    }
+
     const material = await Material.findByIdAndUpdate(id, body, { new: true, runValidators: true });
     if (!material) return NextResponse.json({ error: 'Material not found' }, { status: 404, headers: { 'Cache-Control': 'no-store' } });
     return NextResponse.json(material, {

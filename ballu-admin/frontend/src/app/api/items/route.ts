@@ -29,6 +29,7 @@ export async function GET(req: NextRequest) {
 
     const itemsWithPrice = await Promise.all(
       items.map(async (item) => {
+        if (!item.material) return { ...item, finalPrice: null };
         try {
           const finalPrice = await calculateFinalPrice({
             materialId: item.material._id.toString(),
@@ -59,6 +60,29 @@ export async function POST(req: NextRequest) {
     if (authError) return authError;
     await connectDB();
     const body = await req.json();
+
+    if (!body.category) {
+      return NextResponse.json({ error: 'Category is required' }, { status: 400, headers: { 'Cache-Control': 'no-store' } });
+    }
+    if (!body.name?.en || !body.name?.np) {
+      return NextResponse.json({ error: 'Name (English & Nepali) is required' }, { status: 400, headers: { 'Cache-Control': 'no-store' } });
+    }
+    if (!body.weightGrams || body.weightGrams <= 0) {
+      return NextResponse.json({ error: 'Valid weight is required' }, { status: 400, headers: { 'Cache-Control': 'no-store' } });
+    }
+
+    const existing = await Item.findOne({
+      category: body.category,
+      material: body.material,
+      $or: [
+        { 'name.en': { $regex: new RegExp(`^${body.name?.en?.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') || ''}$`, 'i') } },
+        { 'name.np': body.name?.np },
+      ],
+    });
+    if (existing) {
+      return NextResponse.json({ error: 'An item with this name already exists in this category & material' }, { status: 409, headers: { 'Cache-Control': 'no-store' } });
+    }
+
     const item = await Item.create(body);
     const populated = await item.populate(['category', 'material']);
     return NextResponse.json(populated, { status: 201, headers: { 'Cache-Control': 'no-store' } });

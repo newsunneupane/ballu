@@ -19,6 +19,7 @@ export const categorySlugMap: Record<string, string> = {
   ENGAGEMENT: 'engagement',
   OFFICE: 'office',
   GIFT: 'gift',
+  OTHERS: 'others',
 };
 
 export const categoryFromSlug: Record<string, string> = {};
@@ -63,6 +64,12 @@ export const categoryPageConfig: Record<string, CategoryPageConfig> = {
     subtitle: 'उपहारको सङ्ग्रह',
     breadcrumb: 'Home · Gift',
   },
+  OTHERS: {
+    slug: 'others',
+    title: 'Other Designs.',
+    subtitle: 'अन्य डिजाइनहरू',
+    breadcrumb: 'Home · Others',
+  },
 };
 
 export const categoryConfigMap: Record<string, CategoryConfig> = {
@@ -101,5 +108,11 @@ export const categoryConfigMap: Record<string, CategoryConfig> = {
     englishTitle: 'Gift Edit',
     glowStyle: 'radial-gradient(circle at 40% 40%, rgba(235,195,145,0.2) 0%, rgba(14,11,8,0) 70%)',
     borderColor: 'border-[#ebc391]/10',
+  },
+  OTHERS: {
+    nepaliTitle: 'अन्य',
+    englishTitle: 'Other Designs',
+    glowStyle: 'radial-gradient(circle at 40% 40%, rgba(160,160,160,0.18) 0%, rgba(14,11,8,0) 70%)',
+    borderColor: 'border-[#a0a0a0]/10',
   },
 };

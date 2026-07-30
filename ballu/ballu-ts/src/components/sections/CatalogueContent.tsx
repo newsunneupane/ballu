@@ -87,19 +87,19 @@ export default function CatalogueContent({
   });
 
   return (
-    <div className={`${cormorant.className} min-h-screen bg-[#0f0d0a] text-[#e5e5e0] antialiased`}>
+    <div className={`${cormorant.className} min-h-screen bg-bj-bg-elevated text-bj-text-alt antialiased`}>
       <header className="w-full pt-6 relative">
         <div className="px-4 sm:px-6 md:px-16 lg:px-15 pb-4">
-          <div className={`${tenorSans.className} text-[10px] tracking-[0.35em] text-[#c9a96e] uppercase mt-2 mb-2`}>
-            <Link href="/" className="hover:text-[#d4b77a] transition-colors">Home</Link>
+          <div className={`${tenorSans.className} text-[10px] tracking-[0.35em] text-breadcrumb uppercase mt-2 mb-2`}>
+            <Link href="/" className="hover:text-bj-gold transition-colors">Home</Link>
             {breadcrumb ? ` · ${breadcrumb.split(' · ').slice(1).join(' · ')}` : ' · Catalogue'}
           </div>
           <div className="flex flex-col space-y-1 max-w-4xl">
-            <h1 className="antialiased text-[42px] sm:text-[75px] md:text-[90px] font-light leading-[1.1] text-[#fbf7f0] tracking-tight">
+            <h1 className="antialiased text-[42px] sm:text-[75px] md:text-[90px] font-light leading-[1.1] text-bj-text-heading tracking-tight">
               <span className="block">{title || 'The Drawer.'}</span>
             </h1>
           </div>
-          <p className="italic pb-5 font-nepali-serif tracking-wide text-[#e2d5c3] opacity-85">
+          <p className="italic pb-5 font-nepali-serif tracking-wide text-bj-text-body opacity-85">
             {subtitle || 'दराज — सबै गहना'}
           </p>
         </div>
@@ -107,7 +107,7 @@ export default function CatalogueContent({
 
       <div ref={containerRef} className="w-full h-[97px] relative">
         <div
-          className={`w-full bg-[#0f0d0a]/95 backdrop-blur-md pb-4 pt-4 border-b border-[#2b2415] px-4 sm:px-6 md:px-16 lg:px-15 left-0 right-0 ${
+          className={`w-full bg-bj-bg-elevated/95 backdrop-blur-md pb-4 pt-4 border-b border-bj-border px-4 sm:px-6 md:px-16 lg:px-15 left-0 right-0 ${
             isFixed ? 'fixed top-[50px] z-[49] shadow-2xl' : 'absolute top-0'
           }`}
         >
@@ -122,8 +122,8 @@ export default function CatalogueContent({
                       onClick={() => handleCategoryClick(cat)}
                       className={`${tenorSans.className} inline-block px-3 py-1 text-[8px] hover:-translate-y-[2px] font-small tracking-widest transition-all border rounded-4xl uppercase shrink-0 ${
                         isSelected
-                          ? 'border-[#cda274] text-[#c5b89d] bg-[#1a140f]'
-                          : 'border-[#2b2415] text-[#8e897e]'
+                           ? 'border-bj-gold-alt text-bj-gold-alt bg-bj-bg-elevated'
+                          : 'border-bj-border text-bj-text-muted'
                       }`}
                     >
                       {cat === 'ALL' ? 'ALL' : cat}
@@ -134,15 +134,15 @@ export default function CatalogueContent({
             )}
 
             <div className="flex items-center justify-between gap-4 w-full">
-              <div className="flex gap-4 text-[11px] font-semibold tracking-widest uppercase">
+              <div className="flex overflow-x-auto whitespace-nowrap gap-4 items-center shrink-0 no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0 text-[11px] font-semibold tracking-widest uppercase">
                 {materialButtons.map((mat) => (
                   <button
                     key={mat}
                     onClick={() => setActiveMaterial(mat)}
                     className={`${tenorSans.className} pb-0.5 border-b-2 transition-all ${
                       activeMaterial === mat
-                        ? 'border-[#cda274] text-[#ebd3b4]'
-                        : 'border-transparent text-[#8e897e]'
+                        ? 'border-[#cda274] text-bj-gold-alt'
+                        : 'border-transparent text-bj-text-muted'
                     }`}
                   >
                     {mat}
@@ -150,12 +150,12 @@ export default function CatalogueContent({
                 ))}
               </div>
 
-              <div className="flex items-center gap-4 text-[11px] tracking-[0.2em] uppercase text-[#8e897e]">
+              <div className="flex items-center gap-4 text-[11px] tracking-[0.2em] uppercase text-bj-text-muted">
                 <span className={`${tenorSans.className} opacity-60 hidden sm:block`}>
                   {filteredProducts.length} Pieces
                 </span>
 
-                <div className="flex border border-[#2b2415]">
+                <div className="flex border border-bj-border">
                   <button
                     onClick={() => setViewMode('GRID')}
                     className={`${tenorSans.className} px-3 py-1.5 text-[10px] tracking-[0.15em] transition-all duration-300 uppercase ${
@@ -185,11 +185,11 @@ export default function CatalogueContent({
 
       <main className="px-4 sm:px-6 md:px-16 lg:px-15 pb-32 mt-6">
         {!dataReady ? (
-          <div className={`${tenorSans.className} col-span-full text-center py-20 text-xs tracking-[4px] uppercase text-[#8e897e]`}>
+          <div className={`${tenorSans.className} col-span-full text-center py-20 text-xs tracking-[4px] uppercase text-bj-text-muted`}>
             Loading ...
           </div>
         ) : filteredProducts.length === 0 ? (
-          <div className={`${tenorSans.className} col-span-full text-center py-20 text-xs tracking-[4px] uppercase text-[#8e897e]`}>
+          <div className={`${tenorSans.className} col-span-full text-center py-20 text-xs tracking-[4px] uppercase text-bj-text-muted`}>
             No personalised designs found matching these selections.
           </div>
         ) : viewMode === 'GRID' ? (
@@ -200,7 +200,7 @@ export default function CatalogueContent({
           </div>
         ) : (
           <div className="w-full">
-            <div className={`${tenorSans.className} border-b border-[#2b2415] text-[10px] tracking-[0.25em] text-[#6e695f] uppercase grid grid-cols-[50px_2fr_1fr_100px] sm:grid-cols-[64px_2fr_1fr_1fr_1fr_1fr_1fr_120px] pb-4 items-center font-medium`}>
+            <div className={`${tenorSans.className} border-b border-bj-border text-[10px] tracking-[0.25em] text-bj-text-dim uppercase grid grid-cols-[50px_2fr_1fr_100px] sm:grid-cols-[64px_2fr_1fr_1fr_1fr_1fr_1fr_120px] pb-4 items-center font-medium`}>
               <div />
               <div className="pl-4">Piece</div>
               <div className="hidden sm:block">Category</div>
@@ -210,7 +210,7 @@ export default function CatalogueContent({
               <div>Price</div>
               <div />
             </div>
-            <div className="divide-y divide-[#1f1a10]">
+            <div className="divide-y divide-bj-border">
               {filteredProducts.map((product) => (
                 <ProductCard key={product.id} product={product} viewMode="LIST" />
               ))}

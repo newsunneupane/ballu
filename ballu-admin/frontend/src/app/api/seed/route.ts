@@ -108,6 +108,7 @@ export async function POST(req: NextRequest) {
       { en: 'Engagement', np: 'सगाई', desc: 'Engagement rings and sets' },
       { en: 'Office', np: 'कार्यालय', desc: 'Office-appropriate designs' },
       { en: 'Gift', np: 'उपहार', desc: 'Gifting collection' },
+      { en: 'Others', np: 'अन्य', desc: 'Other jewellery designs' },
     ];
     const categoryIds: Record<string, string> = {};
     for (const c of categoryData) {

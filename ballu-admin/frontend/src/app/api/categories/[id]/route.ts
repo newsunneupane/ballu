@@ -29,6 +29,20 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     const { id } = await params;
     await connectDB();
     const body = await req.json();
+
+    if (body.name?.en || body.name?.np) {
+      const existing = await Category.findOne({
+        _id: { $ne: id },
+        $or: [
+          ...(body.name?.en ? [{ 'name.en': { $regex: new RegExp(`^${body.name.en.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') } }] : []),
+          ...(body.name?.np ? [{ 'name.np': body.name.np }] : []),
+        ],
+      });
+      if (existing) {
+        return NextResponse.json({ error: 'A category with this name already exists' }, { status: 409, headers: { 'Cache-Control': 'no-store' } });
+      }
+    }
+
     const category = await Category.findByIdAndUpdate(id, body, { new: true, runValidators: true });
     if (!category) return NextResponse.json({ error: 'Category not found' }, { status: 404, headers: { 'Cache-Control': 'no-store' } });
     return NextResponse.json(category, {

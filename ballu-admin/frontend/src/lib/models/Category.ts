@@ -10,4 +10,7 @@ const CategorySchema = new Schema<ICategory>(
   { timestamps: true }
 );
 
+CategorySchema.index({ 'name.en': 1 }, { unique: true });
+CategorySchema.index({ 'name.np': 1 }, { unique: true });
+
 export default mongoose.models.Category || mongoose.model<ICategory>('Category', CategorySchema);

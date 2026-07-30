@@ -79,14 +79,14 @@ export default function SearchOverlay({ onClose }: { onClose: () => void }) {
       className={`${cormorant.variable} ${cormorantSC.variable} fixed inset-0 z-[100] flex items-start justify-center pt-[15vh] md:pt-[20vh]`}
       onClick={onClose}
     >
-      <div className="absolute inset-0 bg-black/85 backdrop-blur-sm" />
+      <div className="absolute inset-0 bg-bj-bg-ticker/85 backdrop-blur-sm" />
 
       <div
         className="relative w-full max-w-xl mx-4 z-10"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center gap-3 bg-[#0e0b08] border border-[#2b2415] rounded-lg px-4 py-3 focus-within:border-[#dbb86b] transition-colors">
-          <FiSearch className="text-[#6e695f] shrink-0" size={18} />
+        <div className="flex items-center gap-3 bg-bj-bg-secondary border border-bj-border rounded-lg px-4 py-3 focus-within:border-[#dbb86b] transition-colors">
+          <FiSearch className="text-bj-text-dim shrink-0" size={18} />
           <input
             ref={inputRef}
             type="text"
@@ -94,17 +94,17 @@ export default function SearchOverlay({ onClose }: { onClose: () => void }) {
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Search pieces, materials, collections..."
-            className="flex-1 bg-transparent text-[#fbf7f0] text-sm md:text-base placeholder:text-[#6e695f] outline-none font-sans"
+            className="flex-1 bg-transparent text-bj-text-heading text-sm md:text-base placeholder:text-bj-text-dim outline-none font-sans"
           />
-          <button onClick={onClose} className="text-[#6e695f] hover:text-[#dbb86b] transition-colors">
+          <button onClick={onClose} className="text-bj-text-dim hover:text-bj-gold transition-colors">
             <FiX size={18} />
           </button>
         </div>
 
         {query.trim() && (
-          <div className="mt-2 bg-[#0e0b08] border border-[#2b2415] rounded-lg max-h-[55vh] overflow-y-auto">
+          <div className="mt-2 bg-bj-bg-secondary border border-bj-border rounded-lg max-h-[55vh] overflow-y-auto">
             {results.length === 0 ? (
-              <p className="text-[#6e695f] text-xs tracking-widest uppercase text-center py-10 font-sans">
+              <p className="text-bj-text-dim text-xs tracking-widest uppercase text-center py-10 font-sans">
                 No pieces found
               </p>
             ) : (
@@ -117,10 +117,10 @@ export default function SearchOverlay({ onClose }: { onClose: () => void }) {
                       key={product.id}
                       onClick={() => { router.push(`/catalogue/${product.id}`); onClose(); }}
                       className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-colors ${
-                        isSelected ? 'bg-[#1f1a10]' : 'hover:bg-[#1f1a10]'
+                        isSelected ? 'bg-bj-selected' : 'hover:bg-bj-selected'
                       }`}
                     >
-                      <div className="w-12 h-12 rounded border border-[#1f1a10] overflow-hidden shrink-0 bg-[#0a0806]">
+                      <div className="w-12 h-12 rounded border border-bj-border-light overflow-hidden shrink-0 bg-bj-bg">
                         {product.images?.[0] ? (
                           <img src={product.images[0]} alt="" className="w-full h-full object-cover" />
                         ) : (
@@ -130,23 +130,23 @@ export default function SearchOverlay({ onClose }: { onClose: () => void }) {
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm text-[#fbf7f0] font-medium truncate font-serif-editorial">
+                        <p className="text-sm text-bj-text-heading font-medium truncate font-serif-editorial">
                           {product.title}
                         </p>
                         <div className="flex items-center gap-2 mt-0.5">
-                          <span className="text-[10px] text-[#8e897e] uppercase tracking-wider font-sans">
+                          <span className="text-[10px] text-bj-text-muted uppercase tracking-wider font-sans">
                             {product.category}
                           </span>
-                          <span className="text-[#4e4226] text-[10px]">|</span>
+                          <span className="text-bj-text-separator text-[10px]">|</span>
                           <span className="flex items-center gap-1">
                             <span className={`w-1.5 h-1.5 rounded-full ${matColor}`} />
-                            <span className="text-[10px] text-[#8e897e] uppercase tracking-wider font-sans">
+                            <span className="text-[10px] text-bj-text-muted uppercase tracking-wider font-sans">
                               {product.material}
                             </span>
                           </span>
                         </div>
                       </div>
-                      <span className="text-xs text-[#dbb86b] font-medium whitespace-nowrap font-sans">
+                      <span className="text-xs text-bj-gold font-medium whitespace-nowrap font-sans">
                         {formatPrice(product.price)}
                       </span>
                     </button>

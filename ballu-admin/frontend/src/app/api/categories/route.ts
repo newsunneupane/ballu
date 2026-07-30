@@ -26,6 +26,17 @@ export async function POST(req: NextRequest) {
     if (authError) return authError;
     await connectDB();
     const body = await req.json();
+
+    const existing = await Category.findOne({
+      $or: [
+        { 'name.en': { $regex: new RegExp(`^${body.name?.en.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') } },
+        { 'name.np': body.name?.np },
+      ],
+    });
+    if (existing) {
+      return NextResponse.json({ error: 'A category with this name already exists' }, { status: 409, headers: { 'Cache-Control': 'no-store' } });
+    }
+
     const category = await Category.create(body);
     return NextResponse.json(category, { status: 201, headers: { 'Cache-Control': 'no-store' } });
   } catch (err) {

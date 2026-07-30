@@ -17,7 +17,7 @@ const variantStyles: Record<ButtonVariant, string> = {
   primary:
     'bg-[#c9a96e] text-[#0a0806] hover:brightness-110 shadow-md',
   outline:
-    'border border-[#c9a96e] text-[#c9a96e] bg-transparent hover:bg-[rgba(201,169,110,0.12)]',
+    'border border-bj-gold-dark text-bj-gold-dark bg-transparent hover:bg-bj-gold-dark/12',
   ghost:
     'bg-transparent text-[#c9a96e] hover:bg-white/5',
   magnetic:
@@ -80,7 +80,7 @@ export default function Button({
         .bj-shine-btn { position:relative; overflow:hidden; isolation:isolate; }
         .bj-shine-btn::after {
           content:''; position:absolute; inset:0;
-          background:linear-gradient(105deg, transparent 30%, rgba(255,255,255,.22) 50%, transparent 70%);
+          background:linear-gradient(105deg, transparent 30%, var(--bj-shine) 50%, transparent 70%);
           background-size:250% 100%; background-position:-150% 50%;
           pointer-events:none; transition: background-position .85s ease;
         }

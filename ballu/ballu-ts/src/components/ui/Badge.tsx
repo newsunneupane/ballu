@@ -7,7 +7,7 @@ interface BadgeProps {
 }
 
 const variants = {
-  default: 'bg-[#0e0b08]/90 text-[#ebd3b4] border border-[#2b2415]',
+  default: 'bg-bj-bg-secondary/90 text-bj-text-gold border border-bj-border',
   gold: 'bg-[#cda274] text-[#0a0806]',
   outline: 'bg-transparent text-[#cda274] border border-[#cda274]',
 };

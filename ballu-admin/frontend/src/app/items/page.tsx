@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
-import { Plus, Pencil, Trash2, X, Upload, Database } from 'lucide-react';
+import { Plus, Pencil, Trash2, X, Upload } from 'lucide-react';
 
 export default function ItemsPage() {
   const queryClient = useQueryClient();
@@ -18,8 +18,7 @@ export default function ItemsPage() {
   const [showBulk, setShowBulk] = useState(false);
   const [bulkJson, setBulkJson] = useState('');
   const [bulkResult, setBulkResult] = useState<string | null>(null);
-  const [seeding, setSeeding] = useState(false);
-  const [seedResult, setSeedResult] = useState<string | null>(null);
+
   const [filterCategory, setFilterCategory] = useState('');
   const [filterMaterial, setFilterMaterial] = useState('');
 
@@ -45,9 +44,11 @@ export default function ItemsPage() {
 
   const openNew = () => {
     setEditing(null);
+    const othersCat = categories.find((c: any) => c.name?.en === 'Others');
     setForm({
       nameEn: '', nameNp: '', description: '', tag: '', purity: '',
-      category: categories[0]?._id || '', material: materials[0]?._id || '',
+      category: othersCat?._id || categories[0]?._id || '',
+      material: '',
       weightGrams: '', wastageGrams: '0', makingCharges: '0',
       boutiqueDeduction: '0', diamondValue: '0',
       stonesDetails: '', karigarName: '', images: '',
@@ -69,14 +70,29 @@ export default function ItemsPage() {
     setShowForm(true);
   };
 
+  const [validationErrors, setValidationErrors] = useState<string[]>([]);
+  const [error, setError] = useState('');
+
   const save = async () => {
+    setError('');
+    setValidationErrors([]);
+    const errors: string[] = [];
+    if (!form.category) errors.push('Category is required');
+    if (!form.material) errors.push('Material is required');
+    if (!form.nameEn.trim()) errors.push('Name (English) is required');
+    if (!form.nameNp.trim()) errors.push('Name (Nepali) is required');
+    if (!form.weightGrams || Number(form.weightGrams) <= 0) errors.push('Weight is required');
+    if (errors.length > 0) {
+      setValidationErrors(errors);
+      return;
+    }
     const payload = {
       name: { en: form.nameEn, np: form.nameNp },
       description: form.description,
       tag: form.tag || undefined,
       purity: form.purity || undefined,
       category: form.category,
-      material: form.material,
+      material: form.material || undefined,
       weightGrams: Number(form.weightGrams),
       wastageGrams: Number(form.wastageGrams),
       makingCharges: Number(form.makingCharges),
@@ -87,19 +103,30 @@ export default function ItemsPage() {
       images: form.images ? form.images.split(',').map((s) => s.trim()).filter(Boolean) : [],
     };
 
-    if (editing) {
-      await api.items.update(editing._id, payload);
-    } else {
-      await api.items.create(payload);
+    try {
+      if (editing) {
+        await api.items.update(editing._id, payload);
+      } else {
+        await api.items.create(payload);
+      }
+      setShowForm(false);
+      invalidateItems();
+    } catch (err: any) {
+      setError(err.message);
     }
-    setShowForm(false);
-    invalidateItems();
   };
+
+  const [deleteError, setDeleteError] = useState('');
 
   const remove = async (id: string) => {
     if (!confirm('Delete this item?')) return;
-    await api.items.delete(id);
-    invalidateItems();
+    try {
+      setDeleteError('');
+      await api.items.delete(id);
+      invalidateItems();
+    } catch (err: any) {
+      setDeleteError(err.message);
+    }
   };
 
   const handleBulkUpload = async () => {
@@ -117,28 +144,6 @@ export default function ItemsPage() {
     }
   };
 
-  const handleSeed = async () => {
-    if (!confirm('This will seed 40 random items. Continue?')) return;
-    setSeeding(true);
-    setSeedResult(null);
-    try {
-      const token = localStorage.getItem('bj_token');
-      const res = await fetch('/api/seed', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
-        body: JSON.stringify({ seedItems: true }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
-      setSeedResult(data.created?.join(', ') || `${data.itemCount} items seeded`);
-      invalidateItems();
-    } catch (err: any) {
-      setSeedResult(`Error: ${err.message}`);
-    } finally {
-      setSeeding(false);
-    }
-  };
-
   const tags = ['new-arrival', 'best-seller', 'limited-edition', 'sale', 'bestseller', 'trending'];
 
   return (
@@ -149,9 +154,7 @@ export default function ItemsPage() {
           <button onClick={() => { setBulkJson(''); setBulkResult(null); setShowBulk(true); }} className="flex items-center gap-2 bg-[#0f0c0a] border border-[#1f1a10] text-[#e5e5e0] px-4 py-2 rounded text-sm font-medium hover:border-[#dbb86b] transition-colors">
             <Upload size={16} /> Bulk Upload
           </button>
-          <button onClick={handleSeed} disabled={seeding} className="flex items-center gap-2 bg-[#0f0c0a] border border-[#1f1a10] text-[#e5e5e0] px-4 py-2 rounded text-sm font-medium hover:border-[#dbb86b] transition-colors disabled:opacity-50">
-            <Database size={16} /> {seeding ? 'Seeding...' : 'Seed 40 Items'}
-          </button>
+
           <button onClick={openNew} className="flex items-center gap-2 bg-[#dbb86b] text-[#0a0806] px-4 py-2 rounded text-sm font-medium hover:bg-[#c9a96e] transition-colors">
             <Plus size={16} /> Add Item
           </button>
@@ -219,6 +222,9 @@ export default function ItemsPage() {
             ))}
             {items.length === 0 && (
               <tr><td colSpan={7} className="px-5 py-8 text-center text-[#6e695f]">No items yet</td></tr>
+            )}
+            {deleteError && (
+              <tr><td colSpan={7} className="px-5 py-3 text-center text-red-400 text-sm bg-red-400/5">{deleteError}</td></tr>
             )}
           </tbody>
         </table>
@@ -302,6 +308,16 @@ export default function ItemsPage() {
                 <input value={form.images} onChange={(e) => setForm({ ...form, images: e.target.value })} className="w-full bg-[#0a0806] border border-[#1f1a10] rounded px-3 py-2 text-sm text-[#e5e5e0] focus:outline-none focus:border-[#dbb86b]" placeholder="https://..." />
               </div>
             </div>
+            {validationErrors.length > 0 && (
+              <div className="mt-4 space-y-1">
+                {validationErrors.map((e, i) => (
+                  <div key={i} className="text-red-400 text-sm px-3 py-1.5 rounded bg-red-400/10">{e}</div>
+                ))}
+              </div>
+            )}
+            {error && (
+              <div className="text-red-400 text-sm px-3 py-2 rounded bg-red-400/10 mt-2">{error}</div>
+            )}
             <button onClick={save} className="w-full bg-[#dbb86b] text-[#0a0806] py-2.5 rounded text-sm font-medium hover:bg-[#c9a96e] transition-colors mt-5">
               {editing ? 'Update Item' : 'Create Item'}
             </button>
@@ -341,14 +357,6 @@ export default function ItemsPage() {
         </div>
       )}
 
-      {seedResult && (
-        <div className="fixed bottom-6 right-6 max-w-md bg-[#0f0c0a] border border-[#1f1a10] rounded-lg p-4 shadow-xl z-50">
-          <div className="flex items-start justify-between gap-3">
-            <p className={`text-sm ${seedResult.startsWith('Error') ? 'text-red-400' : 'text-green-400'}`}>{seedResult}</p>
-            <button onClick={() => setSeedResult(null)} className="text-[#6e695f] hover:text-[#e5e5e0] shrink-0"><X size={14} /></button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
