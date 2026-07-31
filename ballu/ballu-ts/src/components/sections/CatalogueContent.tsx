@@ -133,8 +133,8 @@ export default function CatalogueContent({
               </div>
             )}
 
-            <div className="flex items-center justify-between gap-4 w-full">
-              <div className="flex overflow-x-auto whitespace-nowrap gap-4 items-center shrink-0 no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0 text-[11px] font-semibold tracking-widest uppercase">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 w-full">
+              <div className="flex overflow-x-auto whitespace-nowrap gap-4 items-center shrink-0 no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0 text-[11px] font-semibold tracking-widest uppercase w-full sm:w-auto">
                 {materialButtons.map((mat) => (
                   <button
                     key={mat}

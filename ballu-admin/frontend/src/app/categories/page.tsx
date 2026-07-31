@@ -69,7 +69,7 @@ export default function CategoriesPage() {
         </button>
       </div>
 
-      <div className="bg-[#0f0c0a] border border-[#1f1a10] rounded-lg overflow-hidden">
+      <div className="bg-[#0f0c0a] border border-[#1f1a10] rounded-lg overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-[#1f1a10] text-[#6e695f] text-[10px] tracking-[0.2em] uppercase">
