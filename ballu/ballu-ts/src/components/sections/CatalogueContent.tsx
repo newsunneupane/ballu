@@ -151,7 +151,7 @@ export default function CatalogueContent({
               </div>
 
               <div className="flex items-center gap-4 text-[11px] tracking-[0.2em] uppercase text-bj-text-muted">
-                <span className={`${tenorSans.className} opacity-60 hidden sm:block`}>
+                <span className={`${tenorSans.className} pieces-count opacity-60 hidden sm:block`}>
                   {filteredProducts.length} Pieces
                 </span>
 

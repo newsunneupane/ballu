@@ -223,6 +223,10 @@ html {
   .nav-link::after {
     background-color: #b88930 !important;
   }
+
+  .pieces-count {
+    color: #000000 !important;
+  }
 }
 
 .font-thin {

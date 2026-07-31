@@ -203,7 +203,7 @@ export default function CollectionsRow() {
 
                   <div className="flex flex-col gap-2">
                     <div className="flex items-center justify-between text-[10px] tracking-[0.25em] text-bj-text-heading/40 font-sans">
-                      <span>{item.pieces}</span>
+                      <span className="pieces-count">{item.pieces}</span>
                       <span className="group/inner flex items-center gap-1 text-bj-gold transition-colors duration-300 tracking-widest">
                         EXPLORE{' '}
                         <span className="transform group-hover/inner:translate-x-1 transition-transform duration-300">→</span>
