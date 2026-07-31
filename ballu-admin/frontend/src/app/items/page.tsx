@@ -22,6 +22,8 @@ export default function ItemsPage() {
   const [filterCategory, setFilterCategory] = useState('');
   const [filterMaterial, setFilterMaterial] = useState('');
 
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+
   const params: Record<string, string> = {};
   if (filterCategory) params.category = filterCategory;
   if (filterMaterial) params.material = filterMaterial;
@@ -41,6 +43,42 @@ export default function ItemsPage() {
   });
 
   const invalidateItems = () => queryClient.invalidateQueries({ queryKey: ['items'] });
+
+  const visibleIds = items.map((i: any) => i._id as string);
+  const allSelected = visibleIds.length > 0 && visibleIds.every((id) => selected.has(id));
+
+  const toggleSelect = (id: string) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (allSelected) visibleIds.forEach((id) => next.delete(id));
+      else visibleIds.forEach((id) => next.add(id));
+      return next;
+    });
+  };
+
+  const bulkRemove = async () => {
+    if (selected.size === 0) return;
+    const ids = [...selected];
+    if (!confirm(`Delete ${ids.length} item${ids.length > 1 ? 's' : ''}?`)) return;
+    setDeleteError('');
+    queryClient.setQueryData<any[]>(['items', qKey], (old = []) => old.filter((i) => !ids.includes(i._id)));
+    setSelected(new Set());
+    try {
+      await api.items.bulkDelete(ids);
+    } catch (err: any) {
+      setDeleteError(err.message);
+    }
+    invalidateItems();
+  };
 
   const openNew = () => {
     setEditing(null);
@@ -151,6 +189,11 @@ export default function ItemsPage() {
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-2xl font-semibold text-[#fbf7f0]">Items</h1>
         <div className="flex gap-2">
+          {selected.size > 0 && (
+            <button onClick={bulkRemove} className="flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded text-sm font-medium hover:bg-red-500 transition-colors">
+              <Trash2 size={16} /> Delete Selected ({selected.size})
+            </button>
+          )}
           <button onClick={() => { setBulkJson(''); setBulkResult(null); setShowBulk(true); }} className="flex items-center gap-2 bg-[#0f0c0a] border border-[#1f1a10] text-[#e5e5e0] px-4 py-2 rounded text-sm font-medium hover:border-[#dbb86b] transition-colors">
             <Upload size={16} /> Bulk Upload
           </button>
@@ -164,7 +207,7 @@ export default function ItemsPage() {
       <div className="flex gap-3 mb-4">
         <select
           value={filterCategory}
-          onChange={(e) => setFilterCategory(e.target.value)}
+          onChange={(e) => { setFilterCategory(e.target.value); setSelected(new Set()); }}
           className="bg-[#0f0c0a] border border-[#1f1a10] rounded px-3 py-2 text-xs text-[#e5e5e0] focus:outline-none focus:border-[#dbb86b]"
         >
           <option value="">All Categories</option>
@@ -174,7 +217,7 @@ export default function ItemsPage() {
         </select>
         <select
           value={filterMaterial}
-          onChange={(e) => setFilterMaterial(e.target.value)}
+          onChange={(e) => { setFilterMaterial(e.target.value); setSelected(new Set()); }}
           className="bg-[#0f0c0a] border border-[#1f1a10] rounded px-3 py-2 text-xs text-[#e5e5e0] focus:outline-none focus:border-[#dbb86b]"
         >
           <option value="">All Materials</option>
@@ -188,6 +231,14 @@ export default function ItemsPage() {
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-[#1f1a10] text-[#6e695f] text-[10px] tracking-[0.2em] uppercase">
+              <th className="text-left px-4 py-3 font-medium w-8">
+                <input
+                  type="checkbox"
+                  checked={allSelected}
+                  onChange={toggleSelectAll}
+                  className="accent-[#dbb86b]"
+                />
+              </th>
               <th className="text-left px-4 py-3 font-medium">Image</th>
               <th className="text-left px-4 py-3 font-medium">Name</th>
               <th className="text-left px-4 py-3 font-medium">Category</th>
@@ -199,7 +250,15 @@ export default function ItemsPage() {
           </thead>
           <tbody>
             {items.map((item: any) => (
-              <tr key={item._id} className="border-b border-[#1f1a10]/50 last:border-0 hover:bg-white/[0.02]">
+              <tr key={item._id} className={`border-b border-[#1f1a10]/50 last:border-0 hover:bg-white/[0.02] ${selected.has(item._id) ? 'bg-[#dbb86b]/5' : ''}`}>
+                <td className="px-4 py-3">
+                  <input
+                    type="checkbox"
+                    checked={selected.has(item._id)}
+                    onChange={() => toggleSelect(item._id)}
+                    className="accent-[#dbb86b]"
+                  />
+                </td>
                 <td className="px-4 py-3">
                   {item.images?.[0] ? (
                     <img src={item.images[0]} alt="" className="w-10 h-10 object-cover rounded border border-[#1f1a10]" />
@@ -221,10 +280,10 @@ export default function ItemsPage() {
               </tr>
             ))}
             {items.length === 0 && (
-              <tr><td colSpan={7} className="px-5 py-8 text-center text-[#6e695f]">No items yet</td></tr>
+              <tr><td colSpan={8} className="px-5 py-8 text-center text-[#6e695f]">No items yet</td></tr>
             )}
             {deleteError && (
-              <tr><td colSpan={7} className="px-5 py-3 text-center text-red-400 text-sm bg-red-400/5">{deleteError}</td></tr>
+              <tr><td colSpan={8} className="px-5 py-3 text-center text-red-400 text-sm bg-red-400/5">{deleteError}</td></tr>
             )}
           </tbody>
         </table>

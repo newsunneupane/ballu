@@ -90,3 +90,22 @@ export async function POST(req: NextRequest) {
     return errorResponse(err);
   }
 }
+
+export async function DELETE(req: NextRequest) {
+  try {
+    const authError = requireAuth(req);
+    if (authError) return authError;
+    await connectDB();
+    const body = await req.json();
+    const ids = Array.isArray(body) ? body : body.ids;
+    if (!Array.isArray(ids) || ids.length === 0) {
+      return NextResponse.json({ error: 'Provide an array of item ids' }, { status: 400, headers: { 'Cache-Control': 'no-store' } });
+    }
+    const result = await Item.deleteMany({ _id: { $in: ids } });
+    return NextResponse.json({ deleted: result.deletedCount }, {
+      headers: { 'Cache-Control': 'no-store' },
+    });
+  } catch (err) {
+    return errorResponse(err);
+  }
+}
