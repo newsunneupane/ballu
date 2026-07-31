@@ -20,19 +20,46 @@ export default function CustomRequestsPage() {
     queryFn: () => api.customRequests.list(statusFilter || undefined),
   });
 
+  const listKey = ['custom-requests', statusFilter || undefined] as const;
+
   const invalidate = () => {
     queryClient.invalidateQueries({ queryKey: ['custom-requests'] });
     queryClient.invalidateQueries({ queryKey: ['pending-counts'] });
   };
 
   const updateStatus = async (id: string, status: string) => {
-    await api.customRequests.update(id, { status });
+    const prev = queryClient.getQueryData<any[]>(listKey)?.find((r) => r._id === id)?.status;
+
+    queryClient.setQueryData<any[]>(listKey, (old = []) =>
+      old.map((r) => (r._id === id ? { ...r, status } : r))
+    );
+
+    if (prev && prev !== status) {
+      const delta = (status === 'Pending' ? 1 : 0) - (prev === 'Pending' ? 1 : 0);
+      queryClient.setQueryData<Record<string, number>>(['pending-counts'], (old = {}) => ({
+        ...old,
+        pendingRequests: Math.max(0, (old.pendingRequests || 0) + delta),
+      }));
+    }
+
+    try {
+      await api.customRequests.update(id, { status });
+    } catch {
+      queryClient.invalidateQueries({ queryKey: ['custom-requests'] });
+      return;
+    }
     invalidate();
   };
 
   const remove = async (id: string) => {
     if (!confirm('Delete this request?')) return;
-    await api.customRequests.delete(id);
+    queryClient.setQueryData<any[]>(listKey, (old = []) => old.filter((r) => r._id !== id));
+    try {
+      await api.customRequests.delete(id);
+    } catch {
+      queryClient.invalidateQueries({ queryKey: ['custom-requests'] });
+      return;
+    }
     invalidate();
   };
 
