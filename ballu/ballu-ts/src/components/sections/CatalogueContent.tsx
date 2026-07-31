@@ -105,12 +105,12 @@ export default function CatalogueContent({
         </div>
       </header>
 
-      <div ref={containerRef} className="w-full h-[97px] relative">
-        <div
-          className={`w-full bg-bj-bg-elevated/95 backdrop-blur-md pb-4 pt-4 border-b border-bj-border px-4 sm:px-6 md:px-16 lg:px-15 left-0 right-0 ${
-            isFixed ? 'fixed top-[50px] z-[49] shadow-2xl' : 'absolute top-0'
-          }`}
-        >
+      <div
+        ref={containerRef}
+        className={`w-full bg-bj-bg-elevated/95 backdrop-blur-md pb-4 pt-4 border-b border-bj-border px-4 sm:px-6 md:px-16 lg:px-15 sticky top-[50px] z-[49] ${
+          isFixed ? 'shadow-2xl' : ''
+        }`}
+      >
           <div className="flex flex-col gap-3 max-w-[100vw]">
             {!hideCategories && (
               <div className="flex overflow-x-auto whitespace-nowrap gap-2 items-center no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0 py-1">
@@ -181,7 +181,6 @@ export default function CatalogueContent({
             </div>
           </div>
         </div>
-      </div>
 
       <main className="px-4 sm:px-6 md:px-16 lg:px-15 pb-32 mt-6">
         {!dataReady ? (
