@@ -23,14 +23,14 @@ export default function BrandTrust() {
         [data-theme="light"] .brand-orbit .bo-darkgold { stroke: #996515 !important; }
         [data-theme="light"] .brand-orbit .brand-orbit-circle { border-color: #996515 !important; }
       `}</style>
-      <div className="max-w-7xl w-full mx-auto px-6 md:px-12 lg:px-16 pt-24 pb-20 flex flex-col items-center text-center relative overflow-hidden">
+      <div className="max-w-7xl w-full  mx-auto px-6 md:px-12 lg:px-16 pt-10 pb-40 flex flex-col items-center text-center relative overflow-hidden">
         <div className="text-bj-gold tracking-widest mb-6 opacity-80 relative z-10">☆</div>
 
         <p className={`${cormorant.className} italic text-[clamp(1.5rem,4vw,2.5rem)] font-light tracking-wide max-w-4xl text-bj-text-body leading-relaxed mb-4 relative z-10`}>
           &ldquo;Every piece, named for the bench that made it.&rdquo;
         </p>
 
-        <span className="text-[10px] tracking-[0.4em] text-bj-gold uppercase opacity-70 relative z-10">
+        <span className="text-[10px] tracking-[0.4em]  text-bj-gold uppercase opacity-70 relative z-10">
           — Ballu Suvedi, Master Karigar
         </span>
 
@@ -44,7 +44,7 @@ export default function BrandTrust() {
 
 function OrbitalDecoration() {
   return (
-    <div className="brand-orbit absolute right-[5%] md:right-[15%] bottom-0 w-[420px] h-[420px] translate-y-[270px] pointer-events-none opacity-[0.14] select-none z-0">
+    <div className="brand-orbit absolute left-1/2 -translate-x-1/2 translate-y-[270px] md:left-auto md:right-[15%] md:translate-x-0 bottom-0 w-[420px] h-[420px] pointer-events-none opacity-[0.14] select-none z-0">
       <div className="absolute inset-0 w-full h-full flex items-center justify-center animate-[spin_45s_linear_infinite]">
         <div className="absolute inset-0 w-full h-full">
           <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">

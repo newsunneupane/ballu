@@ -11,8 +11,8 @@ Built with Next.js 16, TypeScript, and Tailwind CSS.
 | `/[category]` | Dynamic category pages (festive, daily-wear, engagement, office, gift) |
 | `/catalogue` | Full catalogue with filters |
 | `/catalogue/[id]` | Product detail |
-| `/bespoke` | Commission form |
-| `/journal` | Journal / blog |
+| `/personalize` | Commission form |
+| `/stories` | Stories |
 | `/visit` | Store info & about |
 
 ## Data

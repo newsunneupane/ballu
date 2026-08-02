@@ -105,7 +105,7 @@ old records keep working.
 - `ballu/ballu-ts/src/app/catalogue/[id]/page.tsx` — detail image
 - `ballu/ballu-ts/src/components/sections/HeroSection.tsx` — hero image
 - `ballu/ballu-ts/src/components/layout/SearchOverlay.tsx` — search thumbnail
-- `ballu/ballu-ts/src/app/bespoke/page.tsx` — upload to Cloudinary (no base64)
+- `ballu/ballu-ts/src/app/personalize/page.tsx` — upload to Cloudinary (no base64)
 
 ## Troubleshooting
 

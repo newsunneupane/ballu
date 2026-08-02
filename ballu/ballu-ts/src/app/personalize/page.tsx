@@ -219,8 +219,8 @@ export default function CommissionPage() {
       <div className="w-full md:w-[55%] lg:w-[60%] flex flex-col justify-center px-4 py-10 sm:px-10 md:px-16 lg:px-24">
         <div className="max-w-2xl w-full mx-auto">
           <div className={`${tenorSans.className} flex justify-between items-center text-[9px] tracking-[0.3em] uppercase text-[#cda274] mb-4`}>
-            <span>Step 01 of 02</span>
-            <span className="opacity-60">Ref. BJ-2026-0148</span>
+            <span className=" pieces-count">Step 01 of 02</span>
+            <span className="opacity-60 pieces-count">Ref. BJ-2026-0148</span>
           </div>
 
           <h2 className={`${cormorant.className} text-[32px] sm:text-[40px] text-bj-text-heading font-light mb-8 md:mb-12`}>
@@ -229,7 +229,7 @@ export default function CommissionPage() {
 
           <div className="space-y-8 md:space-y-12">
             <div>
-              <label className={`${tenorSans.className} block text-[9px] tracking-[0.3em] uppercase text-bj-text-muted mb-3`}>
+              <label className={`${tenorSans.className} block text-[9px] tracking-[0.3em] uppercase pieces-count mb-3`}>
                 Type of Piece
               </label>
               <select
@@ -256,7 +256,7 @@ export default function CommissionPage() {
             </div>
 
             <div>
-              <label className={`${tenorSans.className} block text-[9px] tracking-[0.3em] uppercase text-bj-text-muted mb-3`}>
+              <label className={`${tenorSans.className} block text-[9px] tracking-[0.3em] uppercase pieces-count mb-3`}>
                 Material
               </label>
               <div className="flex flex-wrap gap-2 sm:gap-3">
@@ -267,7 +267,7 @@ export default function CommissionPage() {
                     className={`${tenorSans.className} px-3 py-2 sm:px-4 sm:py-2.5 text-[9px] sm:text-[10px] tracking-[0.2em] uppercase transition-all duration-300 border ${
                       selectedMaterial === mat._id
                         ? "border-[#cda274] text-[#cda274] bg-[#cda274]/5"
-                        : "border-bj-border text-bj-text-muted hover:border-bj-border-hover hover:text-bj-text-gold"
+                        : "border-bj-border text-bj-text-muted hover:bg-bj-bg-hover hover:text-bj-text-gold"
                     }`}
                   >
                     {mat.name?.en || "Material"}

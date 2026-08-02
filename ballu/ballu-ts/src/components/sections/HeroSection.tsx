@@ -50,7 +50,7 @@ export default function HeroSection() {
       <GradientOverlay />
       <AmbientParticles />
 
-      <div className="text-[11px] tracking-[0.4em] text-bj-gold text-thin uppercase opacity-80 font-sans fade-in-up fade-in-up-1 z-10">
+      <div className="text-[11px] tracking-[0.4em] text-bj-gold-thin text-thin uppercase opacity-80 font-sans fade-in-up fade-in-up-1 z-10">
         <span className="inline-block animate-[float_4s_ease-in-out_infinite]">
           <StarIcon size={16} fill="var(--bj-gold-light)" />
         </span>{' '}
@@ -81,6 +81,7 @@ export default function HeroSection() {
                 magnetic
                 icon={<ArrowRight />}
                 onClick={() => router.push('/catalogue')}
+                className="atelier-btn"
               >
                 Enter the Atelier
               </Button>

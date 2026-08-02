@@ -65,7 +65,7 @@ export default function Navbar() {
           <div className="flex items-center gap-3 md:gap-5 text-[13px] text-bj-text-nav">
             <div className="hidden md:flex gap-5 tracking-[8px]">
               <NavLink href="/bridal">Bridal</NavLink>
-              <NavLink href="/journal">Stories</NavLink>
+              <NavLink href="/stories">Stories</NavLink>
               <NavLink href="/visit">Visit</NavLink>
             </div>
 
@@ -144,7 +144,7 @@ function Logo({ isShrunk }: { isShrunk: boolean }) {
         {SITE.name}
       </div>
       <div
-        className={`${cormorantSC.className} jewellers-text text-bj-gold-rich tracking-[0.35em] leading-none [font-variant:small-caps] transition-all duration-500 ease-in-out ${
+        className={`${cormorantSC.className} jewellers-text  tracking-[0.35em] leading-none [font-variant:small-caps] transition-all duration-500 ease-in-out ${
           isShrunk ? 'text-[18px] md:text-[20px]' : 'text-[20px] md:text-[23px]'
         }`}
       >

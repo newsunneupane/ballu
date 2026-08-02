@@ -26,11 +26,11 @@ export const NAV_LINKS = {
   left: [
     { href: '/', label: 'Home' },
     { href: '/catalogue', label: 'Catalogue' },
-    { href: '/bespoke', label: 'Personalize' },
+    { href: '/personalize', label: 'Personalize' },
   ],
   right: [
     { href: '/bridal', label: 'Bridal' },
-    { href: '/journal', label: 'Stories' },
+    { href: '/stories', label: 'Stories' },
     { href: '/visit', label: 'Visit' },
   ],
 } as const;

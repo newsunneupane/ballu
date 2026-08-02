@@ -109,22 +109,29 @@ export function GradientOrbit() {
           <svg width="100%" height="100%" viewBox="0 0 100 125" preserveAspectRatio="xMidYMid slice" style={{ display: 'block' }}>
             <defs>
               <radialGradient id="g1" cx="35%" cy="30%" r="80%">
-                <stop offset="0%" stopColor="#f5e3b8" stopOpacity="0.95" />
-                <stop offset="40%" stopColor="#d4a857" stopOpacity="0.7" />
-                <stop offset="80%" stopColor="#8a5e1f" stopOpacity="0.4" />
-                <stop offset="100%" stopColor="#3a2510" stopOpacity="0.1" />
+                <stop className="bo-stop" offset="0%" stopColor="#f5e3b8" stopOpacity="0.95" />
+                <stop className="bo-stop" offset="40%" stopColor="#d4a857" stopOpacity="0.7" />
+                <stop className="bo-stop" offset="80%" stopColor="#8a5e1f" stopOpacity="0.4" />
+                <stop className="bo-stop" offset="100%" stopColor="#3a2510" stopOpacity="0.1" />
               </radialGradient>
               <radialGradient id="g2" cx="75%" cy="80%" r="60%">
-                <stop offset="0%" stopColor="#d4a857" stopOpacity="0.6" />
-                <stop offset="100%" stopColor="#3a2510" stopOpacity="0" />
+                <stop className="bo-stop2" offset="0%" stopColor="#d4a857" stopOpacity="0.6" />
+                <stop className="bo-stop2" offset="100%" stopColor="#3a2510" stopOpacity="0" />
+              </radialGradient>
+              <radialGradient id="halo" cx="50%" cy="50%" r="50%">
+                <stop className="bo-halo" offset="0%" stopColor="#d4a857" stopOpacity="0" />
+                <stop className="bo-halo" offset="100%" stopColor="#d4a857" stopOpacity="0" />
               </radialGradient>
             </defs>
             <rect width="100" height="125" style={{ fill: 'var(--bj-bg-secondary)' }} />
+            <rect width="100" height="125" fill="url(#halo)" />
             <rect width="100" height="125" fill="url(#g1)" />
             <rect width="100" height="125" fill="url(#g2)" />
-            <circle cx="50" cy="50" r="8" fill="none" stroke="#c9a96e" strokeWidth="0.35" opacity="0.4" />
-            <circle cx="50" cy="50" r="5" fill="none" stroke="#c9a96e" strokeWidth="0.3" opacity="0.35" />
-            <circle cx="50" cy="50" r="2.5" fill="none" stroke="#c9a96e" strokeWidth="0.2" opacity="0.3" />
+            <g className="bo-rings">
+              <circle className="bo-ring bo-ring-1" cx="50" cy="50" r="8" fill="none" stroke="#c9a96e" strokeWidth="0.35" opacity="0.4" />
+              <circle className="bo-ring bo-ring-2" cx="50" cy="50" r="5" fill="none" stroke="#c9a96e" strokeWidth="0.3" opacity="0.35" />
+              <circle className="bo-ring bo-ring-3" cx="50" cy="50" r="2.5" fill="none" stroke="#c9a96e" strokeWidth="0.2" opacity="0.3" />
+            </g>
           </svg>
         </div>
       </div>
@@ -180,6 +187,19 @@ export function HeroAnimations() {
         fill: #996515 !important;
         filter: drop-shadow(0 0 8px #996515) !important;
       }
+      [data-theme="light"] .bo-stop:nth-child(1) { stop-color: #f7d986; stop-opacity: 0.95; }
+      [data-theme="light"] .bo-stop:nth-child(2) { stop-color: #e3b34d; stop-opacity: 0.8; }
+      [data-theme="light"] .bo-stop:nth-child(3) { stop-color: #b5821e; stop-opacity: 0.55; }
+      [data-theme="light"] .bo-stop:nth-child(4) { stop-color: #6e4a0e; stop-opacity: 0.18; }
+      [data-theme="light"] .bo-stop2:nth-child(1) { stop-color: #e3b34d; stop-opacity: 0.75; }
+      [data-theme="light"] .bo-stop2:nth-child(2) { stop-color: #6e4a0e; stop-opacity: 0; }
+      [data-theme="light"] .bo-ring { stroke: #996515 !important; }
+      [data-theme="light"] .bo-rings { transform: scale(1.6); transform-origin: 50% 50%; }
+      [data-theme="light"] .bo-ring-1 { stroke-width: 0.7; opacity: 0.85; }
+      [data-theme="light"] .bo-ring-2 { stroke-width: 0.55; opacity: 0.75; }
+      [data-theme="light"] .bo-ring-3 { stroke-width: 0.4; opacity: 0.7; }
+      [data-theme="light"] .bo-halo:nth-child(1) { stop-color: #e3b34d; stop-opacity: 0.5; }
+      [data-theme="light"] .bo-halo:nth-child(2) { stop-color: #e3b34d; stop-opacity: 0.12; }
     `}</style>
   );
 }

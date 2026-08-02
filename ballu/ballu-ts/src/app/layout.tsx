@@ -1,6 +1,5 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Script from "next/script";
 import GoldTicker from "@/components/layout/GoldTicker";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
@@ -30,8 +29,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       suppressHydrationWarning
     >
       <head>
-        <Script id="theme-init" strategy="beforeInteractive">
-          {`
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
               (function() {
                 try {
                   var theme = localStorage.getItem('bj-theme');
@@ -40,8 +40,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   }
                 } catch(e) {}
               })();
-          `}
-        </Script>
+            `,
+          }}
+        />
       </head>
       <body className="min-h-screen" style={{ background: 'var(--bj-bg)', color: 'var(--bj-text-body)' }}>
         <QueryProvider>

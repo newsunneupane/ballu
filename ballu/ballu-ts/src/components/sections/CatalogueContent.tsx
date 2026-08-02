@@ -91,7 +91,7 @@ export default function CatalogueContent({
       <header className="w-full pt-6 relative">
         <div className="px-4 sm:px-6 md:px-16 lg:px-15 pb-4">
           <div className={`${tenorSans.className} text-[10px] tracking-[0.35em] text-breadcrumb uppercase mt-2 mb-2`}>
-            <Link href="/" className="hover:text-bj-gold-larger transition-colors">Home</Link>
+            <Link href="/" className="hover:text-bj-gold-richer transition-colors">Home</Link>
             {breadcrumb ? ` · ${breadcrumb.split(' · ').slice(1).join(' · ')}` : ' · Catalogue'}
           </div>
           <div className="flex flex-col space-y-1 max-w-4xl">
@@ -122,7 +122,7 @@ export default function CatalogueContent({
                       onClick={() => handleCategoryClick(cat)}
                       className={`${tenorSans.className} inline-block px-3 py-1 text-[8px] hover:-translate-y-[2px] font-small tracking-widest transition-all border rounded-4xl uppercase shrink-0 ${
                         isSelected
-                           ? 'border-bj-gold-alt text-bj-gold-alt bg-bj-bg-elevated'
+                           ? 'border-bj-gold-alt text-bj-gold-alt  bg-bj-bg-elevated'
                           : 'border-bj-border text-bj-text-muted'
                       }`}
                     >

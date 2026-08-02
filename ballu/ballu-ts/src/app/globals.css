@@ -84,9 +84,9 @@
   --bj-text-separator: #d4caba;
 
   --bj-border: #b88930;
-  --bj-border-light: #c9a95e;
-  --bj-border-card: #d0c0a8;
-  --bj-border-hover: #b08a48;
+  --bj-border-light: #684209;
+  --bj-border-card: #684209;
+  --bj-border-hover: #684209;
 
   --bj-overlay: rgba(255, 255, 255, 0.85);
   --bj-hover-bg: rgba(219, 184, 107, 0.08);
@@ -94,14 +94,14 @@
 
   --bj-card-shadow: rgba(0, 0, 0, 0.1);
   --bj-shine: rgba(0, 0, 0, 0.15);
-  --bj-hero-overlay-1: rgba(248, 242, 227, 0.55);
-  --bj-hero-overlay-2: rgba(248, 242, 227, 0.85);
+  --bj-hero-overlay-1: rgba(248, 242, 227, 0.3);
+  --bj-hero-overlay-2: rgba(248, 242, 227, 0.5);
 
   --bj-font-weight-thin: 400;
   --bj-font-weight-light: 400;
 
   --bj-gold: #8a6a30;
-  --bj-gold-light: #d4a040;
+  --bj-gold-light: #b47c14;
   --bj-gold-dark: #b88930;
   --bj-gold-alt: #b8894f;
   --bj-gold-rich: #b88930;
@@ -109,6 +109,12 @@
 
   .opacity-50, .opacity-60, .opacity-70, .opacity-80, .opacity-85, .opacity-90 {
     opacity: 1 !important;
+  }
+  .text-bj-gold-thin {
+    font-weight: 300;
+  }
+  .text-bj-gold {
+    font-weight: 700;
   }
 
   .text-bj-gold-rich {
@@ -123,20 +129,23 @@
     background: rgba(219, 184, 107, 0.12) !important;
     border-color: #8a6a30 !important;
     color: #5a3e18 !important;
+    
   }
 
   .border-bj-border.text-bj-text-muted {
     color: #000000 !important;
     border-color: #000000 !important;
+    font:700 !important;
   }
 
   .border-transparent.text-bj-text-muted {
     color: #000000 !important;
+    
   }
 
   .border-bj-gold-alt.text-bj-gold-alt {
-    color: #936319 !important;
-    font-weight: 500 !important;
+    color: #694002 !important;
+    font-weight: 800 !important;
     text-shadow: none;
   }
 
@@ -153,7 +162,7 @@
   }
 
   .text-bj-text-heading {
-    color: #b88930 !important;
+    color: #684209 !important;
     font-weight: 600;
   }
 
@@ -212,7 +221,7 @@
   .jewellers-text {
     text-shadow: 0 1px 2px rgba(0,0,0,0.15);
     font-weight: 700 !important;
-    color: #b88930 !important;
+    color: #684209 !important;
   }
 
   .hero-section .text-bj-gold,
@@ -227,6 +236,11 @@
 
   .pieces-count {
     color: #000000 !important;
+  }
+
+  .atelier-btn {
+    background-color: #8a6a30 !important;
+    color: #fbf7f0 !important;
   }
 }
 

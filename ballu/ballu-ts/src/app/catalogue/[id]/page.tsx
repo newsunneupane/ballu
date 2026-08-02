@@ -68,7 +68,7 @@ export default function ProductDetail() {
       <div className="min-h-screen bg-bj-bg text-bj-text-alt flex flex-col items-center justify-center p-6">
         <h2 className={`${cormorant.className} text-2xl mb-4 text-bj-gold-alt`}>Design Specimen Not Found</h2>
         <p className={`${tenorSans.className} text-xs tracking-widest text-bj-text-muted uppercase`}>
-          The requested archive ID ({id || "none"}) does not exist in this drawer.
+          The requested Catalogue ID ({id || "none"}) does not exist in this drawer.
         </p>
       </div>
     );
@@ -152,7 +152,7 @@ export default function ProductDetail() {
 
           <div className="flex flex-col justify-center py-4">
             <div className={`${tenorSans.className} text-bj-gold-alt text-[9px] tracking-[0.3em] uppercase mb-5`}>
-              Atelier Archive · {product.tag || "COLLECTION"}
+              CATALOGUE · {product.tag || "COLLECTION"}
             </div>
 
             <h1 className={`${cormorant.className} text-4xl lg:text-5xl leading-none text-bj-text-heading mb-2 font-light tracking-wide`}>
