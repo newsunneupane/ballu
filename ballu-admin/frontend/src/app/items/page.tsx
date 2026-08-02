@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
-import { Plus, Pencil, Trash2, X, Upload } from 'lucide-react';
+import { cloudinaryUrl } from '@/lib/cloudinary';
+import { Plus, Pencil, Trash2, X, Upload, ImagePlus, Loader2 } from 'lucide-react';
 
 export default function ItemsPage() {
   const queryClient = useQueryClient();
@@ -13,11 +14,14 @@ export default function ItemsPage() {
     nameEn: '', nameNp: '', description: '', tag: '', purity: '',
     category: '', material: '', weightGrams: '', wastageGrams: '',
     makingCharges: '', boutiqueDeduction: '', diamondValue: '',
-    stonesDetails: '', karigarName: '', images: '',
+    stonesDetails: '', karigarName: '', images: [] as string[],
   });
   const [showBulk, setShowBulk] = useState(false);
   const [bulkJson, setBulkJson] = useState('');
   const [bulkResult, setBulkResult] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [imageError, setImageError] = useState('');
+  const imageInputRef = useRef<HTMLInputElement>(null);
 
   const [filterCategory, setFilterCategory] = useState('');
   const [filterMaterial, setFilterMaterial] = useState('');
@@ -89,7 +93,7 @@ export default function ItemsPage() {
       material: '',
       weightGrams: '', wastageGrams: '0', makingCharges: '0',
       boutiqueDeduction: '0', diamondValue: '0',
-      stonesDetails: '', karigarName: '', images: '',
+      stonesDetails: '', karigarName: '', images: [],
     });
     setShowForm(true);
   };
@@ -103,7 +107,7 @@ export default function ItemsPage() {
       weightGrams: String(item.weightGrams), wastageGrams: String(item.wastageGrams),
       makingCharges: String(item.makingCharges), boutiqueDeduction: String(item.boutiqueDeduction),
       diamondValue: String(item.diamondValue), stonesDetails: item.stonesDetails || '',
-      karigarName: item.karigarName || '', images: (item.images || []).join(', '),
+      karigarName: item.karigarName || '', images: item.images || [],
     });
     setShowForm(true);
   };
@@ -138,7 +142,7 @@ export default function ItemsPage() {
       diamondValue: Number(form.diamondValue),
       stonesDetails: form.stonesDetails || undefined,
       karigarName: form.karigarName || undefined,
-      images: form.images ? form.images.split(',').map((s) => s.trim()).filter(Boolean) : [],
+      images: form.images,
     };
 
     try {
@@ -165,6 +169,50 @@ export default function ItemsPage() {
     } catch (err: any) {
       setDeleteError(err.message);
     }
+  };
+
+  const MAX_IMAGES = 4;
+
+  const uploadImages = async (files: FileList | File[]) => {
+    setImageError('');
+    const toUpload = Array.from(files).filter((f) => f.type.startsWith('image/'));
+    if (toUpload.length === 0) return;
+
+    const remaining = MAX_IMAGES - form.images.length;
+    if (remaining <= 0) return;
+    const accepted = toUpload.slice(0, remaining);
+
+    setUploading(true);
+    try {
+      for (const file of accepted) {
+        const base64 = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result as string);
+          reader.onerror = () => reject(new Error(`Failed to read ${file.name}`));
+          reader.readAsDataURL(file);
+        });
+        const res = await api.upload.image(base64);
+        setForm((prev) => ({
+          ...prev,
+          images: [...prev.images, res.url].slice(0, MAX_IMAGES),
+        }));
+      }
+      if (accepted.length < toUpload.length) {
+        setImageError(`Only ${remaining} more image slot${remaining === 1 ? '' : 's'} available.`);
+      }
+    } catch (err: any) {
+      setImageError(err.message || 'Upload failed. Please try again.');
+    } finally {
+      setUploading(false);
+      if (imageInputRef.current) imageInputRef.current.value = '';
+    }
+  };
+
+  const removeImage = (index: number) => {
+    setForm((prev) => ({
+      ...prev,
+      images: prev.images.filter((_, i) => i !== index),
+    }));
   };
 
   const handleBulkUpload = async () => {
@@ -261,7 +309,7 @@ export default function ItemsPage() {
                 </td>
                 <td className="px-4 py-3">
                   {item.images?.[0] ? (
-                    <img src={item.images[0]} alt="" className="w-10 h-10 object-cover rounded border border-[#1f1a10]" />
+                    <img src={cloudinaryUrl(item.images[0], { width: 80, aspect: '1:1' })} alt="" className="w-10 h-10 object-cover rounded border border-[#1f1a10]" />
                   ) : (
                     <div className="w-10 h-10 rounded border border-[#1f1a10] bg-[#0a0806]" />
                   )}
@@ -363,8 +411,55 @@ export default function ItemsPage() {
                 <input value={form.stonesDetails} onChange={(e) => setForm({ ...form, stonesDetails: e.target.value })} className="w-full bg-[#0a0806] border border-[#1f1a10] rounded px-3 py-2 text-sm text-[#e5e5e0] focus:outline-none focus:border-[#dbb86b]" />
               </div>
               <div className="md:col-span-2">
-                <label className="block text-[10px] tracking-[0.2em] uppercase text-[#6e695f] mb-1.5">Image URLs (comma-separated)</label>
-                <input value={form.images} onChange={(e) => setForm({ ...form, images: e.target.value })} className="w-full bg-[#0a0806] border border-[#1f1a10] rounded px-3 py-2 text-sm text-[#e5e5e0] focus:outline-none focus:border-[#dbb86b]" placeholder="https://..." />
+                <label className="block text-[10px] tracking-[0.2em] uppercase text-[#6e695f] mb-1.5">
+                  Images · {form.images.length}/{MAX_IMAGES}
+                </label>
+                <div className="flex flex-wrap gap-3 mb-3">
+                  {form.images.map((src, i) => (
+                    <div key={i} className="relative group">
+                      <img
+                        src={cloudinaryUrl(src, { width: 160, aspect: '3:4' })}
+                        alt={`Item image ${i + 1}`}
+                        className="w-20 h-24 object-cover rounded border border-[#1f1a10]"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeImage(i)}
+                        className="absolute -top-2 -right-2 bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                        aria-label="Remove image"
+                      >
+                        <X size={12} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+                <input
+                  ref={imageInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/gif,image/avif"
+                  multiple
+                  onChange={(e) => e.target.files && uploadImages(e.target.files)}
+                  className="hidden"
+                  id="item-images-input"
+                />
+                <div className="flex items-center gap-3">
+                  {form.images.length < MAX_IMAGES ? (
+                    <label
+                      htmlFor="item-images-input"
+                      className="inline-flex items-center gap-2 bg-[#0f0c0a] border border-[#1f1a10] text-[#e5e5e0] px-4 py-2 rounded text-sm font-medium hover:border-[#dbb86b] transition-colors cursor-pointer"
+                    >
+                      {uploading ? <Loader2 size={16} className="animate-spin" /> : <ImagePlus size={16} />}
+                      {uploading ? 'Uploading…' : 'Upload Images'}
+                    </label>
+                  ) : (
+                    <span className="text-xs text-[#6e695f]">Maximum of {MAX_IMAGES} images reached.</span>
+                  )}
+                  {imageError && <span className="text-red-400 text-xs">{imageError}</span>}
+                </div>
+                <p className="text-[10px] text-[#6e695f] mt-1.5">Images are uploaded to Cloudinary and stored as URLs. Up to 4 images, 5MB each. The first image is shown in the catalogue.</p>
+                <p className="text-[11px] text-[#dbb86b] mt-2 border border-[#2b2415] bg-[#dbb86b]/5 rounded px-3 py-2">
+                  Recommended image: 1200 × 1500 px (4:5 portrait) — this length/breadth of image will exactly fit and looks good on the item page. Other sections auto-center-crop to fill.
+                </p>
               </div>
             </div>
             {validationErrors.length > 0 && (

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
+import { cloudinaryUrl } from '@/lib/cloudinary';
 import { Trash2 } from 'lucide-react';
 
 const statusColors: Record<string, string> = {
@@ -100,7 +101,7 @@ export default function CustomRequestsPage() {
                   {r.images?.length > 0 && (
                     <div className="flex gap-2 mt-2">
                       {r.images.map((img: string, i: number) => (
-                        <img key={i} src={img} alt="" className="w-16 h-16 object-cover rounded border border-[#1f1a10]" />
+                        <img key={i} src={cloudinaryUrl(img, { width: 120, aspect: '1:1' })} alt="" className="w-16 h-16 object-cover rounded border border-[#1f1a10]" />
                       ))}
                     </div>
                   )}

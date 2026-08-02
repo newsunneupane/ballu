@@ -6,6 +6,15 @@ import { errorResponse } from '@/lib/api-utils';
 
 export const dynamic = 'force-dynamic';
 
+function sanitizePieceOfTheWeek(pieceOfTheWeek: { item?: string; material?: string; category?: string } | null | undefined) {
+  if (!pieceOfTheWeek || !pieceOfTheWeek.item) return null;
+  return {
+    item: pieceOfTheWeek.item,
+    material: pieceOfTheWeek.material || undefined,
+    category: pieceOfTheWeek.category || undefined,
+  };
+}
+
 export async function GET(req: NextRequest) {
   try {
     const authResult = requireAuth(req);
@@ -36,7 +45,11 @@ export async function PUT(req: NextRequest) {
     if (authError) return authError;
     await connectDB();
     const body = await req.json();
-    const settings = await StoreSettings.findOneAndUpdate({}, body, {
+    const sanitized = {
+      ...body,
+      pieceOfTheWeek: sanitizePieceOfTheWeek(body.pieceOfTheWeek),
+    };
+    const settings = await StoreSettings.findOneAndUpdate({}, sanitized, {
       upsert: true,
       new: true,
       runValidators: true,

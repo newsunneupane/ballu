@@ -7,6 +7,7 @@ import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import { ArrowRight, StarIcon } from '@/components/shared/Icons';
 import { AmbientParticles, GradientOrbit, GradientOverlay, HeroAnimations } from '@/components/shared/AmbientBackground';
+import { cloudinaryUrl } from '@/lib/cloudinary';
 import { SITE } from '@/lib/constants';
 
 const cormorant = Cormorant_Garamond({
@@ -138,7 +139,7 @@ function FeaturedCard({ potw }: { potw: any }) {
         {item?.images?.[0] ? (
           <div
             className="w-[calc(100%-1rem)] aspect-[4/3] mb-3 mx-2 rounded-sm overflow-hidden group-hover:scale-110 transition-transform duration-500 bg-cover bg-center"
-            style={{ backgroundImage: `url(${item.images[0]})` }}
+            style={{ backgroundImage: `url(${cloudinaryUrl(item.images[0], { width: 640, aspect: '4:3' })})` }}
           />
         ) : (
           <div className="w-[calc(100%-1rem)] aspect-[4/3] bg-linear-to-tr from-[#3a3127] to-[#5a4b3b] opacity-80 mb-3 mx-2 rounded-sm group-hover:scale-110 transition-transform duration-500" />

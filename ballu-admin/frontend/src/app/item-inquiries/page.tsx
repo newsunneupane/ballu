@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
+import { cloudinaryUrl } from '@/lib/cloudinary';
 import { Trash2 } from 'lucide-react';
 
 const statusColors: Record<string, string> = {
@@ -61,7 +62,7 @@ export default function ItemInquiriesPage() {
                 </div>
                 <div className="text-sm text-[#8e897e] space-y-1">
                   <p>📞 {inq.phoneNumber}</p>
-                  {inq.item && <p>Item: {inq.item.name?.en || 'Unknown'} {inq.item.images?.[0] && <img src={inq.item.images[0]} alt="" className="inline w-8 h-8 object-cover rounded ml-2 align-middle" />}</p>}
+                  {inq.item && <p>Item: {inq.item.name?.en || 'Unknown'} {inq.item.images?.[0] && <img src={cloudinaryUrl(inq.item.images[0], { width: 80, aspect: '1:1' })} alt="" className="inline w-8 h-8 object-cover rounded ml-2 align-middle" />}</p>}
                   {inq.message && <p className="italic text-xs">{inq.message}</p>}
                 </div>
               </div>

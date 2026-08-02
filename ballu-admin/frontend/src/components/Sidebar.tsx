@@ -46,7 +46,8 @@ export default function Sidebar() {
       ]);
       return { pendingRequests: customData.length, pendingInquiries: inquiryData.length };
     },
-    refetchInterval: 30000,
+    refetchInterval: 10000,
+    refetchIntervalInBackground: true,
   });
 
   const closeMobile = () => setMobileOpen(false);

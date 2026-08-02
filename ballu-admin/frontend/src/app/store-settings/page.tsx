@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
+import { cloudinaryUrl } from '@/lib/cloudinary';
 import { Save, Plus, X } from 'lucide-react';
 
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -127,8 +128,8 @@ export default function StoreSettingsPage() {
       tickerItems: form.tickerItems.filter(Boolean),
       pieceOfTheWeek: form.pieceOfTheWeek.item
         ? {
-            material: form.pieceOfTheWeek.material,
-            category: form.pieceOfTheWeek.category,
+            material: form.pieceOfTheWeek.material || undefined,
+            category: form.pieceOfTheWeek.category || undefined,
             item: form.pieceOfTheWeek.item,
           }
         : null,
@@ -263,7 +264,8 @@ export default function StoreSettingsPage() {
                     const itemId = e.target.value;
                     const selectedItem = filteredItems.find((i: any) => i._id === itemId);
                     const catId = selectedItem?.category?._id || selectedItem?.category || '';
-                    setForm({ ...form, pieceOfTheWeek: { ...form.pieceOfTheWeek, item: itemId, category: catId } });
+                    const matId = selectedItem?.material?._id || selectedItem?.material || '';
+                    setForm({ ...form, pieceOfTheWeek: { ...form.pieceOfTheWeek, item: itemId, material: matId, category: catId } });
                   }}
                 className="w-full bg-[#0f0c0a] border border-[#1f1a10] rounded px-3 py-2 text-sm text-[#e5e5e0] focus:outline-none focus:border-[#dbb86b]"
               >
@@ -282,7 +284,7 @@ export default function StoreSettingsPage() {
                   return selected ? (
                     <>
                       {selected.images?.[0] ? (
-                        <img src={selected.images[0]} alt="" className="w-14 h-14 object-cover rounded border border-[#1f1a10]" />
+                        <img src={cloudinaryUrl(selected.images[0], { width: 80, aspect: '1:1' })} alt="" className="w-14 h-14 object-cover rounded border border-[#1f1a10]" />
                       ) : (
                         <div className="w-14 h-14 rounded border border-[#1f1a10] bg-[#0a0806]" />
                       )}

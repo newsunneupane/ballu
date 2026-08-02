@@ -34,6 +34,7 @@ export default function CommissionPage() {
   const [images, setImages] = useState<string[]>([]);
   const [isDragOver, setIsDragOver] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -67,29 +68,53 @@ export default function CommissionPage() {
 
   const MAX_IMAGE_SIZE = 2 * 1024 * 1024;
 
-  const addFiles = useCallback((files: FileList | File[]) => {
-    const toRead = Array.from(files).filter((f) => {
-      if (!f.type.startsWith("image/")) return false;
-      if (f.size > MAX_IMAGE_SIZE) {
-        setError(`Image "${f.name}" exceeds 2MB limit. Please use a smaller image.`);
-        return false;
-      }
-      return true;
-    });
-    if (toRead.length === 0) return;
+  const uploadFiles = useCallback(async (files: File[]) => {
     setError("");
-    const readers = toRead.map(
-      (file) =>
-        new Promise<string>((resolve) => {
+    setUploading(true);
+    try {
+      const remaining = 3 - images.length;
+      const toUpload = files.filter((f) => f.type.startsWith("image/")).slice(0, remaining);
+      if (toUpload.length === 0) return;
+      const tooLarge = toUpload.find((f) => f.size > MAX_IMAGE_SIZE);
+      if (tooLarge) {
+        setError(`Image "${tooLarge.name}" exceeds 2MB limit. Please use a smaller image.`);
+        return;
+      }
+      const urls: string[] = [];
+      for (const file of toUpload) {
+        const base64 = await new Promise<string>((resolve, reject) => {
           const reader = new FileReader();
           reader.onload = (e) => resolve(e.target?.result as string);
+          reader.onerror = () => reject(new Error(`Failed to read ${file.name}`));
           reader.readAsDataURL(file);
-        })
-    );
-    Promise.all(readers).then((results) => {
-      setImages((prev) => [...prev, ...results].slice(0, 3));
-    });
-  }, []);
+        });
+        const res = await fetch("/api/upload", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ file: base64 }),
+        });
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({ error: "Upload failed" }));
+          throw new Error(errData.error || "Upload failed");
+        }
+        const data = await res.json();
+        urls.push(data.url);
+      }
+      setImages((prev) => [...prev, ...urls].slice(0, 3));
+    } catch (e: any) {
+      setError(e.message || "Something went wrong while uploading. Please try again.");
+    } finally {
+      setUploading(false);
+    }
+  }, [images.length]);
+
+  const addFiles = useCallback((files: FileList | File[]) => {
+    const remaining = 3 - images.length;
+    if (remaining <= 0) return;
+    const toUpload = Array.from(files).filter((f) => f.type.startsWith("image/"));
+    if (toUpload.length === 0) return;
+    uploadFiles(toUpload);
+  }, [images.length, uploadFiles]);
 
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -367,7 +392,7 @@ export default function CommissionPage() {
                   `}
                 >
                   <span className={`${tenorSans.className} text-[10px] sm:text-[11px] text-bj-text-muted transition-colors ${isDragOver ? 'text-[#cda274]' : ''}`}>
-                    {isDragOver ? 'Drop your image here' : `${images.length === 0 ? 'Drop Image here - or click to upload' : `Add up to ${3 - images.length} more`}`}
+                    {uploading ? 'Uploading…' : isDragOver ? 'Drop your image here' : `${images.length === 0 ? 'Drop Image here - or click to upload' : `Add up to ${3 - images.length} more`}`}
                   </span>
                   <input
                     ref={fileInputRef}

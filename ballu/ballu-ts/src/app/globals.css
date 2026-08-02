@@ -127,7 +127,7 @@
 
   .border-bj-border.text-bj-text-muted {
     color: #000000 !important;
-    border-color: #3a3020 !important;
+    border-color: #000000 !important;
   }
 
   .border-transparent.text-bj-text-muted {
@@ -135,8 +135,8 @@
   }
 
   .border-bj-gold-alt.text-bj-gold-alt {
-    color: #b88930 !important;
-    font-weight: 600 !important;
+    color: #936319 !important;
+    font-weight: 500 !important;
     text-shadow: none;
   }
 
@@ -188,8 +188,8 @@
   }
 
   .text-breadcrumb {
-    color: #8a6a30 !important;
-    font-weight: 600;
+    color: #2C221E !important;
+    font-weight: 300;
     text-shadow: 0 1px 2px rgba(0,0,0,0.15);
   }
 

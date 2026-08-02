@@ -85,4 +85,8 @@ export const api = {
     get: () => request<any>('/store-settings'),
     update: (data: any) => request<any>('/store-settings', { method: 'PUT', body: JSON.stringify(data) }),
   },
+  upload: {
+    image: (file: string, folder?: string) =>
+      request<{ url: string; public_id: string }>('/upload', { method: 'POST', body: JSON.stringify({ file, folder }) }),
+  },
 };

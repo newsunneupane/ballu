@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Cormorant_Garamond, Cormorant_SC } from 'next/font/google';
 import { FiSearch, FiX } from 'react-icons/fi';
 import { productService } from '@/services/product-service';
+import { cloudinaryUrl } from '@/lib/cloudinary';
 
 const cormorant = Cormorant_Garamond({
   subsets: ['latin'],
@@ -122,7 +123,7 @@ export default function SearchOverlay({ onClose }: { onClose: () => void }) {
                     >
                       <div className="w-12 h-12 rounded border border-bj-border-light overflow-hidden shrink-0 bg-bj-bg">
                         {product.images?.[0] ? (
-                          <img src={product.images[0]} alt="" className="w-full h-full object-cover" />
+                          <img src={cloudinaryUrl(product.images[0], { width: 96, aspect: '1:1' })} alt="" className="w-full h-full object-cover" />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center">
                             <FiSearch className="text-[#2b2415]" size={14} />

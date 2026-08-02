@@ -6,8 +6,9 @@ import { useParams } from "next/navigation";
 import { Cormorant_Garamond, Tenor_Sans } from "next/font/google";
 import { productService } from "@/services/product-service";
 import { useProductData } from "@/hooks/useProductData";
+import { cloudinaryUrl } from "@/lib/cloudinary";
 import { WHATSAPP_URL } from "@/lib/constants";
-import { ArrowRight } from "@/components/shared/Icons";
+import { ArrowRight, ChevronLeft, ChevronRight } from "@/components/shared/Icons";
 import Button from "@/components/ui/Button";
 
 const cormorant = Cormorant_Garamond({
@@ -25,12 +26,34 @@ export default function ProductDetail() {
   const id = params?.id as string;
   const dataReady = useProductData();
   const [product, setProduct] = useState(productService.getById(id) || productService.getById(Number(id)));
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [paused, setPaused] = useState(false);
+
+  const images = product?.images?.length ? product.images : [];
 
   useEffect(() => {
     if (dataReady) {
       setProduct(productService.getById(id) || productService.getById(Number(id)));
     }
   }, [dataReady, id]);
+
+  useEffect(() => {
+    setActiveIndex(0);
+  }, [id]);
+
+  useEffect(() => {
+    if (paused || images.length <= 1) return;
+    const timer = setInterval(() => {
+      setActiveIndex((prev) => (prev + 1) % images.length);
+    }, 3500);
+    return () => clearInterval(timer);
+  }, [paused, images.length]);
+
+  const goTo = (index: number) => {
+    setActiveIndex((index + images.length) % images.length);
+  };
+
+  const hasGallery = images.length > 1;
 
   if (!dataReady) {
     return (
@@ -66,10 +89,46 @@ export default function ProductDetail() {
 
         <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_1fr] gap-10 lg:gap-20">
           <div className="w-full bg-bj-bg-elevated p-4 lg:p-6 rounded-sm border border-bj-border-light">
-            <div className="relative w-full aspect-[4/5] bg-[radial-gradient(circle_at_35%_40%,_#fbe4b5_0%,_#cda274_25%,_#6e5229_60%,_#2b210a_100%)] overflow-hidden shadow-inner">
+            <div
+              className="group relative w-full aspect-[4/5] bg-[radial-gradient(circle_at_35%_40%,_#fbe4b5_0%,_#cda274_25%,_#6e5229_60%,_#2b210a_100%)] overflow-hidden shadow-inner"
+              onMouseEnter={() => setPaused(true)}
+              onMouseLeave={() => setPaused(false)}
+            >
               <div className="absolute top-[40%] left-[35%] -translate-x-1/2 -translate-y-1/2 w-[30%] h-[30%] rounded-full border border-white/20" />
               <div className="absolute top-[40%] left-[35%] -translate-x-1/2 -translate-y-1/2 w-[55%] h-[55%] rounded-full border border-white/10" />
               <div className="absolute top-[40%] left-[35%] -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] rounded-full border border-white/5" />
+
+              {images.length > 0 && (
+                <div className="absolute inset-0">
+                  {images.map((src, i) => (
+                    <img
+                      key={i}
+                      src={cloudinaryUrl(src, { width: 900, aspect: '4:5' })}
+                      alt={`${product.title} ${i + 1}`}
+                      className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ease-in-out ${i === activeIndex ? 'opacity-100' : 'opacity-0'}`}
+                    />
+                  ))}
+                </div>
+              )}
+
+              {hasGallery && (
+                <>
+                  <button
+                    onClick={() => goTo(activeIndex - 1)}
+                    aria-label="Previous image"
+                    className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-bj-bg-ticker/40 backdrop-blur-md border border-white/10 text-bj-gold-alt flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-bj-bg-ticker/70 transition-opacity z-30 cursor-pointer"
+                  >
+                    <ChevronLeft size={16} />
+                  </button>
+                  <button
+                    onClick={() => goTo(activeIndex + 1)}
+                    aria-label="Next image"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-bj-bg-ticker/40 backdrop-blur-md border border-white/10 text-bj-gold-alt flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-bj-bg-ticker/70 transition-opacity z-30 cursor-pointer"
+                  >
+                    <ChevronRight size={16} />
+                  </button>
+                </>
+              )}
 
               <div className="absolute top-4 right-4 border border-bj-gold-alt bg-bj-bg-ticker/40 backdrop-blur-md text-bj-gold-alt px-3 py-1.5 flex items-center gap-2">
                 <span className="text-[8px]">✦</span>
@@ -79,10 +138,14 @@ export default function ProductDetail() {
               </div>
 
               <div className="absolute bottom-6 left-6 flex gap-1.5">
-                <div className="w-6 h-[2px] bg-bj-gold-alt" />
-                <div className="w-6 h-[2px] bg-bj-text-muted/40" />
-                <div className="w-6 h-[2px] bg-bj-text-muted/40" />
-                <div className="w-6 h-[2px] bg-bj-text-muted/40" />
+                {images.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => goTo(i)}
+                    aria-label={`Go to image ${i + 1}`}
+                    className={`h-[2px] cursor-pointer transition-all duration-500 ${i === activeIndex ? 'w-6 bg-bj-gold-alt' : 'w-4 bg-bj-text-muted/40 hover:bg-bj-text-muted/70'}`}
+                  />
+                ))}
               </div>
             </div>
           </div>
