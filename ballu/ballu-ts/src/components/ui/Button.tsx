@@ -17,7 +17,7 @@ const variantStyles: Record<ButtonVariant, string> = {
   primary:
     'bg-[#c9a96e] text-[#0a0806] hover:brightness-110 shadow-md',
   outline:
-    'border border-bj-gold-dark text-bj-gold-dark bg-transparent hover:bg-bj-gold-dark/12',
+    'border border-bj-gold-dark text-bj-text-gold.opacity-80 bg-transparent hover:bg-bj-gold-dark/12',
   ghost:
     'bg-transparent text-[#c9a96e] hover:bg-white/5',
   magnetic:
