@@ -21,10 +21,10 @@ const cormorantSC = Cormorant_SC({
 });
 
 const MATERIAL_COLORS: Record<string, string> = {
-  GOLD: 'bg-[#dbb86b]',
-  SILVER: 'bg-[#c8c8c8]',
-  PLATINUM: 'bg-[#e5e4e2]',
-  DIAMOND: 'bg-[#b9f2ff]',
+  GOLD: 'bg-[#b8860b]',
+  SILVER: 'bg-[#808080]',
+  PLATINUM: 'bg-[#a6a19a]',
+  DIAMOND: 'bg-[#4a90c4]',
 };
 
 export default function CollectionsRow() {
@@ -110,6 +110,13 @@ export default function CollectionsRow() {
           mix-blend-mode: normal;
           opacity: 0.04;
         }
+        [data-theme="light"] .collection-card .card-nepali-title,
+        [data-theme="light"] .collection-card .card-explore {
+          color: #000000 !important;
+        }
+        [data-theme="light"] .collection-card .card-nepali-title {
+          opacity: 1;
+        }
       `}</style>
 
       <div className="max-w-7xl w-full mx-auto px-6 md:px-12 lg:px-16 pt-16 pb-8">
@@ -193,7 +200,7 @@ export default function CollectionsRow() {
 
                 <div className="relative z-10 flex flex-col space-y-4 pt-12">
                   <div>
-                    <p className="font-nepali-serif italic text-bj-gold text-xs tracking-wide font-light mb-1 opacity-90">
+                    <p className="card-nepali-title font-nepali-serif italic text-bj-gold text-xs tracking-wide font-light mb-1 opacity-90">
                       {item.nepaliTitle}
                     </p>
                     <h3 className={`${cormorant.variable} text-2xl inline-block scale-y-[1.2] md:text-2xl font-light font-serif-editorial text-bj-text-heading tracking-wide`}>
@@ -204,7 +211,7 @@ export default function CollectionsRow() {
                   <div className="flex flex-col gap-2">
                     <div className="flex items-center justify-between text-[10px] tracking-[0.25em] text-bj-text-heading/40 font-sans">
                       <span className="pieces-count">{item.pieces}</span>
-                      <span className="group/inner flex items-center gap-1 text-bj-gold transition-colors duration-300 tracking-widest">
+                      <span className="card-explore group/inner flex items-center gap-1 text-bj-gold transition-colors duration-300 tracking-widest">
                         EXPLORE{' '}
                         <span className="transform group-hover/inner:translate-x-1 transition-transform duration-300">→</span>
                       </span>

@@ -130,7 +130,7 @@ function FeaturedCard({ potw }: { potw: any }) {
       className="group w-[240px] sm:w-[280px] lg:w-[7.5cm] slide-in-left slide-in-left-delay overflow-hidden transform transition duration-800 ease-out hover:-translate-y-2.5 cursor-pointer"
       onClick={() => item?._id && router.push(`/catalogue/${item._id}`)}
     >
-      <Card hover={false} className="h-full bg-bj-bg-card/90 border border-white/5 p-3 shadow-2xl backdrop-blur-md">
+      <Card hover={false} className="potw-card h-full bg-bj-bg-card/90 border border-white/5 p-3 shadow-2xl backdrop-blur-md">
         <div className="flex text-bj-gold-rich justify-between items-center text-[10px] tracking-[0.2em] uppercase  opacity-90 font-sans mb-3">
           <span className="pl-2">PIECE OF THE WEEK</span>
           <span className="w-1.5 h-1.5 rounded-full bg-[#dbb86b] animate-infinite-zoom" />

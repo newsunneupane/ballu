@@ -243,6 +243,14 @@
     color: #b88930 !important;
   }
 
+  .potw-card .text-bj-gold-richer {
+    color: #684209 !important;
+  }
+
+  .potw-card.border-bj-border.bg-bj-bg-card:hover {
+    border-color: transparent !important;
+  }
+
   .nav-link::after {
     background-color: #b88930 !important;
   }
