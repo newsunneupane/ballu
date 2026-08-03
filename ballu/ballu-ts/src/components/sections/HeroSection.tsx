@@ -76,12 +76,11 @@ export default function HeroSection() {
           <div className="relative flex flex-row flex-wrap items-start justify-start gap-6 fade-in-up fade-in-up-7 w-full">
             <div className="flex flex-row flex-wrap items-start gap-4">
               <Button
-                variant="magnetic"
+                variant="primary"
                 size="lg"
                 magnetic
                 icon={<ArrowRight />}
                 onClick={() => router.push('/catalogue')}
-                className="atelier-btn"
               >
                 Enter the Atelier
               </Button>
@@ -91,7 +90,6 @@ export default function HeroSection() {
                 size="lg"
                 icon={<ArrowRight />}
                 onClick={() => router.push('/bridal')}
-                className="bridal-outline-btn"
               >
                 Bridal Lookbook
               </Button>

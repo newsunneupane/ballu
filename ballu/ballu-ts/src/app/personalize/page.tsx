@@ -256,7 +256,7 @@ export default function CommissionPage() {
             </div>
 
             <div>
-              <label className={`${tenorSans.className} block text-[9px] tracking-[0.3em] uppercase pieces-count mb-3`}>
+              <label className={`${tenorSans.className} block text-[9px] tracking-[0.3em] uppercase pieces-count  mb-3`}>
                 Material
               </label>
               <div className="flex flex-wrap gap-2 sm:gap-3">
@@ -266,7 +266,7 @@ export default function CommissionPage() {
                     onClick={() => setSelectedMaterial(mat._id)}
                     className={`${tenorSans.className} px-3 py-2 sm:px-4 sm:py-2.5 text-[9px] sm:text-[10px] tracking-[0.2em] uppercase transition-all duration-300 border ${
                       selectedMaterial === mat._id
-                        ? "border-[#cda274] text-[#cda274] bg-[#cda274]/5"
+                        ? "material-selected border-[#cda274]  text-[#cda274]  bg-[#cda274]/5"
                         : "border-bj-border text-bj-text-muted hover:bg-bj-bg-hover hover:text-bj-text-gold"
                     }`}
                   >
@@ -281,10 +281,10 @@ export default function CommissionPage() {
 
             <div>
               <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-2 mb-3 sm:mb-4">
-                <label className={`${tenorSans.className} block text-[9px] tracking-[0.3em] uppercase text-bj-text-muted`}>
+                <label className={`${tenorSans.className} block text-[9px] tracking-[0.3em] uppercase piece-count`}>
                   Budget
                 </label>
-                <div className={`${cormorant.className} text-xl sm:text-2xl text-[#cda274] tracking-wide`}>
+                <div className={`${cormorant.className} budget-amount text-xl sm:text-2xl text-[#cda274] tracking-wide`}>
                   Rs <span className="text-[22px] sm:text-[26px]">{formattedBudget}</span>
                 </div>
               </div>

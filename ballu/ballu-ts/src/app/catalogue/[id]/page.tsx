@@ -8,6 +8,7 @@ import { productService } from "@/services/product-service";
 import { useProductData } from "@/hooks/useProductData";
 import { cloudinaryUrl } from "@/lib/cloudinary";
 import { WHATSAPP_URL } from "@/lib/constants";
+import { categorySlugMap } from "@/data/collections";
 import { ArrowRight, ChevronLeft, ChevronRight } from "@/components/shared/Icons";
 import Button from "@/components/ui/Button";
 
@@ -55,6 +56,10 @@ export default function ProductDetail() {
 
   const hasGallery = images.length > 1;
 
+  const categorySlug =
+    categorySlugMap[product?.category as keyof typeof categorySlugMap] ||
+    (product?.category || "").toLowerCase().replace(/\s+/g, "-");
+
   if (!dataReady) {
     return (
       <div className="min-h-screen bg-bj-bg text-bj-text-alt flex items-center justify-center p-6">
@@ -82,7 +87,7 @@ export default function ProductDetail() {
           <span>·</span>
           <Link href="/catalogue" className="hover:text-bj-gold-alt cursor-pointer transition-colors">Catalogue</Link>
           <span>·</span>
-          <span className="hover:text-bj-gold-alt cursor-pointer transition-colors">{product.category}</span>
+          <Link href={`/${categorySlug}`} className="hover:text-bj-gold-alt cursor-pointer transition-colors">{product.category}</Link>
           <span>·</span>
           <span>{product.title}</span>
         </nav>

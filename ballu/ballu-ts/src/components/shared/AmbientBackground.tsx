@@ -182,24 +182,35 @@ export function HeroAnimations() {
       .bj-grad-shift { animation: bj-grad 90s linear infinite; transform-origin: center; }
       .hero-top-particles { display: none; }
       [data-theme="light"] .hero-top-particles { display: block; }
+      
+      /* --- LUXURY LIGHT MODE OVERRIDES --- */
+      
+      /* Delicate champagne sparkles with a soft, ethereal glow rather than harsh shadow */
       [data-theme="light"] .hero-particles svg {
-        stroke: #996515 !important;
-        fill: #996515 !important;
-        filter: drop-shadow(0 0 8px #996515) !important;
+        stroke: #C5A059 !important;
+        fill: #C5A059 !important;
+        filter: drop-shadow(0 0 6px rgba(197, 160, 89, 0.4)) !important;
       }
-      [data-theme="light"] .bo-stop:nth-child(1) { stop-color: #f7d986; stop-opacity: 0.95; }
-      [data-theme="light"] .bo-stop:nth-child(2) { stop-color: #e3b34d; stop-opacity: 0.8; }
-      [data-theme="light"] .bo-stop:nth-child(3) { stop-color: #b5821e; stop-opacity: 0.55; }
-      [data-theme="light"] .bo-stop:nth-child(4) { stop-color: #6e4a0e; stop-opacity: 0.18; }
-      [data-theme="light"] .bo-stop2:nth-child(1) { stop-color: #e3b34d; stop-opacity: 0.75; }
-      [data-theme="light"] .bo-stop2:nth-child(2) { stop-color: #6e4a0e; stop-opacity: 0; }
-      [data-theme="light"] .bo-ring { stroke: #996515 !important; }
-      [data-theme="light"] .bo-rings { transform: scale(1.6); transform-origin: 50% 50%; }
-      [data-theme="light"] .bo-ring-1 { stroke-width: 0.7; opacity: 0.85; }
-      [data-theme="light"] .bo-ring-2 { stroke-width: 0.55; opacity: 0.75; }
-      [data-theme="light"] .bo-ring-3 { stroke-width: 0.4; opacity: 0.7; }
-      [data-theme="light"] .bo-halo:nth-child(1) { stop-color: #e3b34d; stop-opacity: 0.5; }
-      [data-theme="light"] .bo-halo:nth-child(2) { stop-color: #e3b34d; stop-opacity: 0.12; }
+      
+      /* Luminous pearl and soft champagne background gradients */
+      [data-theme="light"] .bo-stop:nth-child(1) { stop-color: #FFFFFF; stop-opacity: 0.95; }
+      [data-theme="light"] .bo-stop:nth-child(2) { stop-color: #F4E8D1; stop-opacity: 0.75; }
+      [data-theme="light"] .bo-stop:nth-child(3) { stop-color: #E3C598; stop-opacity: 0.35; }
+      [data-theme="light"] .bo-stop:nth-child(4) { stop-color: #C5A059; stop-opacity: 0.05; }
+      
+      [data-theme="light"] .bo-stop2:nth-child(1) { stop-color: #F4E8D1; stop-opacity: 0.6; }
+      [data-theme="light"] .bo-stop2:nth-child(2) { stop-color: #E3C598; stop-opacity: 0; }
+      
+      /* Ultra-fine, delicate rings like fine jewelry wire */
+      [data-theme="light"] .bo-ring { stroke: #D4AF37 !important; }
+      [data-theme="light"] .bo-rings { transform: scale(1.4); transform-origin: 50% 50%; }
+      [data-theme="light"] .bo-ring-1 { stroke-width: 0.25; opacity: 0.6; }
+      [data-theme="light"] .bo-ring-2 { stroke-width: 0.15; opacity: 0.5; }
+      [data-theme="light"] .bo-ring-3 { stroke-width: 0.1; opacity: 0.4; }
+      
+      /* Soft center halo light */
+      [data-theme="light"] .bo-halo:nth-child(1) { stop-color: #FFFFFF; stop-opacity: 0.8; }
+      [data-theme="light"] .bo-halo:nth-child(2) { stop-color: #F4E8D1; stop-opacity: 0; }
     `}</style>
   );
 }
