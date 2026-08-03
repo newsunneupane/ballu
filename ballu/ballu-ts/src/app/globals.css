@@ -244,7 +244,11 @@
   }
 
   .potw-card .text-bj-gold-richer {
-    color: #684209 !important;
+    color: #000000 !important;
+  }
+
+  .potw-card .text-bj-gold-rich {
+    color: #000000 !important;
   }
 
   .potw-card.border-bj-border.bg-bj-bg-card:hover {

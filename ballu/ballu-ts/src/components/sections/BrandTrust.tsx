@@ -19,7 +19,7 @@ export default function BrandTrust() {
         [data-theme="light"] .brand-grid h3 { color: #000000 !important; }
         [data-theme="light"] .brand-grid p { color: #000000 !important; opacity: 0.7 !important; }
         [data-theme="light"] .brand-orbit { opacity: 0.6; }
-        [data-theme="light"] .brand-orbit .bo-black { stroke: rgba(0,0,0,0.5) !important; }
+        [data-theme="light"] .brand-orbit .bo-black { stroke: #000000 !important; }
         [data-theme="light"] .brand-orbit .bo-darkgold { stroke: #996515 !important; }
         [data-theme="light"] .brand-orbit .brand-orbit-circle { border-color: #996515 !important; }
       `}</style>
