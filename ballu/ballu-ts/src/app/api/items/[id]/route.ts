@@ -16,8 +16,9 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
       const pricing = await calculateFinalPrice({
         materialId: (item.material as { _id: string })._id.toString(),
         weightGrams: item.weightGrams,
-        wastageGrams: item.wastageGrams,
+        wastagePercent: item.wastagePercent,
         makingCharges: item.makingCharges,
+        accessoriesCharge: item.accessoriesCharge,
         boutiqueDeduction: item.boutiqueDeduction,
         diamondValue: item.diamondValue,
       });
@@ -31,5 +32,16 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
     }
   } catch {
     return NextResponse.json({ error: 'Failed to fetch item' }, { status: 500, headers: { 'Cache-Control': 'no-store' } });
+  }
+}
+
+export async function POST(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  try {
+    const { id } = await params;
+    await connectDB();
+    await Item.findByIdAndUpdate(id, { $inc: { viewCount: 1 } });
+    return NextResponse.json({ ok: true }, { headers: { 'Cache-Control': 'no-store' } });
+  } catch {
+    return NextResponse.json({ error: 'Failed to record view' }, { status: 500, headers: { 'Cache-Control': 'no-store' } });
   }
 }

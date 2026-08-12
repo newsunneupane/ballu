@@ -1,0 +1,27 @@
+i want you to make manual daily rate input of the gold, solver, diamod or other ornaments that gets used throughout teh application. Also updaes the rates as well as the top scolling header topbar.
+
+as per the user's visit information, preferences, recommend similar things in teh website, or recommend top choices, most visited items , etc.
+
+while listing an item / jewellery item, allow user to input teh caretes of teh ornament too.
+
+the calculation of an item must go like this: 
+1 tola = 11.664 grams
+the rate calculation for any inputted item = wt. in gm(user can input tola or gm any: auto convert) + making charge (manual input) + accessories charge (manual input)
+ also wastage (in % of per gm gold / ornament)
+
+
+
+there must be smart filters present in the website, recommendation engine.
+
+as. per user's IP: india or Nepal, the rate must be displayed accordingly: INR / 1.6, NPR actual rate.
+
+moreover, while the user opens the website, there must be a nice animation, user must be welcomed with a choice or preference asking: what would you like to see ? with the items choice in multi steps (not too many steps). user selects the ornament , then category, then is taken to the relevant page with filters applied.
+
+Addition of whatsapp button under any items, which on clicking directly oopens chat to the ballu jewellers whatsapp account with teh link, product ID, of the product and user's preferences or details.
+
+Alow user to input estimated making period optional for all listed items displayed nicely.
+Also availability flag per item. and also a flag to display rate to uses or not flag which will render rpice on teh card or not.
+
+
+For others, check for improvemenets and fixes on the site.
+in teh hero section, the right side card is a bit not in balance and is downwards, kee p it in mid center of right section with proper decent width

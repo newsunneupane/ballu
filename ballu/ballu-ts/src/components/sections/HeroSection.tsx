@@ -108,7 +108,7 @@ export default function HeroSection() {
           </div>
         </div>
 
-        <div className="absolute right-8 md:right-20 bottom-24 z-10 hidden lg:block">
+        <div className="absolute right-8 md:right-20 top-1/2 -translate-y-1/2 z-10 hidden lg:block">
           <FeaturedCard potw={potw} />
         </div>
       </div>
@@ -127,7 +127,7 @@ function FeaturedCard({ potw }: { potw: any }) {
 
   return (
     <div
-      className="group w-[240px] sm:w-[280px] lg:w-[7.5cm] slide-in-left slide-in-left-delay overflow-hidden transform transition duration-800 ease-out hover:-translate-y-2.5 cursor-pointer"
+      className="group w-[240px] sm:w-[280px] lg:w-[300px] xl:w-[330px] slide-in-left slide-in-left-delay overflow-hidden transform transition duration-800 ease-out hover:-translate-y-2.5 cursor-pointer"
       onClick={() => item?._id && router.push(`/catalogue/${item._id}`)}
     >
       <Card hover={false} className="potw-card h-full bg-bj-bg-card/90 border border-white/5 p-3 shadow-2xl backdrop-blur-md">

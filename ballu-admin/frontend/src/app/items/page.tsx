@@ -4,18 +4,24 @@ import { useRef, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
 import { cloudinaryUrl } from '@/lib/cloudinary';
+import { tolaToGrams, gramsToTola } from '@/lib/utils/units';
 import { Plus, Pencil, Trash2, X, Upload, ImagePlus, Loader2 } from 'lucide-react';
+
+type WeightUnit = 'g' | 'tola';
+
+const initialForm = {
+  nameEn: '', nameNp: '', description: '', tag: '', purity: '',
+  category: '', material: '', weightValue: '', weightUnit: 'g' as WeightUnit,
+  wastagePercent: '', makingCharges: '', accessoriesCharge: '', boutiqueDeduction: '', diamondValue: '',
+  caratWeight: '', stonesDetails: '', karigarName: '', images: [] as string[],
+  isAvailable: true, showPrice: true, makingDaysMin: '', makingDaysMax: '',
+};
 
 export default function ItemsPage() {
   const queryClient = useQueryClient();
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<any>(null);
-  const [form, setForm] = useState({
-    nameEn: '', nameNp: '', description: '', tag: '', purity: '',
-    category: '', material: '', weightGrams: '', wastageGrams: '',
-    makingCharges: '', boutiqueDeduction: '', diamondValue: '',
-    stonesDetails: '', karigarName: '', images: [] as string[],
-  });
+  const [form, setForm] = useState(initialForm);
   const [showBulk, setShowBulk] = useState(false);
   const [bulkJson, setBulkJson] = useState('');
   const [bulkResult, setBulkResult] = useState<string | null>(null);
@@ -88,12 +94,10 @@ export default function ItemsPage() {
     setEditing(null);
     const othersCat = categories.find((c: any) => c.name?.en === 'Others');
     setForm({
-      nameEn: '', nameNp: '', description: '', tag: '', purity: '',
+      ...initialForm,
       category: othersCat?._id || categories[0]?._id || '',
-      material: '',
-      weightGrams: '', wastageGrams: '0', makingCharges: '0',
+      wastagePercent: '0', makingCharges: '0', accessoriesCharge: '0',
       boutiqueDeduction: '0', diamondValue: '0',
-      stonesDetails: '', karigarName: '', images: [],
     });
     setShowForm(true);
   };
@@ -104,13 +108,30 @@ export default function ItemsPage() {
       nameEn: item.name.en, nameNp: item.name.np, description: item.description || '',
       tag: item.tag || '', purity: item.purity || '',
       category: item.category?._id || '', material: item.material?._id || '',
-      weightGrams: String(item.weightGrams), wastageGrams: String(item.wastageGrams),
-      makingCharges: String(item.makingCharges), boutiqueDeduction: String(item.boutiqueDeduction),
-      diamondValue: String(item.diamondValue), stonesDetails: item.stonesDetails || '',
-      karigarName: item.karigarName || '', images: item.images || [],
+      weightValue: String(item.weightGrams), weightUnit: 'g',
+      wastagePercent: String(item.wastagePercent ?? 0),
+      makingCharges: String(item.makingCharges), accessoriesCharge: String(item.accessoriesCharge ?? 0),
+      boutiqueDeduction: String(item.boutiqueDeduction), diamondValue: String(item.diamondValue),
+      caratWeight: item.caratWeight != null ? String(item.caratWeight) : '',
+      stonesDetails: item.stonesDetails || '', karigarName: item.karigarName || '', images: item.images || [],
+      isAvailable: item.isAvailable ?? true, showPrice: item.showPrice ?? true,
+      makingDaysMin: item.estimatedMakingDays?.min != null ? String(item.estimatedMakingDays.min) : '',
+      makingDaysMax: item.estimatedMakingDays?.max != null ? String(item.estimatedMakingDays.max) : '',
     });
     setShowForm(true);
   };
+
+  const setWeightUnit = (unit: WeightUnit) => {
+    const currentGrams = form.weightUnit === 'tola' ? tolaToGrams(Number(form.weightValue) || 0) : Number(form.weightValue) || 0;
+    if (!form.weightValue) {
+      setForm({ ...form, weightUnit: unit });
+      return;
+    }
+    const nextValue = unit === 'tola' ? gramsToTola(currentGrams) : currentGrams;
+    setForm({ ...form, weightUnit: unit, weightValue: String(Math.round(nextValue * 1000) / 1000) });
+  };
+
+  const weightGramsValue = form.weightUnit === 'tola' ? tolaToGrams(Number(form.weightValue) || 0) : Number(form.weightValue) || 0;
 
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [error, setError] = useState('');
@@ -123,11 +144,13 @@ export default function ItemsPage() {
     if (!form.material) errors.push('Material is required');
     if (!form.nameEn.trim()) errors.push('Name (English) is required');
     if (!form.nameNp.trim()) errors.push('Name (Nepali) is required');
-    if (!form.weightGrams || Number(form.weightGrams) <= 0) errors.push('Weight is required');
+    if (!form.weightValue || weightGramsValue <= 0) errors.push('Weight is required');
     if (errors.length > 0) {
       setValidationErrors(errors);
       return;
     }
+    const makingDaysMin = form.makingDaysMin ? Number(form.makingDaysMin) : undefined;
+    const makingDaysMax = form.makingDaysMax ? Number(form.makingDaysMax) : undefined;
     const payload = {
       name: { en: form.nameEn, np: form.nameNp },
       description: form.description,
@@ -135,14 +158,19 @@ export default function ItemsPage() {
       purity: form.purity || undefined,
       category: form.category,
       material: form.material || undefined,
-      weightGrams: Number(form.weightGrams),
-      wastageGrams: Number(form.wastageGrams),
+      weightGrams: weightGramsValue,
+      wastagePercent: Number(form.wastagePercent),
       makingCharges: Number(form.makingCharges),
+      accessoriesCharge: Number(form.accessoriesCharge),
       boutiqueDeduction: Number(form.boutiqueDeduction),
       diamondValue: Number(form.diamondValue),
+      caratWeight: form.caratWeight ? Number(form.caratWeight) : undefined,
       stonesDetails: form.stonesDetails || undefined,
       karigarName: form.karigarName || undefined,
       images: form.images,
+      isAvailable: form.isAvailable,
+      showPrice: form.showPrice,
+      estimatedMakingDays: (makingDaysMin != null || makingDaysMax != null) ? { min: makingDaysMin, max: makingDaysMax } : undefined,
     };
 
     try {
@@ -314,12 +342,17 @@ export default function ItemsPage() {
                     <div className="w-10 h-10 rounded border border-[#1f1a10] bg-[#0a0806]" />
                   )}
                 </td>
-                <td className="px-4 py-3 text-[#e5e5e0] whitespace-nowrap">{item.name?.en}</td>
+                <td className="px-4 py-3 text-[#e5e5e0] whitespace-nowrap">
+                  {item.name?.en}
+                  {item.isAvailable === false && (
+                    <span className="ml-2 text-[9px] tracking-wider uppercase text-red-400 border border-red-400/30 rounded px-1.5 py-0.5">Unavailable</span>
+                  )}
+                </td>
                 <td className="px-4 py-3 text-[#8e897e]">{item.category?.name?.en || '—'}</td>
                 <td className="px-4 py-3 text-[#8e897e]">{item.material?.name?.en || '—'}</td>
                 <td className="px-4 py-3 text-right text-[#e5e5e0] tabular-nums">{item.weightGrams}g</td>
                 <td className="px-4 py-3 text-right text-[#dbb86b] tabular-nums font-medium">
-                  {item.finalPrice != null ? `Rs ${item.finalPrice.toLocaleString()}` : '—'}
+                  {item.showPrice === false ? <span className="text-[#6e695f]">Hidden</span> : item.finalPrice != null ? `Rs ${item.finalPrice.toLocaleString()}` : '—'}
                 </td>
                 <td className="px-4 py-3 text-right whitespace-nowrap">
                   <button onClick={() => openEdit(item)} className="text-[#8e897e] hover:text-[#dbb86b] transition-colors mr-3"><Pencil size={14} /></button>
@@ -383,16 +416,33 @@ export default function ItemsPage() {
                 <input value={form.purity} onChange={(e) => setForm({ ...form, purity: e.target.value })} className="w-full bg-[#0a0806] border border-[#1f1a10] rounded px-3 py-2 text-sm text-[#e5e5e0] focus:outline-none focus:border-[#dbb86b]" placeholder="e.g. 22K" />
               </div>
               <div>
-                <label className="block text-[10px] tracking-[0.2em] uppercase text-[#6e695f] mb-1.5">Weight (grams)</label>
-                <input type="number" step="0.01" value={form.weightGrams} onChange={(e) => setForm({ ...form, weightGrams: e.target.value })} className="w-full bg-[#0a0806] border border-[#1f1a10] rounded px-3 py-2 text-sm text-[#e5e5e0] focus:outline-none focus:border-[#dbb86b]" />
+                <label className="block text-[10px] tracking-[0.2em] uppercase text-[#6e695f] mb-1.5">Weight</label>
+                <div className="flex gap-2">
+                  <input type="number" step="0.001" value={form.weightValue} onChange={(e) => setForm({ ...form, weightValue: e.target.value })} className="flex-1 min-w-0 bg-[#0a0806] border border-[#1f1a10] rounded px-3 py-2 text-sm text-[#e5e5e0] focus:outline-none focus:border-[#dbb86b]" />
+                  <div className="flex border border-[#1f1a10] rounded overflow-hidden shrink-0">
+                    <button type="button" onClick={() => setWeightUnit('g')} className={`px-2.5 py-2 text-xs ${form.weightUnit === 'g' ? 'bg-[#dbb86b] text-[#0a0806]' : 'text-[#8e897e]'}`}>g</button>
+                    <button type="button" onClick={() => setWeightUnit('tola')} className={`px-2.5 py-2 text-xs ${form.weightUnit === 'tola' ? 'bg-[#dbb86b] text-[#0a0806]' : 'text-[#8e897e]'}`}>tola</button>
+                  </div>
+                </div>
+                {form.weightValue && (
+                  <p className="text-[10px] text-[#6e695f] mt-1.5">
+                    {form.weightUnit === 'tola'
+                      ? `= ${weightGramsValue.toFixed(3)} g`
+                      : `= ${gramsToTola(weightGramsValue).toFixed(3)} tola`}
+                  </p>
+                )}
               </div>
               <div>
-                <label className="block text-[10px] tracking-[0.2em] uppercase text-[#6e695f] mb-1.5">Wastage (grams)</label>
-                <input type="number" step="0.01" value={form.wastageGrams} onChange={(e) => setForm({ ...form, wastageGrams: e.target.value })} className="w-full bg-[#0a0806] border border-[#1f1a10] rounded px-3 py-2 text-sm text-[#e5e5e0] focus:outline-none focus:border-[#dbb86b]" />
+                <label className="block text-[10px] tracking-[0.2em] uppercase text-[#6e695f] mb-1.5">Wastage (%)</label>
+                <input type="number" step="0.01" value={form.wastagePercent} onChange={(e) => setForm({ ...form, wastagePercent: e.target.value })} className="w-full bg-[#0a0806] border border-[#1f1a10] rounded px-3 py-2 text-sm text-[#e5e5e0] focus:outline-none focus:border-[#dbb86b]" placeholder="e.g. 8 for 8%" />
               </div>
               <div>
                 <label className="block text-[10px] tracking-[0.2em] uppercase text-[#6e695f] mb-1.5">Making Charges (Rs)</label>
                 <input type="number" value={form.makingCharges} onChange={(e) => setForm({ ...form, makingCharges: e.target.value })} className="w-full bg-[#0a0806] border border-[#1f1a10] rounded px-3 py-2 text-sm text-[#e5e5e0] focus:outline-none focus:border-[#dbb86b]" />
+              </div>
+              <div>
+                <label className="block text-[10px] tracking-[0.2em] uppercase text-[#6e695f] mb-1.5">Accessories Charge (Rs)</label>
+                <input type="number" value={form.accessoriesCharge} onChange={(e) => setForm({ ...form, accessoriesCharge: e.target.value })} className="w-full bg-[#0a0806] border border-[#1f1a10] rounded px-3 py-2 text-sm text-[#e5e5e0] focus:outline-none focus:border-[#dbb86b]" />
               </div>
               <div>
                 <label className="block text-[10px] tracking-[0.2em] uppercase text-[#6e695f] mb-1.5">Boutique Deduction (Rs)</label>
@@ -403,12 +453,34 @@ export default function ItemsPage() {
                 <input type="number" value={form.diamondValue} onChange={(e) => setForm({ ...form, diamondValue: e.target.value })} className="w-full bg-[#0a0806] border border-[#1f1a10] rounded px-3 py-2 text-sm text-[#e5e5e0] focus:outline-none focus:border-[#dbb86b]" />
               </div>
               <div>
+                <label className="block text-[10px] tracking-[0.2em] uppercase text-[#6e695f] mb-1.5">Carat Weight (ct)</label>
+                <input type="number" step="0.01" value={form.caratWeight} onChange={(e) => setForm({ ...form, caratWeight: e.target.value })} className="w-full bg-[#0a0806] border border-[#1f1a10] rounded px-3 py-2 text-sm text-[#e5e5e0] focus:outline-none focus:border-[#dbb86b]" placeholder="Optional" />
+              </div>
+              <div>
                 <label className="block text-[10px] tracking-[0.2em] uppercase text-[#6e695f] mb-1.5">Karigar Name</label>
                 <input value={form.karigarName} onChange={(e) => setForm({ ...form, karigarName: e.target.value })} className="w-full bg-[#0a0806] border border-[#1f1a10] rounded px-3 py-2 text-sm text-[#e5e5e0] focus:outline-none focus:border-[#dbb86b]" />
               </div>
               <div>
                 <label className="block text-[10px] tracking-[0.2em] uppercase text-[#6e695f] mb-1.5">Stones Details</label>
                 <input value={form.stonesDetails} onChange={(e) => setForm({ ...form, stonesDetails: e.target.value })} className="w-full bg-[#0a0806] border border-[#1f1a10] rounded px-3 py-2 text-sm text-[#e5e5e0] focus:outline-none focus:border-[#dbb86b]" />
+              </div>
+              <div>
+                <label className="block text-[10px] tracking-[0.2em] uppercase text-[#6e695f] mb-1.5">Estimated Making Period (days)</label>
+                <div className="flex items-center gap-2">
+                  <input type="number" value={form.makingDaysMin} onChange={(e) => setForm({ ...form, makingDaysMin: e.target.value })} placeholder="Min" className="w-full bg-[#0a0806] border border-[#1f1a10] rounded px-3 py-2 text-sm text-[#e5e5e0] focus:outline-none focus:border-[#dbb86b]" />
+                  <span className="text-[#6e695f] text-xs shrink-0">to</span>
+                  <input type="number" value={form.makingDaysMax} onChange={(e) => setForm({ ...form, makingDaysMax: e.target.value })} placeholder="Max" className="w-full bg-[#0a0806] border border-[#1f1a10] rounded px-3 py-2 text-sm text-[#e5e5e0] focus:outline-none focus:border-[#dbb86b]" />
+                </div>
+              </div>
+              <div className="flex items-end gap-6 pb-2">
+                <label className="flex items-center gap-2 text-sm text-[#e5e5e0] cursor-pointer">
+                  <input type="checkbox" checked={form.isAvailable} onChange={(e) => setForm({ ...form, isAvailable: e.target.checked })} className="accent-[#dbb86b]" />
+                  Available
+                </label>
+                <label className="flex items-center gap-2 text-sm text-[#e5e5e0] cursor-pointer">
+                  <input type="checkbox" checked={form.showPrice} onChange={(e) => setForm({ ...form, showPrice: e.target.checked })} className="accent-[#dbb86b]" />
+                  Show Price to Users
+                </label>
               </div>
               <div className="md:col-span-2">
                 <label className="block text-[10px] tracking-[0.2em] uppercase text-[#6e695f] mb-1.5">

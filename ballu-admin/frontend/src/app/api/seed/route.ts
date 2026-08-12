@@ -132,10 +132,12 @@ export async function POST(req: NextRequest) {
       const catKey = pick(catKeys);
       const matKey = pick(matKeys);
       const weightGrams = rand(2, 60);
-      const wastageGrams = rand(0, 2);
+      const wastagePercent = rand(0, 12);
       const makingCharges = rand(5000, 50000);
+      const accessoriesCharge = rand(0, 3000);
       const boutiqueDeduction = rand(0, 5000);
       const diamondValue = matKey === 'Diamond' ? rand(10000, 200000) : 0;
+      const caratWeight = diamondValue > 0 ? Math.round(rand(0.3, 3) * 100) / 100 : undefined;
 
       return {
         category: categoryIds[catKey],
@@ -145,13 +147,18 @@ export async function POST(req: NextRequest) {
         tag: pick(TAGS),
         purity: pick(PURITIES),
         weightGrams,
-        wastageGrams,
+        wastagePercent,
         makingCharges,
+        accessoriesCharge,
         boutiqueDeduction,
         diamondValue,
-        stonesDetails: diamondValue > 0 ? `${Math.round(rand(0.5, 5) * 10) / 10}ct ${pick(['Round', 'Princess', 'Cushion', 'Emerald', 'Oval'])} cut diamond` : undefined,
+        caratWeight,
+        stonesDetails: diamondValue > 0 ? `${caratWeight}ct ${pick(['Round', 'Princess', 'Cushion', 'Emerald', 'Oval'])} cut diamond` : undefined,
         karigarName: pick(KARIGARS),
         images: [],
+        isAvailable: Math.random() > 0.1,
+        showPrice: Math.random() > 0.05,
+        estimatedMakingDays: Math.random() > 0.4 ? { min: Math.round(rand(3, 7)), max: Math.round(rand(8, 20)) } : undefined,
       };
     });
 

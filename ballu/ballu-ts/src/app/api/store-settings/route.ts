@@ -8,7 +8,7 @@ export async function GET() {
   const settings = await StoreSettings.findOne()
     .populate('pieceOfTheWeek.material', 'name')
     .populate('pieceOfTheWeek.category', 'name')
-    .populate('pieceOfTheWeek.item', 'name images purity weightGrams material wastageGrams makingCharges boutiqueDeduction diamondValue')
+    .populate('pieceOfTheWeek.item', 'name images purity weightGrams material wastagePercent makingCharges accessoriesCharge boutiqueDeduction diamondValue caratWeight isAvailable showPrice estimatedMakingDays')
     .lean();
   if (!settings) {
     return NextResponse.json({
@@ -29,8 +29,9 @@ export async function GET() {
       const pricing = await calculateFinalPrice({
         materialId: item.material?.toString() || '',
         weightGrams: item.weightGrams,
-        wastageGrams: item.wastageGrams || 0,
+        wastagePercent: item.wastagePercent || 0,
         makingCharges: item.makingCharges || 0,
+        accessoriesCharge: item.accessoriesCharge || 0,
         boutiqueDeduction: item.boutiqueDeduction || 0,
         diamondValue: item.diamondValue || 0,
       });

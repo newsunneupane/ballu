@@ -2,12 +2,21 @@
 
 import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { Cormorant_Garamond, Cormorant_SC, Tenor_Sans } from 'next/font/google';
 import { productService } from '@/services/product-service';
 import { CATEGORIES as HARDCODED_CATEGORIES } from '@/data/products';
+import { SortOption } from '@/types/product';
 import { useFilterSticky } from '@/hooks/useFilterSticky';
 import { useProductData } from '@/hooks/useProductData';
 import ProductCard from '@/components/shared/ProductCard';
+
+const SORT_OPTIONS: { value: SortOption; label: string }[] = [
+  { value: 'newest', label: 'Newest' },
+  { value: 'most-viewed', label: 'Most Viewed' },
+  { value: 'price-asc', label: 'Price: Low to High' },
+  { value: 'price-desc', label: 'Price: High to Low' },
+];
 
 const cormorantSC = Cormorant_SC({
   subsets: ['latin'],
@@ -39,10 +48,19 @@ export default function CatalogueContent({
   breadcrumb,
   hideCategories,
 }: CatalogueContentProps) {
+  const searchParams = useSearchParams();
+  const urlCategory = searchParams.get('category')?.toUpperCase();
+  const urlMaterial = searchParams.get('material')?.toUpperCase();
+
   const [activeCategories, setActiveCategories] = useState<string[]>(
-    defaultCategory ? [defaultCategory] : ['ALL']
+    urlCategory ? [urlCategory] : defaultCategory ? [defaultCategory] : ['ALL']
   );
-  const [activeMaterial, setActiveMaterial] = useState('ALL');
+  const [activeMaterial, setActiveMaterial] = useState(urlMaterial || 'ALL');
+  const [activeTag, setActiveTag] = useState('ALL');
+  const [availableOnly, setAvailableOnly] = useState(false);
+  const [minPrice, setMinPrice] = useState('');
+  const [maxPrice, setMaxPrice] = useState('');
+  const [sort, setSort] = useState<SortOption>('newest');
   const [viewMode, setViewMode] = useState<'GRID' | 'LIST'>('GRID');
   const { containerRef, isFixed } = useFilterSticky(50);
   const dataReady = useProductData();
@@ -81,9 +99,20 @@ export default function CatalogueContent({
     return ['ALL', 'GOLD', 'SILVER'];
   }, [dataReady]);
 
+  const tagButtons = useMemo(() => {
+    const tags = new Set<string>();
+    productService.getAll().forEach((p) => { if (p.tag) tags.add(p.tag); });
+    return ['ALL', ...Array.from(tags)];
+  }, [dataReady]);
+
   const filteredProducts = productService.getFiltered({
     categories: activeCategories,
     material: activeMaterial,
+    tag: activeTag,
+    availableOnly,
+    minPrice: minPrice ? Number(minPrice) : undefined,
+    maxPrice: maxPrice ? Number(maxPrice) : undefined,
+    sort,
   });
 
   return (
@@ -181,6 +210,64 @@ export default function CatalogueContent({
             </div>
           </div>
         </div>
+
+      <div className="px-4 sm:px-6 md:px-16 lg:px-15 py-4 border-b border-bj-border/60">
+        <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+          {tagButtons.length > 1 && (
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className={`${tenorSans.className} text-[9px] tracking-[0.2em] uppercase text-bj-text-dim`}>Tag</span>
+              {tagButtons.map((t) => (
+                <button
+                  key={t}
+                  onClick={() => setActiveTag(t)}
+                  className={`${tenorSans.className} px-2.5 py-1 text-[9px] tracking-widest uppercase border rounded-full transition-all ${
+                    activeTag === t ? 'border-bj-gold-alt text-bj-gold-alt' : 'border-bj-border text-bj-text-muted'
+                  }`}
+                >
+                  {t}
+                </button>
+              ))}
+            </div>
+          )}
+
+          <label className={`${tenorSans.className} flex items-center gap-2 text-[9px] tracking-[0.2em] uppercase text-bj-text-muted cursor-pointer`}>
+            <input type="checkbox" checked={availableOnly} onChange={(e) => setAvailableOnly(e.target.checked)} className="accent-[#cda274]" />
+            In Stock Only
+          </label>
+
+          <div className="flex items-center gap-2">
+            <span className={`${tenorSans.className} text-[9px] tracking-[0.2em] uppercase text-bj-text-dim`}>Price</span>
+            <input
+              type="number"
+              value={minPrice}
+              onChange={(e) => setMinPrice(e.target.value)}
+              placeholder="Min"
+              className={`${tenorSans.className} w-20 bg-transparent border border-bj-border rounded px-2 py-1 text-[10px] text-bj-text-alt focus:outline-none focus:border-[#cda274]`}
+            />
+            <span className="text-bj-text-dim text-[10px]">–</span>
+            <input
+              type="number"
+              value={maxPrice}
+              onChange={(e) => setMaxPrice(e.target.value)}
+              placeholder="Max"
+              className={`${tenorSans.className} w-20 bg-transparent border border-bj-border rounded px-2 py-1 text-[10px] text-bj-text-alt focus:outline-none focus:border-[#cda274]`}
+            />
+          </div>
+
+          <div className="flex items-center gap-2 sm:ml-auto">
+            <span className={`${tenorSans.className} text-[9px] tracking-[0.2em] uppercase text-bj-text-dim`}>Sort</span>
+            <select
+              value={sort}
+              onChange={(e) => setSort(e.target.value as SortOption)}
+              className={`${tenorSans.className} bg-transparent border border-bj-border rounded px-2 py-1 text-[10px] text-bj-text-alt focus:outline-none focus:border-[#cda274] uppercase`}
+            >
+              {SORT_OPTIONS.map((o) => (
+                <option key={o.value} value={o.value} className="bg-bj-bg-elevated normal-case">{o.label}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+      </div>
 
       <main className="px-4 sm:px-6 md:px-16 lg:px-15 pb-32 mt-6">
         {!dataReady ? (

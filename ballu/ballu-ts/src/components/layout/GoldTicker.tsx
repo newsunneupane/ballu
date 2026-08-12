@@ -3,6 +3,7 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Cormorant_Garamond } from 'next/font/google';
+import { useCurrency } from '@/hooks/useCurrency';
 
 const cormorant = Cormorant_Garamond({
   subsets: ['latin'],
@@ -11,6 +12,7 @@ const cormorant = Cormorant_Garamond({
 });
 
 export default function GoldTicker() {
+  const { format } = useCurrency();
   const { data: rates = [] } = useQuery({
     queryKey: ['rates-current'],
     queryFn: async () => {
@@ -34,7 +36,7 @@ export default function GoldTicker() {
   const phone: string = settings?.phoneNumbers?.[0] || '+977 9842 000 000';
 
   const rateItems = (rates as { name: string; ratePerGramNrs: number }[]).map(
-    (r) => `${r.name.toUpperCase()} ₨ ${r.ratePerGramNrs.toLocaleString('en-IN')}/G`
+    (r) => `${r.name.toUpperCase()} ${format(r.ratePerGramNrs)}/G`
   );
 
   const parts = ['TODAY', ...rateItems, ...tickerItems.filter(Boolean), `WHATSAPP ${phone}`];

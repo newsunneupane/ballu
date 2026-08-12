@@ -3,9 +3,12 @@
 import React from 'react';
 import Link from 'next/link';
 import { Cormorant_Garamond, Tenor_Sans } from 'next/font/google';
+import { FaWhatsapp } from 'react-icons/fa';
 import { Product } from '@/types/product';
 import { cloudinaryUrl } from '@/lib/cloudinary';
 import Badge from '@/components/ui/Badge';
+import { useCurrency } from '@/hooks/useCurrency';
+import { buildWhatsappLink } from '@/lib/utils/whatsapp';
 
 const cormorant = Cormorant_Garamond({
   subsets: ['latin'],
@@ -23,6 +26,23 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product, viewMode = 'GRID' }: ProductCardProps) {
+  const { format } = useCurrency();
+  const priceDisplay = !product.showPrice
+    ? 'Price on Request'
+    : product.priceNpr != null
+    ? format(product.priceNpr)
+    : '—';
+
+  const openWhatsapp = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    window.open(
+      buildWhatsappLink(product, product.showPrice && product.priceNpr != null ? format(product.priceNpr) : null),
+      '_blank',
+      'noopener,noreferrer'
+    );
+  };
+
   if (viewMode === 'LIST') {
     return (
       <Link
@@ -43,17 +63,29 @@ export default function ProductCard({ product, viewMode = 'GRID' }: ProductCardP
           )}
         </div>
         <div className="pl-4 min-w-0">
-          <div className="text-base sm:text-[18px] text-bj-text-gold font-normal leading-tight tracking-wide truncate">{product.title}</div>
+          <div className="text-base sm:text-[18px] text-bj-text-gold font-normal leading-tight tracking-wide truncate flex items-center gap-2">
+            {product.title}
+            {!product.isAvailable && (
+              <span className="text-[8px] tracking-widest uppercase text-red-400 border border-red-400/30 rounded px-1.5 py-0.5 shrink-0">Made to Order</span>
+            )}
+          </div>
           <div className="text-[10px] sm:text-xs font-light text-bj-text-muted mt-1 opacity-80 truncate">{product.subTitle}</div>
-          <div className="sm:hidden text-[10px] text-bj-text-dim tracking-wide mt-1">{product.material} • {product.karat} • {product.weight.toLowerCase()}</div>
+          <div className="sm:hidden text-[10px] text-bj-text-dim tracking-wide mt-1">{product.material} • {product.karat} • {product.weight.toLowerCase()}{product.caratWeight ? ` • ${product.caratWeight}ct` : ''}</div>
         </div>
         <div className="text-sm font-thin text-bj-text-gold opacity-80 hidden sm:block">{product.type || product.category}</div>
         <div className="text-sm font-thin text-bj-text-gold opacity-80 hidden sm:block">{product.material}</div>
         <div className="text-sm font-thin text-bj-text-gold opacity-80 hidden sm:block">{product.karat}</div>
         <div className="text-sm font-light text-bj-text-gold opacity-80 hidden sm:block">{product.weight.toLowerCase()}</div>
-        <div className="text-base sm:text-[20px] text-bj-gold-alt font-medium tracking-wide">{product.price}</div>
-        <div className="text-right">
-          <span className="text-[10px] group-hover:translate-x-2 transition-transform duration-200 tracking-[0.2em] uppercase text-bj-gold-alt flex items-center justify-end gap-1.5 mr-2 sm:mr-4 ml-auto">
+        <div className="text-base sm:text-[20px] text-bj-gold-alt font-medium tracking-wide">{priceDisplay}</div>
+        <div className="flex items-center justify-end gap-3">
+          <button
+            onClick={openWhatsapp}
+            aria-label="Ask about this piece on WhatsApp"
+            className="text-[#25D366] hover:scale-110 transition-transform shrink-0"
+          >
+            <FaWhatsapp size={16} />
+          </button>
+          <span className="text-[10px] group-hover:translate-x-2 transition-transform duration-200 tracking-[0.2em] uppercase text-bj-gold-alt hidden sm:flex items-center gap-1.5">
             <span className="hidden sm:inline">View</span> →
           </span>
         </div>
@@ -80,16 +112,32 @@ export default function ProductCard({ product, viewMode = 'GRID' }: ProductCardP
             <div className="absolute inset-0 bg-bj-bg-card transition-transform duration-700 ease-out group-hover:scale-110 origin-center" />
           </div>
         )}
-        <div className="absolute inset-0 z-20 p-4 pointer-events-none">
-          {product.tag && <Badge>{product.tag}</Badge>}
+        <div className="absolute inset-0 z-20 p-4 flex items-start justify-between pointer-events-none">
+          <div className="flex flex-col gap-1.5">
+            {product.tag && <Badge>{product.tag}</Badge>}
+            {!product.isAvailable && <Badge className="!bg-red-950/80 !text-red-300 !border-red-400/30">Made to Order</Badge>}
+            {product.estimatedMakingDays?.min != null && (
+              <Badge variant="outline">
+                Ready {product.estimatedMakingDays.min}
+                {product.estimatedMakingDays.max != null && product.estimatedMakingDays.max !== product.estimatedMakingDays.min ? `–${product.estimatedMakingDays.max}` : ''}d
+              </Badge>
+            )}
+          </div>
+          <button
+            onClick={openWhatsapp}
+            aria-label="Ask about this piece on WhatsApp"
+            className="pointer-events-auto w-8 h-8 rounded-full bg-bj-bg-ticker/60 backdrop-blur-md border border-white/10 text-[#25D366] flex items-center justify-center hover:scale-110 transition-transform"
+          >
+            <FaWhatsapp size={15} />
+          </button>
         </div>
       </div>
       <div className="relative z-0 px-5 pb-[10px] pt-[23px] bg-bj-bg-card-body">
         <h3 className="text-base font-normal text-bj-text-gold mb-1">{product.title}</h3>
         <p className="text-xs text-bj-text-muted mb-4 opacity-80">{product.subTitle}</p>
         <div className="flex justify-between items-baseline pt-3 border-t border-bj-border">
-          <span className="text-[10px] text-bj-text-dim tracking-wide">{product.material} • {product.karat} • {product.weight}</span>
-          <span className="text-sm text-bj-text-gold [font-variant-numeric:lining-nums]">{product.price}</span>
+          <span className="text-[10px] text-bj-text-dim tracking-wide">{product.material} • {product.karat} • {product.weight}{product.caratWeight ? ` • ${product.caratWeight}ct` : ''}</span>
+          <span className="text-sm text-bj-text-gold [font-variant-numeric:lining-nums]">{priceDisplay}</span>
         </div>
       </div>
     </Link>

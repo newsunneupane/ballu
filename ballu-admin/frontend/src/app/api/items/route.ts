@@ -34,8 +34,9 @@ export async function GET(req: NextRequest) {
           const finalPrice = await calculateFinalPrice({
             materialId: item.material._id.toString(),
             weightGrams: item.weightGrams,
-            wastageGrams: item.wastageGrams,
+            wastagePercent: item.wastagePercent,
             makingCharges: item.makingCharges,
+            accessoriesCharge: item.accessoriesCharge,
             boutiqueDeduction: item.boutiqueDeduction,
             diamondValue: item.diamondValue,
           });

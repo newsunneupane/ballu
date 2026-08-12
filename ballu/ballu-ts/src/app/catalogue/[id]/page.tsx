@@ -7,10 +7,13 @@ import { Cormorant_Garamond, Tenor_Sans } from "next/font/google";
 import { productService } from "@/services/product-service";
 import { useProductData } from "@/hooks/useProductData";
 import { cloudinaryUrl } from "@/lib/cloudinary";
-import { WHATSAPP_URL } from "@/lib/constants";
 import { categorySlugMap } from "@/data/collections";
+import { useCurrency } from "@/hooks/useCurrency";
+import { buildWhatsappLink } from "@/lib/utils/whatsapp";
+import { recordView } from "@/lib/visitTracking";
 import { ArrowRight, ChevronLeft, ChevronRight } from "@/components/shared/Icons";
 import Button from "@/components/ui/Button";
+import ProductCard from "@/components/shared/ProductCard";
 
 const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
@@ -26,6 +29,7 @@ export default function ProductDetail() {
   const params = useParams();
   const id = params?.id as string;
   const dataReady = useProductData();
+  const { format } = useCurrency();
   const [product, setProduct] = useState(productService.getById(id) || productService.getById(Number(id)));
   const [activeIndex, setActiveIndex] = useState(0);
   const [paused, setPaused] = useState(false);
@@ -41,6 +45,19 @@ export default function ProductDetail() {
   useEffect(() => {
     setActiveIndex(0);
   }, [id]);
+
+  useEffect(() => {
+    if (!product) return;
+    recordView({ id: product.id, category: product.category, material: product.material });
+    const sessionKey = `bj_viewed_${product.id}`;
+    if (sessionStorage.getItem(sessionKey)) return;
+    sessionStorage.setItem(sessionKey, '1');
+    fetch(`/api/items/${product.id}`, { method: 'POST' }).catch(() => {});
+  }, [product?.id]);
+
+  const similarProducts = product
+    ? productService.getRecommended({ excludeId: product.id, category: product.category, material: product.material, limit: 4 })
+    : [];
 
   useEffect(() => {
     if (paused || images.length <= 1) return;
@@ -156,8 +173,11 @@ export default function ProductDetail() {
           </div>
 
           <div className="flex flex-col justify-center py-4">
-            <div className={`${tenorSans.className} text-bj-gold-alt text-[9px] tracking-[0.3em] uppercase mb-5`}>
-              CATALOGUE · {product.tag || "COLLECTION"}
+            <div className={`${tenorSans.className} text-bj-gold-alt text-[9px] tracking-[0.3em] uppercase mb-5 flex items-center gap-3`}>
+              <span>CATALOGUE · {product.tag || "COLLECTION"}</span>
+              {!product.isAvailable && (
+                <span className="text-red-400 border border-red-400/30 rounded px-2 py-0.5">Made to Order</span>
+              )}
             </div>
 
             <h1 className={`${cormorant.className} text-4xl lg:text-5xl leading-none text-bj-text-heading mb-2 font-light tracking-wide`}>
@@ -170,12 +190,23 @@ export default function ProductDetail() {
 
             <div className="flex items-baseline gap-4 mb-8">
               <span className={`${cormorant.className} text-4xl lg:text-[40px] text-bj-gold-alt tracking-wide`}>
-                {product.price}
+                {product.showPrice ? (product.priceNpr != null ? format(product.priceNpr) : '—') : 'Price on Request'}
               </span>
-              <span className={`${tenorSans.className} text-[9px] tracking-[0.2em] text-bj-text-muted uppercase`}>
-                Incl. Making
-              </span>
+              {product.showPrice && (
+                <span className={`${tenorSans.className} text-[9px] tracking-[0.2em] text-bj-text-muted uppercase`}>
+                  Incl. Making
+                </span>
+              )}
             </div>
+
+            {product.estimatedMakingDays?.min != null && (
+              <div className={`${tenorSans.className} inline-flex items-center gap-2 text-[10px] tracking-[0.2em] uppercase text-bj-gold-alt border border-bj-border rounded-full px-3 py-1.5 mb-8 w-fit`}>
+                Ready in {product.estimatedMakingDays.min}
+                {product.estimatedMakingDays.max != null && product.estimatedMakingDays.max !== product.estimatedMakingDays.min
+                  ? `–${product.estimatedMakingDays.max}`
+                  : ''} days
+              </div>
+            )}
 
             {product.description && (
               <p className={`${tenorSans.className} text-[13px] text-bj-text-description leading-[1.8] mb-10 pr-4`}>
@@ -185,7 +216,7 @@ export default function ProductDetail() {
 
             <div className="w-full h-px bg-bj-border mb-8" />
 
-            {product.pricing && (
+            {product.showPrice && product.pricing && (
               <>
                 <div className="mb-10">
                   <h3 className={`${tenorSans.className} text-[9px] tracking-[0.3em] uppercase text-bj-text-muted mb-6`}>
@@ -194,26 +225,34 @@ export default function ProductDetail() {
 
                   <div className={`${tenorSans.className} flex flex-col gap-3 text-[12px] text-bj-text-description mb-5`}>
                     <div className="flex justify-between">
-                      <span>Gold value ({product.purity} - {product.weight} @ Rs14,260/g)</span>
-                      <span className={`${cormorant.className} text-[15px] italic text-bj-text-alt`}>{product.pricing.goldValue}</span>
+                      <span>Gold value ({product.purity} - {product.weight} @ {format(product.pricing.ratePerGramNpr)}/g)</span>
+                      <span className={`${cormorant.className} text-[15px] italic text-bj-text-alt`}>{format(product.pricing.goldValueNpr)}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span>Wastage (8%)</span>
-                      <span className={`${cormorant.className} text-[15px] italic text-bj-text-alt`}>{product.pricing.wastage}</span>
+                      <span>Wastage ({product.pricing.wastagePercent}%)</span>
+                      <span className={`${cormorant.className} text-[15px] italic text-bj-text-alt`}>{format(product.pricing.wastageNpr)}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Making charges</span>
-                      <span className={`${cormorant.className} text-[15px] italic text-bj-text-alt`}>{product.pricing.making}</span>
+                      <span className={`${cormorant.className} text-[15px] italic text-bj-text-alt`}>{format(product.pricing.makingNpr)}</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span>Less: boutique deduction</span>
-                      <span className={`${cormorant.className} text-[15px] italic text-bj-text-alt`}>{product.pricing.discount}</span>
-                    </div>
+                    {product.pricing.accessoriesNpr > 0 && (
+                      <div className="flex justify-between">
+                        <span>Accessories charge</span>
+                        <span className={`${cormorant.className} text-[15px] italic text-bj-text-alt`}>{format(product.pricing.accessoriesNpr)}</span>
+                      </div>
+                    )}
+                    {product.pricing.discountNpr > 0 && (
+                      <div className="flex justify-between">
+                        <span>Less: boutique deduction</span>
+                        <span className={`${cormorant.className} text-[15px] italic text-bj-text-alt`}>− {format(product.pricing.discountNpr)}</span>
+                      </div>
+                    )}
                   </div>
 
                   <div className="flex justify-between pt-5 border-t border-bj-border">
                     <span className={`${tenorSans.className} text-[12px] text-bj-gold-alt`}>Total</span>
-                    <span className={`${cormorant.className} text-xl text-bj-gold-alt`}>{product.price}</span>
+                    <span className={`${cormorant.className} text-xl text-bj-gold-alt`}>{product.priceNpr != null ? format(product.priceNpr) : '—'}</span>
                   </div>
                 </div>
 
@@ -221,7 +260,7 @@ export default function ProductDetail() {
               </>
             )}
 
-            <div className="grid grid-cols-4 gap-4 mb-10">
+            <div className={`grid gap-4 mb-10 ${product.caratWeight ? 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-5' : 'grid-cols-4'}`}>
               <div>
                 <div className={`${tenorSans.className} text-[8px] tracking-[0.25em] uppercase text-bj-text-muted mb-2`}>Purity</div>
                 <div className={`${cormorant.className} text-[17px] text-bj-text-alt`}>{product.purity || product.karat}</div>
@@ -230,6 +269,12 @@ export default function ProductDetail() {
                 <div className={`${tenorSans.className} text-[8px] tracking-[0.25em] uppercase text-bj-text-muted mb-2`}>Weight</div>
                 <div className={`${cormorant.className} text-[17px] text-bj-text-alt`}>{product.weight}</div>
               </div>
+              {product.caratWeight ? (
+                <div>
+                  <div className={`${tenorSans.className} text-[8px] tracking-[0.25em] uppercase text-bj-text-muted mb-2`}>Carat</div>
+                  <div className={`${cormorant.className} text-[17px] text-bj-text-alt`}>{product.caratWeight}ct</div>
+                </div>
+              ) : null}
               <div>
                 <div className={`${tenorSans.className} text-[8px] tracking-[0.25em] uppercase text-bj-text-muted mb-2`}>Stones</div>
                 <div className={`${cormorant.className} text-[17px] text-bj-text-alt`}>{product.stones || 'None'}</div>
@@ -245,7 +290,7 @@ export default function ProductDetail() {
                 Reserve To View
               </Button>
               <a
-                href={`${WHATSAPP_URL}?text=${encodeURIComponent(`Hi, I'm interested in ${product.title} (${product.price})`)}`}
+                href={buildWhatsappLink(product, product.showPrice && product.priceNpr != null ? format(product.priceNpr) : null)}
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -256,6 +301,19 @@ export default function ProductDetail() {
             </div>
           </div>
         </div>
+
+        {similarProducts.length > 0 && (
+          <div className="mt-24 lg:mt-32">
+            <h2 className={`${tenorSans.className} text-[9px] tracking-[0.3em] uppercase text-bj-text-muted mb-6`}>
+              Similar Pieces
+            </h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
+              {similarProducts.map((p) => (
+                <ProductCard key={p.id} product={p} viewMode="GRID" />
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -8,13 +8,19 @@ export interface IItem extends Document {
   tag?: string;
   purity?: string;
   weightGrams: number;
-  wastageGrams: number;
+  wastagePercent: number;
   makingCharges: number;
+  accessoriesCharge: number;
   boutiqueDeduction: number;
   diamondValue: number;
+  caratWeight?: number;
   stonesDetails?: string;
   karigarName?: string;
   images: string[];
+  isAvailable: boolean;
+  showPrice: boolean;
+  estimatedMakingDays?: { min?: number; max?: number };
+  viewCount: number;
 }
 
 const ItemSchema = new Schema<IItem>(
@@ -26,17 +32,24 @@ const ItemSchema = new Schema<IItem>(
     tag: { type: String, enum: ['new-arrival', 'best-seller', 'limited-edition', 'sale', 'bestseller', 'trending'] },
     purity: { type: String },
     weightGrams: { type: Number, required: true },
-    wastageGrams: { type: Number, default: 0 },
+    wastagePercent: { type: Number, default: 0 },
     makingCharges: { type: Number, default: 0 },
+    accessoriesCharge: { type: Number, default: 0 },
     boutiqueDeduction: { type: Number, default: 0 },
     diamondValue: { type: Number, default: 0 },
+    caratWeight: { type: Number },
     stonesDetails: { type: String },
     karigarName: { type: String },
     images: [{ type: String }],
+    isAvailable: { type: Boolean, default: true },
+    showPrice: { type: Boolean, default: true },
+    estimatedMakingDays: {
+      type: { min: { type: Number }, max: { type: Number } },
+      default: undefined,
+    },
+    viewCount: { type: Number, default: 0 },
   },
   { timestamps: true }
 );
-
-
 
 export default mongoose.models.Item || mongoose.model<IItem>('Item', ItemSchema);

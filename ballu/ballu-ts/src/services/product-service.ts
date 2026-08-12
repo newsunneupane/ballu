@@ -6,17 +6,12 @@ let productStore: Product[] = [];
 let categoryStore: any[] = [];
 let materialStore: any[] = [];
 
-function formatCurrency(amount: number): string {
-  return `Rs ${amount.toLocaleString('en-IN')}`;
-}
-
 function transformApiItem(item: any): Product {
   const catEn = item.category?.name?.en?.toUpperCase() || 'BRIDAL';
   const matEn = item.material?.name?.en?.toUpperCase() || 'GOLD';
   const weightStr = `${item.weightGrams}g`;
 
   const pricing = item.pricing;
-  const priceStr = pricing?.finalPrice != null ? formatCurrency(pricing.finalPrice) : '—';
 
   return {
     id: item._id,
@@ -28,18 +23,26 @@ function transformApiItem(item: any): Product {
     subTitle: item.name?.np || '',
     karat: item.purity || '',
     weight: weightStr,
-    price: priceStr,
+    priceNpr: pricing?.finalPrice ?? null,
     description: item.description,
     purity: item.purity,
     stones: item.stonesDetails,
     karigar: item.karigarName,
+    caratWeight: item.caratWeight,
+    isAvailable: item.isAvailable ?? true,
+    showPrice: item.showPrice ?? true,
+    estimatedMakingDays: item.estimatedMakingDays,
+    viewCount: item.viewCount,
     images: item.images,
     pricing: pricing
       ? {
-          goldValue: formatCurrency(pricing.goldValue),
-          wastage: formatCurrency(pricing.wastage),
-          making: formatCurrency(pricing.making),
-          discount: `− ${formatCurrency(pricing.deduction)}`,
+          goldValueNpr: pricing.goldValue,
+          wastageNpr: pricing.wastage,
+          wastagePercent: pricing.wastagePercent,
+          makingNpr: pricing.making,
+          accessoriesNpr: pricing.accessories,
+          discountNpr: pricing.deduction,
+          ratePerGramNpr: pricing.ratePerGramNrs,
         }
       : undefined,
     _apiItem: item,
@@ -118,7 +121,7 @@ export const productService = {
   },
 
   getFiltered(filters: Partial<ProductFilters>): Product[] {
-    return productStore.filter((product) => {
+    const filtered = productStore.filter((product) => {
       const matchesCategory =
         !filters.categories ||
         filters.categories.includes('ALL') ||
@@ -127,8 +130,43 @@ export const productService = {
         !filters.material ||
         filters.material === 'ALL' ||
         product.material === filters.material;
-      return matchesCategory && matchesMaterial;
+      const matchesTag = !filters.tag || filters.tag === 'ALL' || product.tag === filters.tag;
+      const matchesAvailability = !filters.availableOnly || product.isAvailable;
+      const matchesMinPrice = filters.minPrice == null || (product.priceNpr != null && product.priceNpr >= filters.minPrice);
+      const matchesMaxPrice = filters.maxPrice == null || (product.priceNpr != null && product.priceNpr <= filters.maxPrice);
+      return matchesCategory && matchesMaterial && matchesTag && matchesAvailability && matchesMinPrice && matchesMaxPrice;
     });
+
+    switch (filters.sort) {
+      case 'price-asc':
+        return [...filtered].sort((a, b) => (a.priceNpr ?? Infinity) - (b.priceNpr ?? Infinity));
+      case 'price-desc':
+        return [...filtered].sort((a, b) => (b.priceNpr ?? -Infinity) - (a.priceNpr ?? -Infinity));
+      case 'most-viewed':
+        return [...filtered].sort((a, b) => (b.viewCount ?? 0) - (a.viewCount ?? 0));
+      default:
+        // 'newest' (default): productStore is already createdAt-desc from the API
+        return filtered;
+    }
+  },
+
+  getRecommended(opts: { excludeId?: string | number; category?: string; material?: string; limit?: number }): Product[] {
+    const { excludeId, category, material, limit = 8 } = opts;
+    const candidates = productStore.filter((p) => String(p.id) !== String(excludeId));
+    const bothMatch = candidates.filter((p) => p.category === category && p.material === material);
+    const eitherMatch = candidates.filter(
+      (p) => (p.category === category || p.material === material) && !bothMatch.includes(p)
+    );
+    const ranked = [...bothMatch, ...eitherMatch].sort((a, b) => (b.viewCount ?? 0) - (a.viewCount ?? 0));
+    if (ranked.length >= limit) return ranked.slice(0, limit);
+    const rest = candidates
+      .filter((p) => !ranked.includes(p))
+      .sort((a, b) => (b.viewCount ?? 0) - (a.viewCount ?? 0));
+    return [...ranked, ...rest].slice(0, limit);
+  },
+
+  getTopViewed(limit = 8): Product[] {
+    return [...productStore].sort((a, b) => (b.viewCount ?? 0) - (a.viewCount ?? 0)).slice(0, limit);
   },
 
   search(query: string): Product[] {

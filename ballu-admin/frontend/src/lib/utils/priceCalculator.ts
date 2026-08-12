@@ -3,12 +3,13 @@ import DailyRate from '@/lib/models/DailyRate';
 export async function calculateFinalPrice(params: {
   materialId: string;
   weightGrams: number;
-  wastageGrams: number;
+  wastagePercent: number;
   makingCharges: number;
+  accessoriesCharge: number;
   boutiqueDeduction: number;
   diamondValue: number;
 }): Promise<number> {
-  const { materialId, weightGrams, wastageGrams, makingCharges, boutiqueDeduction, diamondValue } = params;
+  const { materialId, weightGrams, wastagePercent, makingCharges, accessoriesCharge, boutiqueDeduction, diamondValue } = params;
 
   const latestRate = await DailyRate.findOne({ material: materialId })
     .sort({ date: -1 })
@@ -18,9 +19,9 @@ export async function calculateFinalPrice(params: {
     throw new Error(`No daily rate found for material ${materialId}`);
   }
 
-  const totalWeight = weightGrams + wastageGrams;
-  const metalCost = totalWeight * latestRate.ratePerGramNrs;
-  const finalPrice = metalCost + makingCharges - boutiqueDeduction + diamondValue;
+  const goldValue = weightGrams * latestRate.ratePerGramNrs;
+  const wastage = goldValue * (wastagePercent / 100);
+  const finalPrice = goldValue + wastage + makingCharges + accessoriesCharge - boutiqueDeduction + diamondValue;
 
   return Math.round(finalPrice);
 }

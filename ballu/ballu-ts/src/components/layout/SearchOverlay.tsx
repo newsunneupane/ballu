@@ -6,6 +6,7 @@ import { Cormorant_Garamond, Cormorant_SC } from 'next/font/google';
 import { FiSearch, FiX } from 'react-icons/fi';
 import { productService } from '@/services/product-service';
 import { cloudinaryUrl } from '@/lib/cloudinary';
+import { useCurrency } from '@/hooks/useCurrency';
 
 const cormorant = Cormorant_Garamond({
   subsets: ['latin'],
@@ -26,15 +27,9 @@ const MATERIAL_COLORS: Record<string, string> = {
   DIAMOND: 'bg-[#b9f2ff]',
 };
 
-function formatPrice(price: string): string {
-  const cleaned = price.replace(/[^0-9]/g, '');
-  if (!cleaned) return price;
-  const num = parseInt(cleaned, 10);
-  return `Rs ${num.toLocaleString('en-IN')}`;
-}
-
 export default function SearchOverlay({ onClose }: { onClose: () => void }) {
   const router = useRouter();
+  const { format } = useCurrency();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<any[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -148,7 +143,7 @@ export default function SearchOverlay({ onClose }: { onClose: () => void }) {
                         </div>
                       </div>
                       <span className="text-xs text-bj-gold font-medium whitespace-nowrap font-sans">
-                        {formatPrice(product.price)}
+                        {product.showPrice && product.priceNpr != null ? format(product.priceNpr) : 'On Request'}
                       </span>
                     </button>
                   );

@@ -1,8 +1,11 @@
 export interface Pricing {
-  goldValue: string;
-  wastage: string;
-  making: string;
-  discount: string;
+  goldValueNpr: number;
+  wastageNpr: number;
+  wastagePercent: number;
+  makingNpr: number;
+  accessoriesNpr: number;
+  discountNpr: number;
+  ratePerGramNpr: number;
 }
 
 export interface Product {
@@ -15,18 +18,30 @@ export interface Product {
   subTitle: string;
   karat: string;
   weight: string;
-  price: string;
+  priceNpr: number | null;
   description?: string;
   purity?: string;
   stones?: string;
   karigar?: string;
+  caratWeight?: number;
+  isAvailable: boolean;
+  showPrice: boolean;
+  estimatedMakingDays?: { min?: number; max?: number };
+  viewCount?: number;
   pricing?: Pricing;
   images?: string[];
   _apiItem?: any;
 }
 
+export type SortOption = 'newest' | 'price-asc' | 'price-desc' | 'most-viewed';
+
 export interface ProductFilters {
   categories: string[];
   material: string;
+  tag: string;
+  availableOnly: boolean;
+  minPrice?: number;
+  maxPrice?: number;
+  sort: SortOption;
   viewMode: 'GRID' | 'LIST';
 }
