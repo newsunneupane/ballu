@@ -2,9 +2,9 @@ import mongoose from 'mongoose';
 
 // Register all models so Mongoose knows about them for populate()
 import './models/Material';
+import './models/Group';
 import './models/Category';
 import './models/Item';
-import './models/DailyRate';
 import './models/CustomRequest';
 import './models/StoreSettings';
 

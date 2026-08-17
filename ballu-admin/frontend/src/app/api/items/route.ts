@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import Item from '@/lib/models/Item';
+import Group from '@/lib/models/Group';
 import { calculateFinalPrice } from '@/lib/utils/priceCalculator';
 import { requireAuth } from '@/lib/auth/middleware';
 import { errorResponse } from '@/lib/api-utils';
@@ -24,15 +25,20 @@ export async function GET(req: NextRequest) {
     const items = await Item.find(filter)
       .populate('category', 'name')
       .populate('material', 'name')
+      .populate('group', 'name')
       .sort({ createdAt: -1 })
       .lean();
 
     const itemsWithPrice = await Promise.all(
       items.map(async (item) => {
         if (!item.material) return { ...item, finalPrice: null };
+        if (item.manualPriceNpr != null) {
+          return { ...item, finalPrice: Number(item.manualPriceNpr) };
+        }
         try {
           const finalPrice = await calculateFinalPrice({
             materialId: item.material._id.toString(),
+            groupId: item.group ? (item.group as { _id: string })._id.toString() : undefined,
             weightGrams: item.weightGrams,
             wastagePercent: item.wastagePercent,
             makingCharges: item.makingCharges,
@@ -71,6 +77,19 @@ export async function POST(req: NextRequest) {
     if (!body.weightGrams || body.weightGrams <= 0) {
       return NextResponse.json({ error: 'Valid weight is required' }, { status: 400, headers: { 'Cache-Control': 'no-store' } });
     }
+    if (!body.group) {
+      return NextResponse.json({ error: 'Group is required' }, { status: 400, headers: { 'Cache-Control': 'no-store' } });
+    }
+    if (!/^[a-f\d]{24}$/i.test(body.group)) {
+      return NextResponse.json({ error: 'Invalid group' }, { status: 400, headers: { 'Cache-Control': 'no-store' } });
+    }
+
+    const group = await Group.findById(body.group).lean();
+    if (!group) {
+      return NextResponse.json({ error: 'Group not found' }, { status: 400, headers: { 'Cache-Control': 'no-store' } });
+    }
+    const purity = (group as { name: string }).name;
+    const material = (group as { material: { toString(): string } }).material.toString();
 
     const existing = await Item.findOne({
       category: body.category,
@@ -84,8 +103,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'An item with this name already exists in this category & material' }, { status: 409, headers: { 'Cache-Control': 'no-store' } });
     }
 
-    const item = await Item.create(body);
-    const populated = await item.populate(['category', 'material']);
+    const item = await Item.create({ ...body, material, purity, manualPriceNpr: body.manualPriceNpr != null ? Number(body.manualPriceNpr) : undefined });
+    const populated = await item.populate(['category', 'material', 'group']);
     return NextResponse.json(populated, { status: 201, headers: { 'Cache-Control': 'no-store' } });
   } catch (err) {
     return errorResponse(err);

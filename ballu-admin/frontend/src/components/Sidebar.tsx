@@ -9,9 +9,9 @@ import { api } from '@/lib/api';
 import {
   LayoutDashboard,
   Gem,
+  Layers,
   Tag,
   Package,
-  DollarSign,
   MessageSquare,
   PhoneCall,
   Settings,
@@ -23,9 +23,9 @@ import {
 const navItems = [
   { href: '/', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/materials', label: 'Materials', icon: Gem },
+  { href: '/groups', label: 'Groups', icon: Layers },
   { href: '/categories', label: 'Categories', icon: Tag },
   { href: '/items', label: 'Items', icon: Package },
-  { href: '/daily-rates', label: 'Daily Rates', icon: DollarSign },
   { href: '/custom-requests', label: 'Custom Requests', icon: MessageSquare, badgeKey: 'pendingRequests' as const },
   { href: '/item-inquiries', label: 'Item Inquiries', icon: PhoneCall, badgeKey: 'pendingInquiries' as const },
   { href: '/store-settings', label: 'Store Settings', icon: Settings },

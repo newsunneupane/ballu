@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
 import { cloudinaryUrl } from '@/lib/cloudinary';
+import SearchableSelect from '@/components/SearchableSelect';
 import { Trash2 } from 'lucide-react';
 
 const statusColors: Record<string, string> = {
@@ -11,6 +12,12 @@ const statusColors: Record<string, string> = {
   Reviewed: 'text-blue-400 bg-blue-400/10',
   Contacted: 'text-emerald-400 bg-emerald-400/10',
 };
+
+const statusOptions = [
+  { value: 'Pending', label: 'Pending' },
+  { value: 'Reviewed', label: 'Reviewed' },
+  { value: 'Contacted', label: 'Contacted' },
+];
 
 export default function CustomRequestsPage() {
   const queryClient = useQueryClient();
@@ -68,12 +75,15 @@ export default function CustomRequestsPage() {
     <div>
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-2xl font-semibold text-[#fbf7f0]">Custom Requests</h1>
-        <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="bg-[#0a0806] border border-[#1f1a10] rounded px-3 py-2 text-sm text-[#e5e5e0] focus:outline-none focus:border-[#dbb86b]">
-          <option value="">All Statuses</option>
-          <option value="Pending">Pending</option>
-          <option value="Reviewed">Reviewed</option>
-          <option value="Contacted">Contacted</option>
-        </select>
+        <SearchableSelect
+          value={statusFilter}
+          onChange={(v) => setStatusFilter(v)}
+          options={statusOptions}
+          placeholder="All Statuses"
+          clearLabel="All Statuses"
+          size="sm"
+          className="w-48"
+        />
       </div>
 
       <div className="space-y-3">
@@ -108,15 +118,13 @@ export default function CustomRequestsPage() {
                 </div>
               </div>
               <div className="flex items-center gap-2 shrink-0">
-                <select
+                <SearchableSelect
                   value={r.status}
-                  onChange={(e) => updateStatus(r._id, e.target.value)}
-                  className="bg-[#0a0806] border border-[#1f1a10] rounded px-2 py-1 text-xs text-[#e5e5e0] focus:outline-none focus:border-[#dbb86b]"
-                >
-                  <option value="Pending">Pending</option>
-                  <option value="Reviewed">Reviewed</option>
-                  <option value="Contacted">Contacted</option>
-                </select>
+                  onChange={(v) => updateStatus(r._id, v)}
+                  options={statusOptions}
+                  size="sm"
+                  className="w-36"
+                />
                 <button onClick={() => remove(r._id)} className="text-[#6e695f] hover:text-red-400 transition-colors"><Trash2 size={14} /></button>
               </div>
             </div>

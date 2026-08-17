@@ -3,6 +3,7 @@ import mongoose, { Schema, Document, Types } from 'mongoose';
 export interface IItem extends Document {
   category: Types.ObjectId;
   material: Types.ObjectId;
+  group: Types.ObjectId;
   name: { en: string; np: string };
   description?: string;
   tag?: string;
@@ -20,6 +21,7 @@ export interface IItem extends Document {
   isAvailable: boolean;
   showPrice: boolean;
   estimatedMakingDays?: { min?: number; max?: number };
+  manualPriceNpr?: number;
   viewCount: number;
 }
 
@@ -27,6 +29,7 @@ const ItemSchema = new Schema<IItem>(
   {
     category: { type: Schema.Types.ObjectId, ref: 'Category', required: true },
     material: { type: Schema.Types.ObjectId, ref: 'Material', required: true },
+    group: { type: Schema.Types.ObjectId, ref: 'Group', required: true },
     name: { en: { type: String, required: true }, np: { type: String, required: true } },
     description: { type: String },
     tag: { type: String, enum: ['new-arrival', 'best-seller', 'limited-edition', 'sale', 'bestseller', 'trending'] },
@@ -47,6 +50,7 @@ const ItemSchema = new Schema<IItem>(
       type: { min: { type: Number }, max: { type: Number } },
       default: undefined,
     },
+    manualPriceNpr: { type: Number },
     viewCount: { type: Number, default: 0 },
   },
   { timestamps: true }

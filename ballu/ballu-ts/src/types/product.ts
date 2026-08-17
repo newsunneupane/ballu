@@ -38,6 +38,7 @@ export type SortOption = 'newest' | 'price-asc' | 'price-desc' | 'most-viewed';
 export interface ProductFilters {
   categories: string[];
   material: string;
+  purity?: string;
   tag: string;
   availableOnly: boolean;
   minPrice?: number;

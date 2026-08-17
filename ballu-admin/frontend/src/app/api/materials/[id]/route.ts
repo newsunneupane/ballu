@@ -3,6 +3,7 @@ import { connectDB } from '@/lib/db';
 import Material from '@/lib/models/Material';
 import { requireAuth } from '@/lib/auth/middleware';
 import { errorResponse } from '@/lib/api-utils';
+import { nprToInr } from '@/lib/utils/units';
 
 export const dynamic = 'force-dynamic';
 
@@ -12,9 +13,9 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
     if (authResult) return authResult;
     const { id } = await params;
     await connectDB();
-    const material = await Material.findById(id);
+    const material = await Material.findById(id).lean();
     if (!material) return NextResponse.json({ error: 'Material not found' }, { status: 404, headers: { 'Cache-Control': 'no-store' } });
-    return NextResponse.json(material, {
+    return NextResponse.json({ ...material, rateInr: nprToInr(material.rateNpr) }, {
       headers: { 'Cache-Control': 'no-store' },
     });
   } catch (err) {
@@ -30,6 +31,10 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     await connectDB();
     const body = await req.json();
 
+    if (body.rateNpr != null && Number(body.rateNpr) < 0) {
+      return NextResponse.json({ error: 'Material rate cannot be negative' }, { status: 400, headers: { 'Cache-Control': 'no-store' } });
+    }
+
     if (body.name?.en || body.name?.np) {
       const existing = await Material.findOne({
         _id: { $ne: id },
@@ -43,9 +48,10 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       }
     }
 
-    const material = await Material.findByIdAndUpdate(id, body, { new: true, runValidators: true });
+    const material = await Material.findByIdAndUpdate(id, { ...body, rateNpr: body.rateNpr != null ? Number(body.rateNpr) : undefined }, { new: true, runValidators: true });
     if (!material) return NextResponse.json({ error: 'Material not found' }, { status: 404, headers: { 'Cache-Control': 'no-store' } });
-    return NextResponse.json(material, {
+    const lean = material.toObject();
+    return NextResponse.json({ ...lean, rateInr: nprToInr(lean.rateNpr) }, {
       headers: { 'Cache-Control': 'no-store' },
     });
   } catch (err) {

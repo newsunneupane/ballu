@@ -28,10 +28,10 @@ Open `http://localhost:3001/login` and sign in with the credentials above.
 |---|---|---|
 | `/login` | Sign in | — |
 | `/` | Dashboard | ✅ |
-| `/materials` | CRUD | ✅ |
+| `/materials` | CRUD (with rate NPR/g + auto INR) | ✅ |
 | `/categories` | CRUD | ✅ |
 | `/items` | CRUD with price | ✅ |
-| `/daily-rates` | Rate history | ✅ |
+| `/groups` | CRUD | ✅ |
 | `/custom-requests` | Manage status | ✅ |
 | `/item-inquiries` | Manage status | ✅ |
 | `/store-settings` | Edit store info | ✅ |
@@ -50,16 +50,15 @@ Open `http://localhost:3001/login` and sign in with the credentials above.
 | `/api/categories/[id]` | GET, PUT, DELETE | write protected |
 | `/api/items` | GET (+ computed price), POST | POST protected |
 | `/api/items/[id]` | GET (+ computed price), PUT, DELETE | write protected |
-| `/api/daily-rates` | GET, POST | POST protected |
-| `/api/daily-rates/latest` | GET | — |
-| `/api/daily-rates/[id]` | GET, PUT, DELETE | write protected |
+| `/api/groups` | GET, POST | POST protected |
+| `/api/groups/[id]` | GET, PUT, DELETE | write protected |
 | `/api/custom-requests` | GET (protected), POST (public) | GET protected |
 | `/api/custom-requests/[id]` | GET, PUT, DELETE | all protected |
 | `/api/item-inquiries` | GET (protected), POST (public) | GET protected |
 | `/api/item-inquiries/[id]` | GET, PUT, DELETE | all protected |
 | `/api/store-settings` | GET, PUT | PUT protected |
 
-Price formula: `((weight + wastage) × dailyRate) + makingCharges − boutiqueDeduction + diamondValue`
+Price formula: `(weight × materialRate) + wastage% + making + accessories + diamond − boutique`. The rate comes from the material page (`rateNpr`); an optional `manualPriceNpr` on an item overrides the computed price. INR = NPR ÷ 1.6.
 
 ## Prerequisites
 

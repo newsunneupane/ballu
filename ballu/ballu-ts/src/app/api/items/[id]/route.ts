@@ -9,12 +9,13 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
   try {
     const { id } = await params;
     await connectDB();
-    const item = await Item.findById(id).populate('category', 'name').populate('material', 'name').lean();
+    const item = await Item.findById(id).populate('category', 'name').populate('material', 'name').populate('group', 'name').lean();
     if (!item) return NextResponse.json({ error: 'Item not found' }, { status: 404, headers: { 'Cache-Control': 'no-store' } });
 
     try {
       const pricing = await calculateFinalPrice({
         materialId: (item.material as { _id: string })._id.toString(),
+        groupId: item.group ? (item.group as { _id: string })._id.toString() : undefined,
         weightGrams: item.weightGrams,
         wastagePercent: item.wastagePercent,
         makingCharges: item.makingCharges,

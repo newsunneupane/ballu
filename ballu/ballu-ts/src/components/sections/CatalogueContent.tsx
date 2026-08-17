@@ -56,6 +56,7 @@ export default function CatalogueContent({
     urlCategory ? [urlCategory] : defaultCategory ? [defaultCategory] : ['ALL']
   );
   const [activeMaterial, setActiveMaterial] = useState(urlMaterial || 'ALL');
+  const [activeGroup, setActiveGroup] = useState('ALL');
   const [activeTag, setActiveTag] = useState('ALL');
   const [availableOnly, setAvailableOnly] = useState(false);
   const [minPrice, setMinPrice] = useState('');
@@ -99,6 +100,13 @@ export default function CatalogueContent({
     return ['ALL', 'GOLD', 'SILVER'];
   }, [dataReady]);
 
+  const groupButtons = useMemo(() => {
+    if (activeMaterial === 'ALL') return ['ALL'];
+    const groups = productService.getGroupsForMaterial(activeMaterial);
+    if (groups.length === 0) return ['ALL'];
+    return ['ALL', ...groups.map((g: any) => g.name?.toUpperCase() || '')];
+  }, [dataReady, activeMaterial]);
+
   const tagButtons = useMemo(() => {
     const tags = new Set<string>();
     productService.getAll().forEach((p) => { if (p.tag) tags.add(p.tag); });
@@ -108,6 +116,7 @@ export default function CatalogueContent({
   const filteredProducts = productService.getFiltered({
     categories: activeCategories,
     material: activeMaterial,
+    purity: activeGroup,
     tag: activeTag,
     availableOnly,
     minPrice: minPrice ? Number(minPrice) : undefined,
@@ -167,7 +176,7 @@ export default function CatalogueContent({
                 {materialButtons.map((mat) => (
                   <button
                     key={mat}
-                    onClick={() => setActiveMaterial(mat)}
+                    onClick={() => { setActiveMaterial(mat); setActiveGroup('ALL'); }}
                     className={`${tenorSans.className} pb-0.5 border-b-2 transition-all ${
                       activeMaterial === mat
                         ? 'border-[#cda274] text-bj-gold-alt'
@@ -178,6 +187,24 @@ export default function CatalogueContent({
                   </button>
                 ))}
               </div>
+
+              {activeMaterial !== 'ALL' && groupButtons.length > 1 && (
+                <div className="flex overflow-x-auto whitespace-nowrap gap-2 items-center no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0 text-[11px] font-semibold tracking-widest uppercase">
+                  {groupButtons.map((grp) => (
+                    <button
+                      key={grp}
+                      onClick={() => setActiveGroup(grp)}
+                      className={`${tenorSans.className} inline-block px-3 py-1 text-[8px] hover:-translate-y-[2px] font-small tracking-widest transition-all border rounded-4xl uppercase shrink-0 ${
+                        activeGroup === grp
+                          ? 'border-bj-gold-alt text-bj-gold-alt bg-bj-bg-elevated'
+                          : 'border-bj-border text-bj-text-muted'
+                      }`}
+                    >
+                      {grp}
+                    </button>
+                  ))}
+                </div>
+              )}
 
               <div className="flex items-center gap-4 text-[11px] tracking-[0.2em] uppercase text-bj-text-muted">
                 <span className={`${tenorSans.className} pieces-count opacity-60 hidden sm:block`}>

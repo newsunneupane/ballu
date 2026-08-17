@@ -5,11 +5,13 @@ import { categoryConfigMap, categorySlugMap, categoryFromSlug, categoryPageConfi
 let productStore: Product[] = [];
 let categoryStore: any[] = [];
 let materialStore: any[] = [];
+let groupStore: any[] = [];
 
 function transformApiItem(item: any): Product {
   const catEn = item.category?.name?.en?.toUpperCase() || 'BRIDAL';
   const matEn = item.material?.name?.en?.toUpperCase() || 'GOLD';
   const weightStr = `${item.weightGrams}g`;
+  const purity = item.group?.name?.en || item.purity || '';
 
   const pricing = item.pricing;
 
@@ -21,11 +23,11 @@ function transformApiItem(item: any): Product {
     material: matEn,
     title: item.name?.en || '',
     subTitle: item.name?.np || '',
-    karat: item.purity || '',
+    karat: purity,
     weight: weightStr,
     priceNpr: pricing?.finalPrice ?? null,
     description: item.description,
-    purity: item.purity,
+    purity,
     stones: item.stonesDetails,
     karigar: item.karigarName,
     caratWeight: item.caratWeight,
@@ -89,9 +91,22 @@ async function loadMaterialsFromApi(): Promise<void> {
   materialStore = [];
 }
 
+async function loadGroupsFromApi(): Promise<void> {
+  try {
+    const res = await fetch('/api/groups');
+    if (res.ok) {
+      groupStore = await res.json();
+      return;
+    }
+  } catch {
+    /* ignore */
+  }
+  groupStore = [];
+}
+
 export const productService = {
   async ensureLoaded(): Promise<void> {
-    await Promise.all([loadFromApi(), loadCategoriesFromApi(), loadMaterialsFromApi()]);
+    await Promise.all([loadFromApi(), loadCategoriesFromApi(), loadMaterialsFromApi(), loadGroupsFromApi()]);
   },
 
   isLoaded(): boolean {
@@ -104,6 +119,18 @@ export const productService = {
 
   getMaterialsList(): any[] {
     return [...materialStore];
+  },
+
+  getGroupsList(): any[] {
+    return [...groupStore];
+  },
+
+  getGroupsForMaterial(material: string): any[] {
+    const key = material?.toUpperCase();
+    if (!key) return [];
+    return groupStore.filter(
+      (g) => (g.material?.name?.en || '').toUpperCase() === key
+    );
   },
 
   getAll(): Product[] {
@@ -130,11 +157,15 @@ export const productService = {
         !filters.material ||
         filters.material === 'ALL' ||
         product.material === filters.material;
+      const matchesPurity =
+        !filters.purity ||
+        filters.purity === 'ALL' ||
+        (product.purity || '').toUpperCase() === filters.purity;
       const matchesTag = !filters.tag || filters.tag === 'ALL' || product.tag === filters.tag;
       const matchesAvailability = !filters.availableOnly || product.isAvailable;
       const matchesMinPrice = filters.minPrice == null || (product.priceNpr != null && product.priceNpr >= filters.minPrice);
       const matchesMaxPrice = filters.maxPrice == null || (product.priceNpr != null && product.priceNpr <= filters.maxPrice);
-      return matchesCategory && matchesMaterial && matchesTag && matchesAvailability && matchesMinPrice && matchesMaxPrice;
+      return matchesCategory && matchesMaterial && matchesPurity && matchesTag && matchesAvailability && matchesMinPrice && matchesMaxPrice;
     });
 
     switch (filters.sort) {
@@ -319,5 +350,6 @@ export const productService = {
     productStore = [];
     categoryStore = [];
     materialStore = [];
+    groupStore = [];
   },
 };

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
+import { nprToInr } from '@/lib/utils/units';
 import { Plus, Pencil, Trash2, X } from 'lucide-react';
 
 export default function MaterialsPage() {
@@ -13,19 +14,19 @@ export default function MaterialsPage() {
   });
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<any>(null);
-  const [form, setForm] = useState({ nameEn: '', nameNp: '' });
+  const [form, setForm] = useState({ nameEn: '', nameNp: '', rateNpr: '' });
 
   const invalidate = () => queryClient.invalidateQueries({ queryKey: ['materials'] });
 
   const openNew = () => {
     setEditing(null);
-    setForm({ nameEn: '', nameNp: '' });
+    setForm({ nameEn: '', nameNp: '', rateNpr: '' });
     setShowForm(true);
   };
 
   const openEdit = (m: any) => {
     setEditing(m);
-    setForm({ nameEn: m.name.en, nameNp: m.name.np });
+    setForm({ nameEn: m.name.en, nameNp: m.name.np, rateNpr: String(m.rateNpr ?? '') });
     setShowForm(true);
   };
 
@@ -33,7 +34,11 @@ export default function MaterialsPage() {
 
   const save = async () => {
     setError('');
-    const payload = { name: { en: form.nameEn, np: form.nameNp } };
+    if (!form.rateNpr || Number(form.rateNpr) <= 0) {
+      setError('Rate (NPR/g) is required and must be greater than 0');
+      return;
+    }
+    const payload = { name: { en: form.nameEn, np: form.nameNp }, rateNpr: Number(form.rateNpr) };
     try {
       if (editing) {
         await api.materials.update(editing._id, payload);
@@ -60,6 +65,8 @@ export default function MaterialsPage() {
     }
   };
 
+  const inrValue = form.rateNpr ? nprToInr(Number(form.rateNpr) || 0) : null;
+
   return (
     <div>
       <div className="flex items-center justify-between mb-8">
@@ -75,6 +82,8 @@ export default function MaterialsPage() {
             <tr className="border-b border-[#1f1a10] text-[#6e695f] text-[10px] tracking-[0.2em] uppercase">
               <th className="text-left px-5 py-3 font-medium">English</th>
               <th className="text-left px-5 py-3 font-medium">Nepali</th>
+              <th className="text-right px-5 py-3 font-medium">Rate (NPR/g)</th>
+              <th className="text-right px-5 py-3 font-medium">Rate (INR/g)</th>
               <th className="text-right px-5 py-3 font-medium">Actions</th>
             </tr>
           </thead>
@@ -83,6 +92,8 @@ export default function MaterialsPage() {
               <tr key={m._id} className="border-b border-[#1f1a10]/50 last:border-0 hover:bg-white/[0.02]">
                 <td className="px-5 py-3 text-[#e5e5e0]">{m.name.en}</td>
                 <td className="px-5 py-3 text-[#e5e5e0]">{m.name.np}</td>
+                <td className="px-5 py-3 text-right text-[#dbb86b] tabular-nums">{Number(m.rateNpr || 0).toLocaleString()}</td>
+                <td className="px-5 py-3 text-right text-[#8e897e] tabular-nums">{nprToInr(Number(m.rateNpr || 0)).toLocaleString()}</td>
                 <td className="px-5 py-3 text-right">
                   <button onClick={() => openEdit(m)} className="text-[#8e897e] hover:text-[#dbb86b] transition-colors mr-3"><Pencil size={14} /></button>
                   <button onClick={() => remove(m._id)} className="text-[#8e897e] hover:text-red-400 transition-colors"><Trash2 size={14} /></button>
@@ -90,10 +101,10 @@ export default function MaterialsPage() {
               </tr>
             ))}
             {materials.length === 0 && (
-              <tr><td colSpan={3} className="px-5 py-8 text-center text-[#6e695f]">No materials yet</td></tr>
+              <tr><td colSpan={5} className="px-5 py-8 text-center text-[#6e695f]">No materials yet</td></tr>
             )}
             {deleteError && (
-              <tr><td colSpan={3} className="px-5 py-3 text-center text-red-400 text-sm bg-red-400/5">{deleteError}</td></tr>
+              <tr><td colSpan={5} className="px-5 py-3 text-center text-red-400 text-sm bg-red-400/5">{deleteError}</td></tr>
             )}
           </tbody>
         </table>
@@ -114,6 +125,13 @@ export default function MaterialsPage() {
               <div>
                 <label className="block text-[10px] tracking-[0.2em] uppercase text-[#6e695f] mb-1.5">Name (Nepali)</label>
                 <input value={form.nameNp} onChange={(e) => setForm({ ...form, nameNp: e.target.value })} className="w-full bg-[#0a0806] border border-[#1f1a10] rounded px-3 py-2 text-sm text-[#e5e5e0] focus:outline-none focus:border-[#dbb86b]" />
+              </div>
+              <div>
+                <label className="block text-[10px] tracking-[0.2em] uppercase text-[#6e695f] mb-1.5">Rate (NPR per gram)</label>
+                <input type="number" step="0.01" min="0" value={form.rateNpr} onChange={(e) => setForm({ ...form, rateNpr: e.target.value })} className="w-full bg-[#0a0806] border border-[#1f1a10] rounded px-3 py-2 text-sm text-[#e5e5e0] focus:outline-none focus:border-[#dbb86b]" />
+                {inrValue != null && (
+                  <p className="text-[10px] text-[#6e695f] mt-1.5">≈ ₹ {inrValue.toLocaleString()} per gram</p>
+                )}
               </div>
               {error && (
                 <div className="text-red-400 text-sm px-3 py-2 rounded bg-red-400/10">{error}</div>

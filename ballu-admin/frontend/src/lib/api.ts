@@ -33,6 +33,16 @@ export const api = {
     update: (id: string, data: any) => request<any>(`/materials/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
     delete: (id: string) => request<any>(`/materials/${id}`, { method: 'DELETE' }),
   },
+  groups: {
+    list: (material?: string) => {
+      const qs = material ? `?material=${material}` : '';
+      return request<any[]>(`/groups${qs}`);
+    },
+    get: (id: string) => request<any>(`/groups/${id}`),
+    create: (data: any) => request<any>('/groups', { method: 'POST', body: JSON.stringify(data) }),
+    update: (id: string, data: any) => request<any>(`/groups/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+    delete: (id: string) => request<any>(`/groups/${id}`, { method: 'DELETE' }),
+  },
   categories: {
     list: () => request<any[]>('/categories'),
     get: (id: string) => request<any>(`/categories/${id}`),
@@ -51,19 +61,6 @@ export const api = {
     delete: (id: string) => request<any>(`/items/${id}`, { method: 'DELETE' }),
     bulkCreate: (items: any[]) => request<{ count: number; items: any[] }>('/items/bulk', { method: 'POST', body: JSON.stringify(items) }),
     bulkDelete: (ids: string[]) => request<{ deleted: number }>('/items', { method: 'DELETE', body: JSON.stringify({ ids }) }),
-  },
-  dailyRates: {
-    list: (material?: string) => {
-      const qs = material ? `?material=${material}` : '';
-      return request<any[]>(`/daily-rates${qs}`);
-    },
-    latest: (material?: string) => {
-      const qs = material ? `?material=${material}` : '';
-      return request<any>(`/daily-rates/latest${qs}`);
-    },
-    create: (data: any) => request<any>('/daily-rates', { method: 'POST', body: JSON.stringify(data) }),
-    update: (id: string, data: any) => request<any>(`/daily-rates/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
-    delete: (id: string) => request<any>(`/daily-rates/${id}`, { method: 'DELETE' }),
   },
   customRequests: {
     list: (status?: string) => {

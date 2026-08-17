@@ -39,6 +39,7 @@ export async function GET(req: NextRequest) {
     const items = await Item.find(filter)
       .populate('category', 'name')
       .populate('material', 'name')
+      .populate('group', 'name')
       .sort({ createdAt: -1 })
       .lean();
 
@@ -48,6 +49,7 @@ export async function GET(req: NextRequest) {
         try {
           const pricing = await calculateFinalPrice({
             materialId: (item.material as { _id: string })._id.toString(),
+            groupId: item.group ? (item.group as { _id: string })._id.toString() : undefined,
             weightGrams: item.weightGrams,
             wastagePercent: item.wastagePercent,
             makingCharges: item.makingCharges,

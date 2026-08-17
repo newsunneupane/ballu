@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import Item from '@/lib/models/Item';
+import Group from '@/lib/models/Group';
 import { calculateFinalPrice } from '@/lib/utils/priceCalculator';
 import { requireAuth } from '@/lib/auth/middleware';
 import { errorResponse } from '@/lib/api-utils';
@@ -13,12 +14,18 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
     if (authResult) return authResult;
     const { id } = await params;
     await connectDB();
-    const item = await Item.findById(id).populate('category', 'name').populate('material', 'name').lean();
+    const item = await Item.findById(id).populate('category', 'name').populate('material', 'name').populate('group', 'name').lean();
     if (!item) return NextResponse.json({ error: 'Item not found' }, { status: 404, headers: { 'Cache-Control': 'no-store' } });
 
     try {
+      if (item.manualPriceNpr != null) {
+        return NextResponse.json({ ...item, finalPrice: Number(item.manualPriceNpr) }, {
+          headers: { 'Cache-Control': 'no-store' },
+        });
+      }
       const finalPrice = await calculateFinalPrice({
         materialId: item.material._id.toString(),
+        groupId: item.group ? (item.group as { _id: string })._id.toString() : undefined,
         weightGrams: item.weightGrams,
         wastagePercent: item.wastagePercent,
         makingCharges: item.makingCharges,
@@ -56,6 +63,19 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     if (!body.weightGrams || body.weightGrams <= 0) {
       return NextResponse.json({ error: 'Valid weight is required' }, { status: 400, headers: { 'Cache-Control': 'no-store' } });
     }
+    if (!body.group) {
+      return NextResponse.json({ error: 'Group is required' }, { status: 400, headers: { 'Cache-Control': 'no-store' } });
+    }
+    if (!/^[a-f\d]{24}$/i.test(body.group)) {
+      return NextResponse.json({ error: 'Invalid group' }, { status: 400, headers: { 'Cache-Control': 'no-store' } });
+    }
+
+    const group = await Group.findById(body.group).lean();
+    if (!group) {
+      return NextResponse.json({ error: 'Group not found' }, { status: 400, headers: { 'Cache-Control': 'no-store' } });
+    }
+    const purity = (group as { name: string }).name;
+    const material = (group as { material: { toString(): string } }).material.toString();
 
     if (body.name?.en || body.name?.np) {
       const existing = await Item.findOne({
@@ -72,7 +92,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       }
     }
 
-    const item = await Item.findByIdAndUpdate(id, body, { new: true, runValidators: true }).populate(['category', 'material']);
+    const item = await Item.findByIdAndUpdate(id, { ...body, material, purity, manualPriceNpr: body.manualPriceNpr != null ? Number(body.manualPriceNpr) : undefined }, { new: true, runValidators: true }).populate(['category', 'material', 'group']);
     if (!item) return NextResponse.json({ error: 'Item not found' }, { status: 404, headers: { 'Cache-Control': 'no-store' } });
     return NextResponse.json(item, {
       headers: { 'Cache-Control': 'no-store' },

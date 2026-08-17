@@ -1,9 +1,8 @@
-import DailyRate from '@/lib/models/DailyRate';
-
-const rateCache = new Map<string, Awaited<ReturnType<typeof DailyRate.findOne>>>();
+import Material from '@/lib/models/Material';
 
 export async function calculateFinalPrice(params: {
   materialId: string;
+  groupId?: string;
   weightGrams: number;
   wastagePercent: number;
   makingCharges: number;
@@ -22,19 +21,17 @@ export async function calculateFinalPrice(params: {
 }> {
   const { materialId, weightGrams, wastagePercent, makingCharges, accessoriesCharge, boutiqueDeduction, diamondValue } = params;
 
-  let latestRate = rateCache.get(materialId);
-  if (!latestRate) {
-    latestRate = await DailyRate.findOne({ material: materialId })
-      .sort({ date: -1 })
-      .lean();
-    if (latestRate) rateCache.set(materialId, latestRate);
+  const material = await Material.findById(materialId).lean();
+  if (!material) {
+    throw new Error(`No material found for id ${materialId}`);
   }
 
-  if (!latestRate) {
-    throw new Error(`No daily rate found for material ${materialId}`);
+  const ratePerGramNrs = Number(material.rateNpr) || 0;
+  if (ratePerGramNrs <= 0) {
+    throw new Error(`No rate set for material ${(material as { name: { en: string } }).name?.en || materialId}`);
   }
 
-  const goldValue = weightGrams * latestRate.ratePerGramNrs;
+  const goldValue = weightGrams * ratePerGramNrs;
   const wastage = goldValue * (wastagePercent / 100);
   const finalPrice = goldValue + wastage + makingCharges + accessoriesCharge - boutiqueDeduction + diamondValue;
 
@@ -46,6 +43,6 @@ export async function calculateFinalPrice(params: {
     making: makingCharges,
     accessories: accessoriesCharge,
     deduction: boutiqueDeduction,
-    ratePerGramNrs: latestRate.ratePerGramNrs,
+    ratePerGramNrs,
   };
 }

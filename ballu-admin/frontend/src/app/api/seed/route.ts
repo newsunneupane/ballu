@@ -4,6 +4,7 @@ import { connectDB } from '@/lib/db';
 import User from '@/lib/models/User';
 import Material from '@/lib/models/Material';
 import Category from '@/lib/models/Category';
+import Group from '@/lib/models/Group';
 import Item from '@/lib/models/Item';
 import { requireAuth } from '@/lib/auth/middleware';
 import { errorResponse } from '@/lib/api-utils';
@@ -86,19 +87,47 @@ export async function POST(req: NextRequest) {
     }
 
     const materialData = [
-      { en: 'Gold', np: 'सुन' },
-      { en: 'Silver', np: 'चाँदी' },
-      { en: 'Platinum', np: 'प्लेटिनम' },
-      { en: 'Diamond', np: 'हीरा' },
+      { en: 'Gold', np: 'सुन', rateNpr: 14500 },
+      { en: 'Silver', np: 'चाँदी', rateNpr: 220 },
+      { en: 'Platinum', np: 'प्लेटिनम', rateNpr: 38000 },
+      { en: 'Diamond', np: 'हीरा', rateNpr: 2000 },
     ];
     const materialIds: Record<string, string> = {};
     for (const m of materialData) {
       let mat = await Material.findOne({ 'name.en': m.en });
       if (!mat) {
-        mat = await Material.create({ name: { en: m.en, np: m.np } });
+        mat = await Material.create({ name: { en: m.en, np: m.np }, rateNpr: m.rateNpr });
         created.push(`Material: ${m.en}`);
+      } else {
+        if (!mat.rateNpr) {
+          await Material.findByIdAndUpdate(mat._id, { rateNpr: m.rateNpr });
+          created.push(`Material rate set: ${m.en}`);
+        }
       }
       materialIds[m.en] = mat._id.toString();
+    }
+
+    const groupNames: Record<string, string[]> = {
+      Gold: ['22K', '24K'],
+      Silver: ['925', '950'],
+      Platinum: ['950'],
+      Diamond: ['VS', 'VVS'],
+    };
+    const materialGroups: Record<string, string[]> = {};
+    for (const matKey of Object.keys(materialIds)) {
+      const names = groupNames[matKey] || ['Standard'];
+      const ids: string[] = [];
+      for (const gname of names) {
+        const group = await Group.findOne({ material: materialIds[matKey], name: gname });
+        if (!group) {
+          const g = await Group.create({ material: materialIds[matKey], name: gname });
+          ids.push(g._id.toString());
+          created.push(`Group: ${matKey} ${gname}`);
+        } else {
+          ids.push(group._id.toString());
+        }
+      }
+      materialGroups[matKey] = ids;
     }
 
     const categoryData = [
@@ -142,6 +171,7 @@ export async function POST(req: NextRequest) {
       return {
         category: categoryIds[catKey],
         material: materialIds[matKey],
+        group: pick(materialGroups[matKey]),
         name,
         description: `Handcrafted ${name.en.toLowerCase()} — ${catKey.toLowerCase()} piece in ${matKey.toLowerCase()}.`,
         tag: pick(TAGS),

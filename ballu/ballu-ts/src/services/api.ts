@@ -26,12 +26,6 @@ export const api = {
   materials: {
     list: () => request<any[]>('/materials'),
   },
-  dailyRates: {
-    latest: (material?: string) => {
-      const qs = material ? `?material=${material}` : '';
-      return request<any>(`/daily-rates/latest${qs}`);
-    },
-  },
   customRequests: {
     create: (data: any) => request<any>('/custom-requests', { method: 'POST', body: JSON.stringify(data) }),
   },

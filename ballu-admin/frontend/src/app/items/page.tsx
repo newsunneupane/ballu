@@ -5,16 +5,17 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
 import { cloudinaryUrl } from '@/lib/cloudinary';
 import { tolaToGrams, gramsToTola } from '@/lib/utils/units';
+import SearchableSelect from '@/components/SearchableSelect';
 import { Plus, Pencil, Trash2, X, Upload, ImagePlus, Loader2 } from 'lucide-react';
 
 type WeightUnit = 'g' | 'tola';
 
 const initialForm = {
-  nameEn: '', nameNp: '', description: '', tag: '', purity: '',
-  category: '', material: '', weightValue: '', weightUnit: 'g' as WeightUnit,
+  nameEn: '', nameNp: '', description: '', tag: '', group: '',
+  category: '', weightValue: '', weightUnit: 'g' as WeightUnit,
   wastagePercent: '', makingCharges: '', accessoriesCharge: '', boutiqueDeduction: '', diamondValue: '',
   caratWeight: '', stonesDetails: '', karigarName: '', images: [] as string[],
-  isAvailable: true, showPrice: true, makingDaysMin: '', makingDaysMax: '',
+  isAvailable: true, showPrice: true, makingDaysMin: '', makingDaysMax: '', manualPrice: '',
 };
 
 export default function ItemsPage() {
@@ -46,6 +47,10 @@ export default function ItemsPage() {
   const { data: materials = [] } = useQuery({
     queryKey: ['materials'],
     queryFn: api.materials.list,
+  });
+  const { data: groups = [] } = useQuery({
+    queryKey: ['groups'],
+    queryFn: () => api.groups.list(),
   });
   const { data: categories = [] } = useQuery({
     queryKey: ['categories'],
@@ -106,8 +111,8 @@ export default function ItemsPage() {
     setEditing(item);
     setForm({
       nameEn: item.name.en, nameNp: item.name.np, description: item.description || '',
-      tag: item.tag || '', purity: item.purity || '',
-      category: item.category?._id || '', material: item.material?._id || '',
+      tag: item.tag || '', group: item.group?._id || '',
+      category: item.category?._id || '',
       weightValue: String(item.weightGrams), weightUnit: 'g',
       wastagePercent: String(item.wastagePercent ?? 0),
       makingCharges: String(item.makingCharges), accessoriesCharge: String(item.accessoriesCharge ?? 0),
@@ -117,6 +122,7 @@ export default function ItemsPage() {
       isAvailable: item.isAvailable ?? true, showPrice: item.showPrice ?? true,
       makingDaysMin: item.estimatedMakingDays?.min != null ? String(item.estimatedMakingDays.min) : '',
       makingDaysMax: item.estimatedMakingDays?.max != null ? String(item.estimatedMakingDays.max) : '',
+      manualPrice: item.manualPriceNpr != null ? String(item.manualPriceNpr) : '',
     });
     setShowForm(true);
   };
@@ -133,6 +139,23 @@ export default function ItemsPage() {
 
   const weightGramsValue = form.weightUnit === 'tola' ? tolaToGrams(Number(form.weightValue) || 0) : Number(form.weightValue) || 0;
 
+  const selectedGroup = groups.find((g: any) => g._id === form.group);
+  const selectedMaterial = materials.find((m: any) => m._id === selectedGroup?.material?._id);
+  const groupRate = Number(selectedMaterial?.rateNpr || 0);
+
+  const liveBreakdown = (() => {
+    const weight = weightGramsValue;
+    const rate = groupRate;
+    const goldValue = weight * rate;
+    const wastage = goldValue * ((Number(form.wastagePercent) || 0) / 100);
+    const making = Number(form.makingCharges) || 0;
+    const accessories = Number(form.accessoriesCharge) || 0;
+    const deduction = Number(form.boutiqueDeduction) || 0;
+    const diamond = Number(form.diamondValue) || 0;
+    const total = goldValue + wastage + making + accessories - deduction + diamond;
+    return { goldValue, wastage, making, accessories, deduction, diamond, total: Math.round(total) };
+  })();
+
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [error, setError] = useState('');
 
@@ -141,7 +164,7 @@ export default function ItemsPage() {
     setValidationErrors([]);
     const errors: string[] = [];
     if (!form.category) errors.push('Category is required');
-    if (!form.material) errors.push('Material is required');
+    if (!form.group) errors.push('Group is required');
     if (!form.nameEn.trim()) errors.push('Name (English) is required');
     if (!form.nameNp.trim()) errors.push('Name (Nepali) is required');
     if (!form.weightValue || weightGramsValue <= 0) errors.push('Weight is required');
@@ -155,9 +178,8 @@ export default function ItemsPage() {
       name: { en: form.nameEn, np: form.nameNp },
       description: form.description,
       tag: form.tag || undefined,
-      purity: form.purity || undefined,
+      group: form.group,
       category: form.category,
-      material: form.material || undefined,
       weightGrams: weightGramsValue,
       wastagePercent: Number(form.wastagePercent),
       makingCharges: Number(form.makingCharges),
@@ -171,6 +193,7 @@ export default function ItemsPage() {
       isAvailable: form.isAvailable,
       showPrice: form.showPrice,
       estimatedMakingDays: (makingDaysMin != null || makingDaysMax != null) ? { min: makingDaysMin, max: makingDaysMax } : undefined,
+      manualPriceNpr: form.manualPrice ? Number(form.manualPrice) : undefined,
     };
 
     try {
@@ -281,26 +304,24 @@ export default function ItemsPage() {
       </div>
 
       <div className="flex gap-3 mb-4">
-        <select
+        <SearchableSelect
           value={filterCategory}
-          onChange={(e) => { setFilterCategory(e.target.value); setSelected(new Set()); }}
-          className="bg-[#0f0c0a] border border-[#1f1a10] rounded px-3 py-2 text-xs text-[#e5e5e0] focus:outline-none focus:border-[#dbb86b]"
-        >
-          <option value="">All Categories</option>
-          {categories.map((c: any) => (
-            <option key={c._id} value={c._id}>{c.name.en}</option>
-          ))}
-        </select>
-        <select
+          onChange={(v) => { setFilterCategory(v); setSelected(new Set()); }}
+          options={categories.map((c: any) => ({ value: c._id, label: c.name.en }))}
+          placeholder="All Categories"
+          clearLabel="All Categories"
+          size="sm"
+          className="w-56"
+        />
+        <SearchableSelect
           value={filterMaterial}
-          onChange={(e) => { setFilterMaterial(e.target.value); setSelected(new Set()); }}
-          className="bg-[#0f0c0a] border border-[#1f1a10] rounded px-3 py-2 text-xs text-[#e5e5e0] focus:outline-none focus:border-[#dbb86b]"
-        >
-          <option value="">All Materials</option>
-          {materials.map((m: any) => (
-            <option key={m._id} value={m._id}>{m.name.en}</option>
-          ))}
-        </select>
+          onChange={(v) => { setFilterMaterial(v); setSelected(new Set()); }}
+          options={materials.map((m: any) => ({ value: m._id, label: m.name.en }))}
+          placeholder="All Materials"
+          clearLabel="All Materials"
+          size="sm"
+          className="w-56"
+        />
       </div>
 
       <div className="bg-[#0f0c0a] border border-[#1f1a10] rounded-lg overflow-x-auto">
@@ -392,28 +413,34 @@ export default function ItemsPage() {
               </div>
               <div>
                 <label className="block text-[10px] tracking-[0.2em] uppercase text-[#6e695f] mb-1.5">Category</label>
-                <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className="w-full bg-[#0a0806] border border-[#1f1a10] rounded px-3 py-2 text-sm text-[#e5e5e0] focus:outline-none focus:border-[#dbb86b]">
-                  <option value="">Select</option>
-                  {categories.map((c: any) => <option key={c._id} value={c._id}>{c.name.en}</option>)}
-                </select>
+                <SearchableSelect
+                  value={form.category}
+                  onChange={(v) => setForm({ ...form, category: v })}
+                  options={categories.map((c: any) => ({ value: c._id, label: c.name.en }))}
+                  placeholder="Select category"
+                />
               </div>
               <div>
-                <label className="block text-[10px] tracking-[0.2em] uppercase text-[#6e695f] mb-1.5">Material</label>
-                <select value={form.material} onChange={(e) => setForm({ ...form, material: e.target.value })} className="w-full bg-[#0a0806] border border-[#1f1a10] rounded px-3 py-2 text-sm text-[#e5e5e0] focus:outline-none focus:border-[#dbb86b]">
-                  <option value="">Select</option>
-                  {materials.map((m: any) => <option key={m._id} value={m._id}>{m.name.en}</option>)}
-                </select>
+                <label className="block text-[10px] tracking-[0.2em] uppercase text-[#6e695f] mb-1.5">Group</label>
+                <SearchableSelect
+                  value={form.group}
+                  onChange={(v) => setForm({ ...form, group: v })}
+                  options={groups.map((g: any) => ({ value: g._id, label: `${g.name} · ${g.material?.name?.en || ''}`.trim() }))}
+                  placeholder="Select group"
+                />
+                {groups.length === 0 && (
+                  <p className="text-[10px] text-[#6e695f] mt-1.5">No groups yet. Add them in the Groups page.</p>
+                )}
               </div>
               <div>
                 <label className="block text-[10px] tracking-[0.2em] uppercase text-[#6e695f] mb-1.5">Tag</label>
-                <select value={form.tag} onChange={(e) => setForm({ ...form, tag: e.target.value })} className="w-full bg-[#0a0806] border border-[#1f1a10] rounded px-3 py-2 text-sm text-[#e5e5e0] focus:outline-none focus:border-[#dbb86b]">
-                  <option value="">None</option>
-                  {tags.map((t) => <option key={t} value={t}>{t}</option>)}
-                </select>
-              </div>
-              <div>
-                <label className="block text-[10px] tracking-[0.2em] uppercase text-[#6e695f] mb-1.5">Purity</label>
-                <input value={form.purity} onChange={(e) => setForm({ ...form, purity: e.target.value })} className="w-full bg-[#0a0806] border border-[#1f1a10] rounded px-3 py-2 text-sm text-[#e5e5e0] focus:outline-none focus:border-[#dbb86b]" placeholder="e.g. 22K" />
+                <SearchableSelect
+                  value={form.tag}
+                  onChange={(v) => setForm({ ...form, tag: v })}
+                  options={tags.map((t) => ({ value: t, label: t }))}
+                  placeholder="None"
+                  clearLabel="None"
+                />
               </div>
               <div>
                 <label className="block text-[10px] tracking-[0.2em] uppercase text-[#6e695f] mb-1.5">Weight</label>
@@ -534,6 +561,59 @@ export default function ItemsPage() {
                 </p>
               </div>
             </div>
+            <div className="mt-5 border border-[#1f1a10] rounded-lg overflow-hidden">
+              <div className="px-4 py-3 bg-[#dbb86b]/5 border-b border-[#1f1a10] flex items-center justify-between">
+                <span className="text-[10px] tracking-[0.2em] uppercase text-[#dbb86b]">Live Price</span>
+                <span className="text-[#6e695f] text-[10px]">
+                  {selectedGroup && groupRate > 0
+                    ? `${selectedMaterial?.name?.en || 'Material'} rate: Rs ${groupRate.toLocaleString()}/g`
+                    : selectedGroup
+                      ? 'No rate set for this material'
+                      : 'Select a group to see price'}
+                </span>
+              </div>
+              <div className="p-4 space-y-2 text-sm">
+                <div className="flex justify-between text-[#8e897e]">
+                  <span>Gold value (weight × rate)</span>
+                  <span className="tabular-nums">Rs {liveBreakdown.goldValue.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between text-[#8e897e]">
+                  <span>Wastage ({(Number(form.wastagePercent) || 0)}%)</span>
+                  <span className="tabular-nums">Rs {liveBreakdown.wastage.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between text-[#8e897e]">
+                  <span>Making charges</span>
+                  <span className="tabular-nums">Rs {liveBreakdown.making.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between text-[#8e897e]">
+                  <span>Accessories charge</span>
+                  <span className="tabular-nums">Rs {liveBreakdown.accessories.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between text-[#8e897e]">
+                  <span>Less: boutique deduction</span>
+                  <span className="tabular-nums">− Rs {liveBreakdown.deduction.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between text-[#8e897e]">
+                  <span>Add: diamond value</span>
+                  <span className="tabular-nums">+ Rs {liveBreakdown.diamond.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between pt-3 border-t border-[#1f1a10] text-[#fbf7f0] font-semibold">
+                  <span>Total (NPR)</span>
+                  <span className="text-[#dbb86b] tabular-nums text-lg">{liveBreakdown.total.toLocaleString()}</span>
+                </div>
+              </div>
+            </div>
+            <div className="mt-4">
+              <label className="block text-[10px] tracking-[0.2em] uppercase text-[#6e695f] mb-1.5">Manual Price (NPR) — optional override</label>
+              <input
+                type="number"
+                min="0"
+                value={form.manualPrice}
+                onChange={(e) => setForm({ ...form, manualPrice: e.target.value })}
+                className="w-full bg-[#0a0806] border border-[#1f1a10] rounded px-3 py-2 text-sm text-[#e5e5e0] focus:outline-none focus:border-[#dbb86b]"
+                placeholder="Leave empty to use the auto-calculated price"
+              />
+            </div>
             {validationErrors.length > 0 && (
               <div className="mt-4 space-y-1">
                 {validationErrors.map((e, i) => (
@@ -558,13 +638,13 @@ export default function ItemsPage() {
               <h2 className="text-lg font-semibold text-[#fbf7f0]">Bulk Upload Items</h2>
               <button onClick={() => setShowBulk(false)} className="text-[#6e695f] hover:text-[#e5e5e0]"><X size={18} /></button>
             </div>
-            <p className="text-xs text-[#6e695f] mb-3">Paste a JSON array of items. Each item needs <span className="text-[#dbb86b]">category</span>, <span className="text-[#dbb86b]">material</span> (IDs), <span className="text-[#dbb86b]">name</span> (object with <span className="text-[#dbb86b]">en</span>/<span className="text-[#dbb86b]">np</span>), and <span className="text-[#dbb86b]">weightGrams</span>.</p>
+            <p className="text-xs text-[#6e695f] mb-3">Paste a JSON array of items. Each item needs <span className="text-[#dbb86b]">category</span> (ID), <span className="text-[#dbb86b]">group</span> (ID — material is derived from the group), <span className="text-[#dbb86b]">name</span> (object with <span className="text-[#dbb86b]">en</span>/<span className="text-[#dbb86b]">np</span>), and <span className="text-[#dbb86b]">weightGrams</span>.</p>
             <textarea
               value={bulkJson}
               onChange={(e) => setBulkJson(e.target.value)}
               rows={12}
               className="w-full bg-[#0a0806] border border-[#1f1a10] rounded px-3 py-2 text-sm text-[#e5e5e0] font-mono focus:outline-none focus:border-[#dbb86b]"
-              placeholder='[{&quot;category&quot;: &quot;...&quot;, &quot;material&quot;: &quot;...&quot;, &quot;name&quot;: {&quot;en&quot;: &quot;Item Name&quot;, &quot;np&quot;: &quot;...&quot;}, &quot;weightGrams&quot;: 10}]'
+              placeholder='[{&quot;category&quot;: &quot;...&quot;, &quot;group&quot;: &quot;...&quot;, &quot;name&quot;: {&quot;en&quot;: &quot;Item Name&quot;, &quot;np&quot;: &quot;...&quot;}, &quot;weightGrams&quot;: 10}]'
             />
             {bulkResult && (
               <div className={`mt-3 text-sm px-3 py-2 rounded ${bulkResult.startsWith('Error') ? 'text-red-400 bg-red-400/10' : 'text-green-400 bg-green-400/10'}`}>

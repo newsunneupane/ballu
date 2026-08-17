@@ -1,26 +1,31 @@
 import { NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import Material from '@/lib/models/Material';
-import DailyRate from '@/lib/models/DailyRate';
+
+const INR_PER_NPR_DIVISOR = 1.6;
 
 export async function GET() {
-  await connectDB();
+  try {
+    await connectDB();
 
-  const materials = await Material.find({}).lean();
-  const rates: { name: string; ratePerGramNrs: number; ratePerGramInr: number }[] = [];
+    const materials = await Material.find({ rateNpr: { $gt: 0 } }).sort({ createdAt: 1 }).lean();
 
-  for (const mat of materials) {
-    const rate = await DailyRate.findOne({ material: mat._id }).sort({ date: -1 }).lean();
-    if (rate) {
-      rates.push({
-        name: (mat.name as any)?.en || mat._id.toString(),
-        ratePerGramNrs: rate.ratePerGramNrs,
-        ratePerGramInr: rate.ratePerGramInr,
-      });
-    }
+    const rates = materials.map((mat) => {
+      const matName = (mat.name as any)?.en || mat._id.toString();
+      const ratePerGramNrs = Number(mat.rateNpr) || 0;
+      return {
+        name: matName,
+        ratePerGramNrs,
+        ratePerGramInr: Math.round((ratePerGramNrs / INR_PER_NPR_DIVISOR) * 100) / 100,
+      };
+    });
+
+    return NextResponse.json({ rates }, {
+      headers: { 'Cache-Control': 'public, max-age=3600, stale-while-revalidate=86400' },
+    });
+  } catch {
+    return NextResponse.json({ rates: [] }, {
+      headers: { 'Cache-Control': 'public, max-age=3600, stale-while-revalidate=86400' },
+    });
   }
-
-  return NextResponse.json({ rates }, {
-    headers: { 'Cache-Control': 'public, max-age=3600, stale-while-revalidate=86400' },
-  });
 }

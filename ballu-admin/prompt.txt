@@ -1,0 +1,21 @@
+i want you to check the different things in my system and make a list of things that needs to be changed in my system ... and prepare a different phases of works needs to be done one by one to get the system i want .........
+There should be a item tree...
+
+first- material, there it should be add material form ... that consist of nepali name and english name and rate of the materials in npr..that should be automatically converted in inr later if needed.
+
+
+then comes - group , it should have material selection and name of the group in english only..
+
+
+then comes -items , it sould have name in nepali and english , description , then category selection , then groups selection ... no need of the materials because every material will have the group and it should have group selection field , and tag , weight - and and price of the group * weight should be shown in the price total field in the bottom automatically when entering the each entries 
+weight can be in tola or gram but at backend it should be calculated in gm only 1 tola == 11.664 gm ..., wastage in percentage always , making charge and accessories (stones should be added) always 
+boutique dedection should be deducted , diamond value should be added ...and karigar name and stone details as it is and also estimated making time min to max ..
+and available or not and show price to user or not checkbox , and uplod image ... and also a price box in npr- and the price should be seen automatically when adding the datas in every field and also the price can be manuallly added at last by the admin ....
+
+AND the ui in public website should be same note if changes are needed 
+
+And category donot comes in the above tree... it is different and ....
+Daily rates should not be there ..the daily rates will be reflected from the materialpage-rates only and all the selection-dropdown should be (select+search)  
+
+First make a look at my system and note what needs to be change ..
+make the phase wise solution for this system you need to change ..
