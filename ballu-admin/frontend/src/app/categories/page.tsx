@@ -50,7 +50,7 @@ export default function CategoriesPage() {
   const [deleteError, setDeleteError] = useState('');
 
   const remove = async (id: string) => {
-    if (!confirm('Delete this category?')) return;
+    if (!confirm('Delete this collection?')) return;
     try {
       setDeleteError('');
       await api.categories.delete(id);
@@ -63,9 +63,9 @@ export default function CategoriesPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-2xl font-semibold text-[#1f1b16]">Categories</h1>
+        <h1 className="text-2xl font-semibold text-[#1f1b16]">Collections</h1>
         <button onClick={openNew} className="flex items-center gap-2 bg-[#b8860b] text-[#ffffff] px-4 py-2 rounded text-sm font-medium hover:bg-[#9a7208] transition-colors">
-          <Plus size={16} /> Add Category
+          <Plus size={16} /> Add Collection
         </button>
       </div>
 
@@ -105,7 +105,7 @@ export default function CategoriesPage() {
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50" onClick={() => setShowForm(false)}>
           <div className="bg-[#ffffff] border border-[#e5ded2] rounded-lg p-6 w-full max-w-md mx-4" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-5">
-              <h2 className="text-lg font-semibold text-[#1f1b16]">{editing ? 'Edit Category' : 'New Category'}</h2>
+              <h2 className="text-lg font-semibold text-[#1f1b16]">{editing ? 'Edit Collection' : 'New Collection'}</h2>
               <button onClick={() => setShowForm(false)} className="text-[#6b655b] hover:text-[#26221d]"><X size={18} /></button>
             </div>
             <div className="space-y-4">

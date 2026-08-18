@@ -244,13 +244,13 @@ export default function StoreSettingsPage() {
               </select>
             </div>
             <div>
-              <label className="block text-[10px] tracking-[0.2em] uppercase text-[#6b655b] mb-1.5">Category</label>
+              <label className="block text-[10px] tracking-[0.2em] uppercase text-[#6b655b] mb-1.5">Collection</label>
               <select
                 value={form.pieceOfTheWeek.category}
                 onChange={(e) => setForm({ ...form, pieceOfTheWeek: { ...form.pieceOfTheWeek, category: e.target.value, item: '' } })}
                 className="w-full bg-[#ffffff] border border-[#e5ded2] rounded px-3 py-2 text-sm text-[#26221d] focus:outline-none focus:border-[#b8860b]"
               >
-                <option value="">All Categories</option>
+                <option value="">All Collections</option>
                 {categories.map((c: any) => (
                   <option key={c._id} value={c._id}>{c.name.en}</option>
                 ))}

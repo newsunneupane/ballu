@@ -22,6 +22,13 @@ const nextConfig = {
           { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
         ],
       },
+      {
+        source: '/:path((?!_next/static|_next/image|api|favicon.ico).*)',
+        has: [{ type: 'header', key: 'accept', value: 'text/html.*' }],
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=0, must-revalidate' },
+        ],
+      },
     ];
   },
 };

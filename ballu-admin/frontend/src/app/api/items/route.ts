@@ -4,7 +4,7 @@ import Item from '@/lib/models/Item';
 import Group from '@/lib/models/Group';
 import { calculateFinalPrice } from '@/lib/utils/priceCalculator';
 import { requireAuth } from '@/lib/auth/middleware';
-import { errorResponse } from '@/lib/api-utils';
+import { errorResponse, badRequest, isObjectId } from '@/lib/api-utils';
 
 export const dynamic = 'force-dynamic';
 
@@ -69,24 +69,49 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
 
     if (!body.category) {
-      return NextResponse.json({ error: 'Category is required' }, { status: 400, headers: { 'Cache-Control': 'no-store' } });
+      return badRequest('Collection is required');
+    }
+    if (!isObjectId(body.category)) {
+      return badRequest('Invalid collection');
     }
     if (!body.name?.en || !body.name?.np) {
-      return NextResponse.json({ error: 'Name (English & Nepali) is required' }, { status: 400, headers: { 'Cache-Control': 'no-store' } });
-    }
-    if (!body.weightGrams || body.weightGrams <= 0) {
-      return NextResponse.json({ error: 'Valid weight is required' }, { status: 400, headers: { 'Cache-Control': 'no-store' } });
+      return badRequest('Name (English & Nepali) is required');
     }
     if (!body.group) {
-      return NextResponse.json({ error: 'Group is required' }, { status: 400, headers: { 'Cache-Control': 'no-store' } });
+      return badRequest('Group is required');
     }
-    if (!/^[a-f\d]{24}$/i.test(body.group)) {
-      return NextResponse.json({ error: 'Invalid group' }, { status: 400, headers: { 'Cache-Control': 'no-store' } });
+    if (!isObjectId(body.group)) {
+      return badRequest('Invalid group');
+    }
+    if (body.weightGrams == null || !Number.isFinite(Number(body.weightGrams)) || Number(body.weightGrams) <= 0) {
+      return badRequest('Valid weight is required');
+    }
+
+    const numericFields: { name: string; value: unknown }[] = [
+      { name: 'wastagePercent', value: body.wastagePercent },
+      { name: 'makingCharges', value: body.makingCharges },
+      { name: 'accessoriesCharge', value: body.accessoriesCharge },
+      { name: 'boutiqueDeduction', value: body.boutiqueDeduction },
+      { name: 'diamondValue', value: body.diamondValue },
+    ];
+    for (const f of numericFields) {
+      if (f.value != null && !Number.isFinite(Number(f.value))) {
+        return badRequest(`Invalid number for ${f.name}`);
+      }
+    }
+    if (body.caratWeight != null && !Number.isFinite(Number(body.caratWeight))) {
+      return badRequest('Invalid number for caratWeight');
+    }
+    if (body.manualPriceNpr != null && !Number.isFinite(Number(body.manualPriceNpr))) {
+      return badRequest('Invalid number for manualPriceNpr');
     }
 
     const group = await Group.findById(body.group).lean();
     if (!group) {
-      return NextResponse.json({ error: 'Group not found' }, { status: 400, headers: { 'Cache-Control': 'no-store' } });
+      return badRequest('Group not found');
+    }
+    if (!(group as { material?: unknown }).material) {
+      return badRequest('This group has no material assigned — create or reassign its material first');
     }
     const purity = (group as { name: string }).name;
     const material = (group as { material: { toString(): string } }).material.toString();

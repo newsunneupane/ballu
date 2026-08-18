@@ -13,7 +13,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
     const { id } = await params;
     await connectDB();
     const category = await Category.findById(id);
-    if (!category) return NextResponse.json({ error: 'Category not found' }, { status: 404, headers: { 'Cache-Control': 'no-store' } });
+    if (!category) return NextResponse.json({ error: 'Collection not found' }, { status: 404, headers: { 'Cache-Control': 'no-store' } });
     return NextResponse.json(category, {
       headers: { 'Cache-Control': 'no-store' },
     });
@@ -39,7 +39,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
         ],
       });
       if (existing) {
-        return NextResponse.json({ error: 'A category with this name already exists' }, { status: 409, headers: { 'Cache-Control': 'no-store' } });
+        return NextResponse.json({ error: 'A collection with this name already exists' }, { status: 409, headers: { 'Cache-Control': 'no-store' } });
       }
     }
 
@@ -60,8 +60,8 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     const { id } = await params;
     await connectDB();
     const category = await Category.findByIdAndDelete(id);
-    if (!category) return NextResponse.json({ error: 'Category not found' }, { status: 404, headers: { 'Cache-Control': 'no-store' } });
-    return NextResponse.json({ message: 'Category deleted' }, {
+    if (!category) return NextResponse.json({ error: 'Collection not found' }, { status: 404, headers: { 'Cache-Control': 'no-store' } });
+    return NextResponse.json({ message: 'Collection deleted' }, {
       headers: { 'Cache-Control': 'no-store' },
     });
   } catch (err) {

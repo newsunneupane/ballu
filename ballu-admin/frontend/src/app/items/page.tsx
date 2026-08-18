@@ -173,7 +173,7 @@ export default function ItemsPage() {
     setError('');
     setValidationErrors([]);
     const errors: string[] = [];
-    if (!form.category) errors.push('Category is required');
+    if (!form.category) errors.push('Collection is required');
     if (!form.group) errors.push('Group is required');
     if (!form.nameEn.trim()) errors.push('Name (English) is required');
     if (!form.nameNp.trim()) errors.push('Name (Nepali) is required');
@@ -327,8 +327,8 @@ export default function ItemsPage() {
           value={filterCategory}
           onChange={(v) => { setFilterCategory(v); setSelected(new Set()); }}
           options={categories.map((c: any) => ({ value: c._id, label: c.name.en }))}
-          placeholder="All Categories"
-          clearLabel="All Categories"
+          placeholder="All Collections"
+          clearLabel="All Collections"
           size="sm"
           className="w-56"
         />
@@ -357,7 +357,7 @@ export default function ItemsPage() {
               </th>
               <th className="text-left px-4 py-3 font-medium">Image</th>
               <th className="text-left px-4 py-3 font-medium">Name</th>
-              <th className="text-left px-4 py-3 font-medium">Category</th>
+              <th className="text-left px-4 py-3 font-medium">Collection</th>
               <th className="text-left px-4 py-3 font-medium">Material</th>
               <th className="text-right px-4 py-3 font-medium">Weight</th>
               <th className="text-right px-4 py-3 font-medium">Price</th>
@@ -431,12 +431,12 @@ export default function ItemsPage() {
                 <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={2} className="w-full bg-[#faf8f4] border border-[#e5ded2] rounded px-3 py-2 text-sm text-[#26221d] focus:outline-none focus:border-[#b8860b]" />
               </div>
               <div>
-                <label className="block text-[10px] tracking-[0.2em] uppercase text-[#6b655b] mb-1.5">Category</label>
-                <SearchableSelect
-                  value={form.category}
-                  onChange={(v) => setForm({ ...form, category: v })}
-                  options={categories.map((c: any) => ({ value: c._id, label: c.name.en }))}
-                  placeholder="Select category"
+<label className="block text-[10px] tracking-[0.2em] uppercase text-[#6b655b] mb-1.5">Collection</label>
+                  <SearchableSelect
+                    value={form.category}
+                    onChange={(v) => setForm({ ...form, category: v })}
+                    options={categories.map((c: any) => ({ value: c._id, label: c.name.en }))}
+                    placeholder="Select collection"
                 />
               </div>
               <div>
@@ -657,7 +657,7 @@ export default function ItemsPage() {
               <h2 className="text-lg font-semibold text-[#1f1b16]">Bulk Upload Items</h2>
               <button onClick={() => setShowBulk(false)} className="text-[#6b655b] hover:text-[#26221d]"><X size={18} /></button>
             </div>
-            <p className="text-xs text-[#6b655b] mb-3">Paste a JSON array of items. Each item needs <span className="text-[#b8860b]">category</span> (ID), <span className="text-[#b8860b]">group</span> (ID — material is derived from the group), <span className="text-[#b8860b]">name</span> (object with <span className="text-[#b8860b]">en</span>/<span className="text-[#b8860b]">np</span>), and <span className="text-[#b8860b]">weightGrams</span>.</p>
+            <p className="text-xs text-[#6b655b] mb-3">Paste a JSON array of items. Each item needs <span className="text-[#b8860b]">collection</span> (ID), <span className="text-[#b8860b]">group</span> (ID — material is derived from the group), <span className="text-[#b8860b]">name</span> (object with <span className="text-[#b8860b]">en</span>/<span className="text-[#b8860b]">np</span>), and <span className="text-[#b8860b]">weightGrams</span>.</p>
             <textarea
               value={bulkJson}
               onChange={(e) => setBulkJson(e.target.value)}

@@ -10,7 +10,7 @@ function getToken(): string | null {
 const RESOURCE_NAMES: Record<string, string> = {
   materials: 'Material',
   groups: 'Group',
-  categories: 'Category',
+  categories: 'Collection',
   items: 'Item',
   'custom-requests': 'Custom request',
   'item-inquiries': 'Inquiry',

@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
       ],
     });
     if (existing) {
-      return NextResponse.json({ error: 'A category with this name already exists' }, { status: 409, headers: { 'Cache-Control': 'no-store' } });
+      return NextResponse.json({ error: 'A collection with this name already exists' }, { status: 409, headers: { 'Cache-Control': 'no-store' } });
     }
 
     const category = await Category.create(body);

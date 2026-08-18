@@ -25,7 +25,7 @@ export default function DashboardPage() {
   const cards = [
     { label: 'Items', value: stats?.items, icon: Package, color: 'text-blue-700', href: '/items' },
     { label: 'Materials', value: stats?.materials, icon: Gem, color: 'text-emerald-700', href: '/materials' },
-    { label: 'Categories', value: stats?.categories, icon: Tag, color: 'text-purple-700', href: '/categories' },
+    { label: 'Collections', value: stats?.categories, icon: Tag, color: 'text-purple-700', href: '/categories' },
     { label: 'Custom Requests', value: stats?.customRequests, icon: MessageSquare, color: 'text-amber-700', href: '/custom-requests' },
     { label: 'Pending Requests', value: stats?.pendingRequests, icon: MessageSquare, color: 'text-red-600', href: '/custom-requests' },
     { label: 'Item Inquiries', value: stats?.itemInquiries, icon: PhoneCall, color: 'text-cyan-700', href: '/item-inquiries' },
