@@ -262,6 +262,12 @@
   .pieces-count {
     color: #000000 !important;
   }
+
+  .whatsapp-btn {
+    background: #684209 !important;
+    backdrop-filter: none !important;
+    border-color: rgba(37, 211, 102, 0.55) !important;
+  }
 }
 
 .font-thin {

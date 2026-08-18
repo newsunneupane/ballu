@@ -10,6 +10,7 @@ import { cloudinaryUrl } from "@/lib/cloudinary";
 import { categorySlugMap } from "@/data/collections";
 import { useCurrency } from "@/hooks/useCurrency";
 import { buildWhatsappLink } from "@/lib/utils/whatsapp";
+import { useStoreSettings, whatsappNumber } from "@/hooks/useStoreSettings";
 import { recordView } from "@/lib/visitTracking";
 import { ArrowRight, ChevronLeft, ChevronRight } from "@/components/shared/Icons";
 import Button from "@/components/ui/Button";
@@ -30,6 +31,7 @@ export default function ProductDetail() {
   const id = params?.id as string;
   const dataReady = useProductData();
   const { format } = useCurrency();
+  const { data: settings } = useStoreSettings();
   const [product, setProduct] = useState(productService.getById(id) || productService.getById(Number(id)));
   const [activeIndex, setActiveIndex] = useState(0);
   const [paused, setPaused] = useState(false);
@@ -290,7 +292,7 @@ export default function ProductDetail() {
                 Reserve To View
               </Button>
               <a
-                href={buildWhatsappLink(product, product.showPrice && product.priceNpr != null ? format(product.priceNpr) : null)}
+                href={buildWhatsappLink(product, product.showPrice && product.priceNpr != null ? format(product.priceNpr) : null, whatsappNumber(settings))}
                 target="_blank"
                 rel="noopener noreferrer"
               >

@@ -9,6 +9,7 @@ import { cloudinaryUrl } from '@/lib/cloudinary';
 import Badge from '@/components/ui/Badge';
 import { useCurrency } from '@/hooks/useCurrency';
 import { buildWhatsappLink } from '@/lib/utils/whatsapp';
+import { useStoreSettings, whatsappNumber } from '@/hooks/useStoreSettings';
 
 const cormorant = Cormorant_Garamond({
   subsets: ['latin'],
@@ -27,6 +28,7 @@ interface ProductCardProps {
 
 export default function ProductCard({ product, viewMode = 'GRID' }: ProductCardProps) {
   const { format } = useCurrency();
+  const { data: settings } = useStoreSettings();
   const priceDisplay = !product.showPrice
     ? 'Price on Request'
     : product.priceNpr != null
@@ -37,7 +39,7 @@ export default function ProductCard({ product, viewMode = 'GRID' }: ProductCardP
     e.preventDefault();
     e.stopPropagation();
     window.open(
-      buildWhatsappLink(product, product.showPrice && product.priceNpr != null ? format(product.priceNpr) : null),
+      buildWhatsappLink(product, product.showPrice && product.priceNpr != null ? format(product.priceNpr) : null, whatsappNumber(settings)),
       '_blank',
       'noopener,noreferrer'
     );
@@ -125,7 +127,7 @@ export default function ProductCard({ product, viewMode = 'GRID' }: ProductCardP
           <button
             onClick={openWhatsapp}
             aria-label="Ask about this piece on WhatsApp"
-            className="pointer-events-auto w-8 h-8 rounded-full bg-bj-bg-ticker/60 backdrop-blur-md border border-white/10 text-[#25D366] flex items-center justify-center hover:scale-110 transition-transform"
+            className="whatsapp-btn pointer-events-auto w-8 h-8 rounded-full bg-bj-bg-ticker/60 backdrop-blur-md border border-white/10 text-[#25D366] flex items-center justify-center hover:scale-110 transition-transform"
           >
             <FaWhatsapp size={15} />
           </button>

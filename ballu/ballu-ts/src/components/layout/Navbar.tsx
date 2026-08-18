@@ -6,7 +6,9 @@ import { Cormorant_Garamond, Cormorant_SC } from 'next/font/google';
 import { FiSearch, FiMenu, FiX, FiSun, FiMoon } from 'react-icons/fi';
 import { FaWhatsapp } from 'react-icons/fa';
 import { useScrollPosition } from '@/hooks/useScrollPosition';
-import { NAV_LINKS, SITE, WHATSAPP_URL } from '@/lib/constants';
+import { NAV_LINKS, SITE } from '@/lib/constants';
+import { useStoreSettings, whatsappNumber } from '@/hooks/useStoreSettings';
+import { whatsappBaseUrl } from '@/lib/utils/whatsapp';
 import SearchOverlay from '@/components/layout/SearchOverlay';
 import { useTheme } from '@/components/layout/ThemeProvider';
 
@@ -26,6 +28,7 @@ export default function Navbar() {
   const [showSearch, setShowSearch] = useState(false);
   const [tickerOffset, setTickerOffset] = useState(32);
   const { theme, toggleTheme } = useTheme();
+  const { data: settings } = useStoreSettings();
 
   useEffect(() => {
     const updateOffset = () => {
@@ -92,7 +95,7 @@ export default function Navbar() {
 </span>
 
               <a
-                href={WHATSAPP_URL}
+                href={whatsappBaseUrl(whatsappNumber(settings))}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="relative inline-flex cursor-pointer group text-bj-text-nav transition-all duration-300"
