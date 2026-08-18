@@ -4,6 +4,7 @@ import Item from '@/lib/models/Item';
 import Group from '@/lib/models/Group';
 import { requireAuth } from '@/lib/auth/middleware';
 import { errorResponse } from '@/lib/api-utils';
+import { revalidateCatalog } from '@/lib/revalidateCatalog';
 
 export const dynamic = 'force-dynamic';
 
@@ -62,6 +63,7 @@ export async function POST(req: NextRequest) {
     }
 
     const created = await Item.insertMany(prepared, { ordered: false });
+    revalidateCatalog();
     return NextResponse.json({ count: created.length, items: created }, { status: 201, headers: { 'Cache-Control': 'no-store' } });
   } catch (err) {
     return errorResponse(err);

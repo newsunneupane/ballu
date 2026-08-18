@@ -1,9 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { connectDB } from '@/lib/db';
-import Item from '@/lib/models/Item';
-import { calculateFinalPrice } from '@/lib/utils/priceCalculator';
-
-export const dynamic = 'force-dynamic';
+import { getItemsData, CATALOG_REVALIDATE_SECONDS } from '@/lib/server/catalog-data';
 
 function isValidObjectId(id: string): boolean {
   return /^[a-f\d]{24}$/i.test(id);
@@ -11,61 +7,29 @@ function isValidObjectId(id: string): boolean {
 
 export async function GET(req: NextRequest) {
   try {
-    await connectDB();
     const { searchParams } = new URL(req.url);
-    const filter: Record<string, unknown> = {};
     const collection = searchParams.get('collection');
     const material = searchParams.get('material');
     const tag = searchParams.get('tag');
-    if (collection) {
-      if (!isValidObjectId(collection)) {
-        return NextResponse.json({ error: 'Invalid collection parameter' }, { status: 400 });
-      }
-      filter.collection = collection;
+
+    if ((collection && !isValidObjectId(collection)) || (material && !isValidObjectId(material))) {
+      return NextResponse.json({ error: 'Invalid collection/material parameter' }, { status: 400, headers: { 'Cache-Control': 'no-store' } });
     }
-    if (material) {
-      if (!isValidObjectId(material)) {
-        return NextResponse.json({ error: 'Invalid material parameter' }, { status: 400 });
-      }
-      filter.material = material;
-    }
-    if (tag) {
-      if (typeof tag !== 'string' || tag.length > 100 || /[<>$]/.test(tag)) {
-        return NextResponse.json({ error: 'Invalid tag parameter' }, { status: 400 });
-      }
-      filter.tag = tag;
+    if (tag && (typeof tag !== 'string' || tag.length > 100 || /[<>$]/.test(tag))) {
+      return NextResponse.json({ error: 'Invalid tag parameter' }, { status: 400, headers: { 'Cache-Control': 'no-store' } });
     }
 
-    const items = await Item.find(filter)
-      .populate('collection', 'name')
-      .populate('material', 'name')
-      .populate('group', 'name')
-      .sort({ createdAt: -1 })
-      .lean();
+    const items = await getItemsData();
 
-    const itemsWithPricing = await Promise.all(
-      items.map(async (item) => {
-        if (!item.material) return { ...item, pricing: null };
-        try {
-          const pricing = await calculateFinalPrice({
-            materialId: (item.material as { _id: string })._id.toString(),
-            groupId: item.group ? (item.group as { _id: string })._id.toString() : undefined,
-            weightGrams: item.weightGrams,
-            wastagePercent: item.wastagePercent,
-            makingCharges: item.makingCharges,
-            accessoriesCharge: item.accessoriesCharge,
-            boutiqueDeduction: item.boutiqueDeduction,
-            diamondValue: item.diamondValue,
-          });
-          return { ...item, pricing };
-        } catch {
-          return { ...item, pricing: null };
-        }
-      })
-    );
+    const filtered = items.filter((item: any) => {
+      if (collection && String((item.collection as any)?._id || '') !== collection) return false;
+      if (material && String((item.material as any)?._id || '') !== material) return false;
+      if (tag && item.tag !== tag) return false;
+      return true;
+    });
 
-    return NextResponse.json(itemsWithPricing, {
-      headers: { 'Cache-Control': 'no-store' },
+    return NextResponse.json(filtered, {
+      headers: { 'Cache-Control': `public, s-maxage=${CATALOG_REVALIDATE_SECONDS}, stale-while-revalidate=600` },
     });
   } catch {
     return NextResponse.json({ error: 'Failed to fetch items' }, { status: 500, headers: { 'Cache-Control': 'no-store' } });

@@ -1,15 +1,11 @@
 import { NextResponse } from 'next/server';
-import { connectDB } from '@/lib/db';
-import Collection from '@/lib/models/Collection';
-
-export const dynamic = 'force-dynamic';
+import { getCollectionsData, CATALOG_REVALIDATE_SECONDS } from '@/lib/server/catalog-data';
 
 export async function GET() {
   try {
-    await connectDB();
-    const collections = await Collection.find().sort({ createdAt: -1 });
+    const collections = await getCollectionsData();
     return NextResponse.json(collections, {
-      headers: { 'Cache-Control': 'no-store' },
+      headers: { 'Cache-Control': `public, s-maxage=${CATALOG_REVALIDATE_SECONDS}, stale-while-revalidate=600` },
     });
   } catch {
     return NextResponse.json({ error: 'Failed to fetch collections' }, { status: 500, headers: { 'Cache-Control': 'no-store' } });

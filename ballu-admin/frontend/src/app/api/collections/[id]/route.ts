@@ -3,6 +3,7 @@ import { connectDB } from '@/lib/db';
 import Collection from '@/lib/models/Collection';
 import { requireAuth } from '@/lib/auth/middleware';
 import { errorResponse } from '@/lib/api-utils';
+import { revalidateCatalog } from '@/lib/revalidateCatalog';
 
 export const dynamic = 'force-dynamic';
 
@@ -45,6 +46,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 
     const collection = await Collection.findByIdAndUpdate(id, body, { new: true, runValidators: true });
     if (!collection) return NextResponse.json({ error: 'Collection not found' }, { status: 404, headers: { 'Cache-Control': 'no-store' } });
+    revalidateCatalog();
     return NextResponse.json(collection, {
       headers: { 'Cache-Control': 'no-store' },
     });
@@ -61,6 +63,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     await connectDB();
     const collection = await Collection.findByIdAndDelete(id);
     if (!collection) return NextResponse.json({ error: 'Collection not found' }, { status: 404, headers: { 'Cache-Control': 'no-store' } });
+    revalidateCatalog();
     return NextResponse.json({ message: 'Collection deleted' }, {
       headers: { 'Cache-Control': 'no-store' },
     });

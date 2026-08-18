@@ -4,6 +4,7 @@ import Group from '@/lib/models/Group';
 import Item from '@/lib/models/Item';
 import { requireAuth } from '@/lib/auth/middleware';
 import { errorResponse } from '@/lib/api-utils';
+import { revalidateCatalog } from '@/lib/revalidateCatalog';
 
 export const dynamic = 'force-dynamic';
 
@@ -49,6 +50,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 
     const group = await Group.findByIdAndUpdate(id, { name: body.name.trim(), material: body.material }, { new: true, runValidators: true }).populate('material', 'name');
     if (!group) return NextResponse.json({ error: 'Group not found' }, { status: 404, headers: { 'Cache-Control': 'no-store' } });
+    revalidateCatalog();
     return NextResponse.json(group, {
       headers: { 'Cache-Control': 'no-store' },
     });
@@ -66,6 +68,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     const group = await Group.findByIdAndDelete(id);
     if (!group) return NextResponse.json({ error: 'Group not found' }, { status: 404, headers: { 'Cache-Control': 'no-store' } });
     await Item.updateMany({ group: id }, { $unset: { group: 1 } });
+    revalidateCatalog();
     return NextResponse.json({ message: 'Group deleted' }, {
       headers: { 'Cache-Control': 'no-store' },
     });

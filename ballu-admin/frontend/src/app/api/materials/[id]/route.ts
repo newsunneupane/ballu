@@ -4,6 +4,7 @@ import Material from '@/lib/models/Material';
 import { requireAuth } from '@/lib/auth/middleware';
 import { errorResponse } from '@/lib/api-utils';
 import { nprToInr } from '@/lib/utils/units';
+import { revalidateCatalog } from '@/lib/revalidateCatalog';
 
 export const dynamic = 'force-dynamic';
 
@@ -51,6 +52,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     const material = await Material.findByIdAndUpdate(id, { ...body, rateNpr: body.rateNpr != null ? Number(body.rateNpr) : undefined }, { new: true, runValidators: true });
     if (!material) return NextResponse.json({ error: 'Material not found' }, { status: 404, headers: { 'Cache-Control': 'no-store' } });
     const lean = material.toObject();
+    revalidateCatalog();
     return NextResponse.json({ ...lean, rateInr: nprToInr(lean.rateNpr) }, {
       headers: { 'Cache-Control': 'no-store' },
     });
@@ -67,6 +69,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     await connectDB();
     const material = await Material.findByIdAndDelete(id);
     if (!material) return NextResponse.json({ error: 'Material not found' }, { status: 404, headers: { 'Cache-Control': 'no-store' } });
+    revalidateCatalog();
     return NextResponse.json({ message: 'Material deleted' }, {
       headers: { 'Cache-Control': 'no-store' },
     });

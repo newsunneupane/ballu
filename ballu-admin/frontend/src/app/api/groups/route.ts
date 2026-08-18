@@ -3,6 +3,7 @@ import { connectDB } from '@/lib/db';
 import Group from '@/lib/models/Group';
 import { requireAuth } from '@/lib/auth/middleware';
 import { errorResponse } from '@/lib/api-utils';
+import { revalidateCatalog } from '@/lib/revalidateCatalog';
 
 export const dynamic = 'force-dynamic';
 
@@ -49,6 +50,7 @@ export async function POST(req: NextRequest) {
 
     const group = await Group.create({ name: body.name.trim(), material: body.material });
     const populated = await group.populate('material', 'name');
+    revalidateCatalog();
     return NextResponse.json(populated, { status: 201, headers: { 'Cache-Control': 'no-store' } });
   } catch (err) {
     return errorResponse(err);

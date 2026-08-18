@@ -1,15 +1,11 @@
 import { NextResponse } from 'next/server';
-import { connectDB } from '@/lib/db';
-import Material from '@/lib/models/Material';
-
-export const dynamic = 'force-dynamic';
+import { getMaterialsData, CATALOG_REVALIDATE_SECONDS } from '@/lib/server/catalog-data';
 
 export async function GET() {
   try {
-    await connectDB();
-    const materials = await Material.find().sort({ createdAt: -1 });
+    const materials = await getMaterialsData();
     return NextResponse.json(materials, {
-      headers: { 'Cache-Control': 'no-store' },
+      headers: { 'Cache-Control': `public, s-maxage=${CATALOG_REVALIDATE_SECONDS}, stale-while-revalidate=600` },
     });
   } catch {
     return NextResponse.json({ error: 'Failed to fetch materials' }, { status: 500, headers: { 'Cache-Control': 'no-store' } });

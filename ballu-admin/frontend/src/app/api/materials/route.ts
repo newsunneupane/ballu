@@ -4,6 +4,7 @@ import Material from '@/lib/models/Material';
 import { requireAuth } from '@/lib/auth/middleware';
 import { errorResponse } from '@/lib/api-utils';
 import { nprToInr } from '@/lib/utils/units';
+import { revalidateCatalog } from '@/lib/revalidateCatalog';
 
 export const dynamic = 'force-dynamic';
 
@@ -51,6 +52,7 @@ export async function POST(req: NextRequest) {
 
     const material = await Material.create({ ...body, rateNpr: Number(body.rateNpr) });
     const lean = material.toObject();
+    revalidateCatalog();
     return NextResponse.json({ ...lean, rateInr: nprToInr(lean.rateNpr) }, { status: 201, headers: { 'Cache-Control': 'no-store' } });
   } catch (err) {
     return errorResponse(err);

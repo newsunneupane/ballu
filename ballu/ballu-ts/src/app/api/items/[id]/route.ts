@@ -1,36 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { connectDB } from '@/lib/db';
-import Item from '@/lib/models/Item';
-import { calculateFinalPrice } from '@/lib/utils/priceCalculator';
-
-export const dynamic = 'force-dynamic';
+import { getItemByIdData, CATALOG_REVALIDATE_SECONDS } from '@/lib/server/catalog-data';
 
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
-    await connectDB();
-    const item = await Item.findById(id).populate('collection', 'name').populate('material', 'name').populate('group', 'name').lean();
+    const item = await getItemByIdData(id);
     if (!item) return NextResponse.json({ error: 'Item not found' }, { status: 404, headers: { 'Cache-Control': 'no-store' } });
-
-    try {
-      const pricing = await calculateFinalPrice({
-        materialId: (item.material as { _id: string })._id.toString(),
-        groupId: item.group ? (item.group as { _id: string })._id.toString() : undefined,
-        weightGrams: item.weightGrams,
-        wastagePercent: item.wastagePercent,
-        makingCharges: item.makingCharges,
-        accessoriesCharge: item.accessoriesCharge,
-        boutiqueDeduction: item.boutiqueDeduction,
-        diamondValue: item.diamondValue,
-      });
-      return NextResponse.json({ ...item, pricing }, {
-        headers: { 'Cache-Control': 'no-store' },
-      });
-    } catch {
-      return NextResponse.json({ ...item, pricing: null }, {
-        headers: { 'Cache-Control': 'no-store' },
-      });
-    }
+    return NextResponse.json(item, {
+      headers: { 'Cache-Control': `public, s-maxage=${CATALOG_REVALIDATE_SECONDS}, stale-while-revalidate=600` },
+    });
   } catch {
     return NextResponse.json({ error: 'Failed to fetch item' }, { status: 500, headers: { 'Cache-Control': 'no-store' } });
   }
@@ -39,6 +17,8 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
 export async function POST(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
+    const { connectDB } = await import('@/lib/db');
+    const Item = (await import('@/lib/models/Item')).default;
     await connectDB();
     await Item.findByIdAndUpdate(id, { $inc: { viewCount: 1 } });
     return NextResponse.json({ ok: true }, { headers: { 'Cache-Control': 'no-store' } });

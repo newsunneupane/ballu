@@ -6,6 +6,11 @@ let productStore: Product[] = [];
 let collectionStore: any[] = [];
 let materialStore: any[] = [];
 let groupStore: any[] = [];
+let seeded = false;
+
+export function isProductStoreSeeded(): boolean {
+  return seeded;
+}
 
 function transformApiItem(item: any): Product {
   const catEn = item.collection?.name?.en?.toUpperCase() || 'BRIDAL';
@@ -105,8 +110,22 @@ async function loadGroupsFromApi(): Promise<void> {
 }
 
 export const productService = {
+  seed(data: { items: any[]; collections: any[]; materials: any[]; groups: any[] }): void {
+    if (data.items) productStore = data.items.map(transformApiItem);
+    if (data.collections) collectionStore = data.collections;
+    if (data.materials) materialStore = data.materials;
+    if (data.groups) groupStore = data.groups;
+    seeded = true;
+  },
+
+  isSeeded(): boolean {
+    return seeded;
+  },
+
   async ensureLoaded(): Promise<void> {
+    if (seeded) return;
     await Promise.all([loadFromApi(), loadCollectionsFromApi(), loadMaterialsFromApi(), loadGroupsFromApi()]);
+    seeded = true;
   },
 
   isLoaded(): boolean {
@@ -351,5 +370,6 @@ export const productService = {
     collectionStore = [];
     materialStore = [];
     groupStore = [];
+    seeded = false;
   },
 };

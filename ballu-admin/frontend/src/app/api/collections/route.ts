@@ -3,6 +3,7 @@ import { connectDB } from '@/lib/db';
 import Collection from '@/lib/models/Collection';
 import { requireAuth } from '@/lib/auth/middleware';
 import { errorResponse } from '@/lib/api-utils';
+import { revalidateCatalog } from '@/lib/revalidateCatalog';
 
 export const dynamic = 'force-dynamic';
 
@@ -38,6 +39,7 @@ export async function POST(req: NextRequest) {
     }
 
     const collection = await Collection.create(body);
+    revalidateCatalog();
     return NextResponse.json(collection, { status: 201, headers: { 'Cache-Control': 'no-store' } });
   } catch (err) {
     return errorResponse(err);

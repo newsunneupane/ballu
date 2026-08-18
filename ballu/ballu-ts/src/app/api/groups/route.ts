@@ -1,19 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { connectDB } from '@/lib/db';
-import Group from '@/lib/models/Group';
-
-export const dynamic = 'force-dynamic';
+import { getGroupsData, CATALOG_REVALIDATE_SECONDS } from '@/lib/server/catalog-data';
 
 export async function GET(req: NextRequest) {
   try {
-    await connectDB();
     const { searchParams } = new URL(req.url);
     const material = searchParams.get('material');
-    const filter: Record<string, unknown> = {};
-    if (material) filter.material = material;
-    const groups = await Group.find(filter).populate('material', 'name').sort({ createdAt: -1 });
-    return NextResponse.json(groups, {
-      headers: { 'Cache-Control': 'no-store' },
+    const groups = await getGroupsData();
+    const filtered = material ? groups.filter((g: any) => String(g.material?._id || '') === material) : groups;
+    return NextResponse.json(filtered, {
+      headers: { 'Cache-Control': `public, s-maxage=${CATALOG_REVALIDATE_SECONDS}, stale-while-revalidate=600` },
     });
   } catch {
     return NextResponse.json({ error: 'Failed to fetch groups' }, { status: 500, headers: { 'Cache-Control': 'no-store' } });

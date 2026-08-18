@@ -1,47 +1,13 @@
 import { NextResponse } from 'next/server';
-import { connectDB } from '@/lib/db';
-import StoreSettings from '@/lib/models/StoreSettings';
-import { calculateFinalPrice } from '@/lib/utils/priceCalculator';
+import { getStoreSettingsData, CATALOG_REVALIDATE_SECONDS } from '@/lib/server/catalog-data';
 
 export async function GET() {
-  await connectDB();
-  const settings = await StoreSettings.findOne()
-    .populate('pieceOfTheWeek.material', 'name')
-    .populate('pieceOfTheWeek.collection', 'name')
-    .populate('pieceOfTheWeek.item', 'name images purity weightGrams material wastagePercent makingCharges accessoriesCharge boutiqueDeduction diamondValue caratWeight isAvailable showPrice estimatedMakingDays')
-    .lean();
-  if (!settings) {
-    return NextResponse.json({
-      contactEmail: '',
-      phoneNumbers: [],
-      timings: [
-        { dayFrom: 'Mon', dayTo: 'Sat', timeFrom: '10', timeTo: '19' },
-        { dayFrom: 'Sun', dayTo: 'Sun', timeFrom: '11', timeTo: '17' },
-      ],
-    }, {
-      headers: { 'Cache-Control': 'public, max-age=300' },
+  try {
+    const settings = await getStoreSettingsData();
+    return NextResponse.json(settings, {
+      headers: { 'Cache-Control': `public, s-maxage=${CATALOG_REVALIDATE_SECONDS}, stale-while-revalidate=600` },
     });
+  } catch {
+    return NextResponse.json({ error: 'Failed to fetch store settings' }, { status: 500, headers: { 'Cache-Control': 'no-store' } });
   }
-
-  if (settings.pieceOfTheWeek?.item) {
-    const item = settings.pieceOfTheWeek.item as any;
-    try {
-      const pricing = await calculateFinalPrice({
-        materialId: item.material?.toString() || '',
-        weightGrams: item.weightGrams,
-        wastagePercent: item.wastagePercent || 0,
-        makingCharges: item.makingCharges || 0,
-        accessoriesCharge: item.accessoriesCharge || 0,
-        boutiqueDeduction: item.boutiqueDeduction || 0,
-        diamondValue: item.diamondValue || 0,
-      });
-      item.pricing = pricing;
-    } catch {
-      item.pricing = null;
-    }
-  }
-
-  return NextResponse.json(settings, {
-    headers: { 'Cache-Control': 'public, max-age=300' },
-  });
 }

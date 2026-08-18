@@ -5,6 +5,7 @@ import Group from '@/lib/models/Group';
 import { calculateFinalPrice } from '@/lib/utils/priceCalculator';
 import { requireAuth } from '@/lib/auth/middleware';
 import { errorResponse, badRequest, isObjectId } from '@/lib/api-utils';
+import { revalidateCatalog } from '@/lib/revalidateCatalog';
 
 export const dynamic = 'force-dynamic';
 
@@ -119,6 +120,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 
     const item = await Item.findByIdAndUpdate(id, { ...body, material, purity, manualPriceNpr: body.manualPriceNpr != null ? Number(body.manualPriceNpr) : undefined }, { new: true, runValidators: true }).populate(['collection', 'material', 'group']);
     if (!item) return NextResponse.json({ error: 'Item not found' }, { status: 404, headers: { 'Cache-Control': 'no-store' } });
+    revalidateCatalog();
     return NextResponse.json(item, {
       headers: { 'Cache-Control': 'no-store' },
     });
@@ -135,6 +137,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     await connectDB();
     const item = await Item.findByIdAndDelete(id);
     if (!item) return NextResponse.json({ error: 'Item not found' }, { status: 404, headers: { 'Cache-Control': 'no-store' } });
+    revalidateCatalog();
     return NextResponse.json({ message: 'Item deleted' }, {
       headers: { 'Cache-Control': 'no-store' },
     });

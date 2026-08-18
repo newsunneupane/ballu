@@ -5,6 +5,7 @@ import Group from '@/lib/models/Group';
 import { calculateFinalPrice } from '@/lib/utils/priceCalculator';
 import { requireAuth } from '@/lib/auth/middleware';
 import { errorResponse, badRequest, isObjectId } from '@/lib/api-utils';
+import { revalidateCatalog } from '@/lib/revalidateCatalog';
 
 export const dynamic = 'force-dynamic';
 
@@ -130,6 +131,7 @@ export async function POST(req: NextRequest) {
 
     const item = await Item.create({ ...body, material, purity, manualPriceNpr: body.manualPriceNpr != null ? Number(body.manualPriceNpr) : undefined });
     const populated = await item.populate(['collection', 'material', 'group']);
+    revalidateCatalog();
     return NextResponse.json(populated, { status: 201, headers: { 'Cache-Control': 'no-store' } });
   } catch (err) {
     return errorResponse(err);
@@ -147,6 +149,7 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: 'Provide an array of item ids' }, { status: 400, headers: { 'Cache-Control': 'no-store' } });
     }
     const result = await Item.deleteMany({ _id: { $in: ids } });
+    revalidateCatalog();
     return NextResponse.json({ deleted: result.deletedCount }, {
       headers: { 'Cache-Control': 'no-store' },
     });

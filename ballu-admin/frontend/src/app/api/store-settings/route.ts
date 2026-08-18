@@ -3,6 +3,7 @@ import { connectDB } from '@/lib/db';
 import StoreSettings from '@/lib/models/StoreSettings';
 import { requireAuth } from '@/lib/auth/middleware';
 import { errorResponse } from '@/lib/api-utils';
+import { revalidateCatalog } from '@/lib/revalidateCatalog';
 
 export const dynamic = 'force-dynamic';
 
@@ -54,6 +55,7 @@ export async function PUT(req: NextRequest) {
       new: true,
       runValidators: true,
     }).populate('pieceOfTheWeek.item', 'name images purity weightGrams');
+    revalidateCatalog();
     return NextResponse.json(settings, {
       headers: { 'Cache-Control': 'no-store' },
     });
