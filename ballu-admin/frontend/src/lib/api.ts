@@ -1,16 +1,53 @@
 const BASE_URL = '/api';
 
+import { toast } from '@/lib/toast';
+
 function getToken(): string | null {
   if (typeof window === 'undefined') return null;
   return localStorage.getItem('bj_token');
 }
 
+const RESOURCE_NAMES: Record<string, string> = {
+  materials: 'Material',
+  groups: 'Group',
+  categories: 'Category',
+  items: 'Item',
+  'custom-requests': 'Custom request',
+  'item-inquiries': 'Inquiry',
+  'store-settings': 'Store settings',
+  upload: 'Image',
+  auth: 'Account',
+  dashboard: 'Dashboard',
+};
+
+function describe(path: string, method: string): string {
+  const clean = path.split('?')[0].replace(/^\/+/, '');
+  const resource = clean.split('/')[0];
+  const action = { POST: 'created', PUT: 'updated', DELETE: 'deleted' }[method];
+  if (!action) return '';
+  const noun =
+    RESOURCE_NAMES[resource] ||
+    resource
+      .replace(/[-_]/g, ' ')
+      .replace(/\b\w/g, (c) => c.toUpperCase()) ||
+    'Item';
+  return `${noun} ${action}`;
+}
+
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
+  const method = (options?.method || 'GET').toUpperCase();
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
   const token = getToken();
   if (token) headers['Authorization'] = `Bearer ${token}`;
 
-  const res = await fetch(`${BASE_URL}${path}`, { headers, ...options });
+  let res: Response;
+  try {
+    res = await fetch(`${BASE_URL}${path}`, { headers, ...options });
+  } catch {
+    toast.error('Network error - please try again');
+    throw new Error('Network error - please try again');
+  }
+
   if (!res.ok) {
     if (res.status === 401) {
       localStorage.removeItem('bj_token');
@@ -19,9 +56,15 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
     const text = await res.text();
     let err;
     try { err = JSON.parse(text); } catch { err = { error: text || res.statusText }; }
-    throw new Error(err.error || 'Request failed');
+    const message = err.error || 'Request failed';
+    if (res.status !== 401) toast.error(message);
+    throw new Error(message);
   }
-  return res.json();
+
+  const data = await res.json();
+  const message = describe(path, method);
+  if (message) toast.success(message);
+  return data;
 }
 
 export const api = {

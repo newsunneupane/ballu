@@ -79,8 +79,8 @@ export default function GroupsPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-2xl font-semibold text-[#fbf7f0]">Groups</h1>
-        <button onClick={openNew} className="flex items-center gap-2 bg-[#dbb86b] text-[#0a0806] px-4 py-2 rounded text-sm font-medium hover:bg-[#c9a96e] transition-colors">
+        <h1 className="text-2xl font-semibold text-[#1f1b16]">Groups</h1>
+        <button onClick={openNew} className="flex items-center gap-2 bg-[#b8860b] text-[#ffffff] px-4 py-2 rounded text-sm font-medium hover:bg-[#9a7208] transition-colors">
           <Plus size={16} /> Add Group
         </button>
       </div>
@@ -97,10 +97,10 @@ export default function GroupsPage() {
         />
       </div>
 
-      <div className="bg-[#0f0c0a] border border-[#1f1a10] rounded-lg overflow-hidden">
+      <div className="bg-[#ffffff] border border-[#e5ded2] rounded-lg overflow-hidden">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-[#1f1a10] text-[#6e695f] text-[10px] tracking-[0.2em] uppercase">
+            <tr className="border-b border-[#e5ded2] text-[#6b655b] text-[10px] tracking-[0.2em] uppercase">
               <th className="text-left px-5 py-3 font-medium">Name</th>
               <th className="text-left px-5 py-3 font-medium">Material</th>
               <th className="text-right px-5 py-3 font-medium">Actions</th>
@@ -108,35 +108,35 @@ export default function GroupsPage() {
           </thead>
           <tbody>
             {groups.map((g: any) => (
-              <tr key={g._id} className="border-b border-[#1f1a10]/50 last:border-0 hover:bg-white/[0.02]">
-                <td className="px-5 py-3 text-[#e5e5e0]">{g.name}</td>
-                <td className="px-5 py-3 text-[#8e897e]">{materialName(g)}</td>
+              <tr key={g._id} className="border-b border-[#e5ded2]/50 last:border-0 hover:bg-black/5">
+                <td className="px-5 py-3 text-[#26221d]">{g.name}</td>
+                <td className="px-5 py-3 text-[#7d776c]">{materialName(g)}</td>
                 <td className="px-5 py-3 text-right">
-                  <button onClick={() => openEdit(g)} className="text-[#8e897e] hover:text-[#dbb86b] transition-colors mr-3"><Pencil size={14} /></button>
-                  <button onClick={() => remove(g._id)} className="text-[#8e897e] hover:text-red-400 transition-colors"><Trash2 size={14} /></button>
+                  <button onClick={() => openEdit(g)} className="text-[#7d776c] hover:text-[#b8860b] transition-colors mr-3"><Pencil size={14} /></button>
+                  <button onClick={() => remove(g._id)} className="text-[#7d776c] hover:text-red-600 transition-colors"><Trash2 size={14} /></button>
                 </td>
               </tr>
             ))}
             {groups.length === 0 && (
-              <tr><td colSpan={3} className="px-5 py-8 text-center text-[#6e695f]">No groups yet</td></tr>
+              <tr><td colSpan={3} className="px-5 py-8 text-center text-[#6b655b]">No groups yet</td></tr>
             )}
             {deleteError && (
-              <tr><td colSpan={3} className="px-5 py-3 text-center text-red-400 text-sm bg-red-400/5">{deleteError}</td></tr>
+              <tr><td colSpan={3} className="px-5 py-3 text-center text-red-600 text-sm bg-red-50">{deleteError}</td></tr>
             )}
           </tbody>
         </table>
       </div>
 
       {showForm && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50" onClick={() => setShowForm(false)}>
-          <div className="bg-[#0f0c0a] border border-[#1f1a10] rounded-lg p-6 w-full max-w-md mx-4" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50" onClick={() => setShowForm(false)}>
+          <div className="bg-[#ffffff] border border-[#e5ded2] rounded-lg p-6 w-full max-w-md mx-4" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-5">
-              <h2 className="text-lg font-semibold text-[#fbf7f0]">{editing ? 'Edit Group' : 'New Group'}</h2>
-              <button onClick={() => setShowForm(false)} className="text-[#6e695f] hover:text-[#e5e5e0]"><X size={18} /></button>
+              <h2 className="text-lg font-semibold text-[#1f1b16]">{editing ? 'Edit Group' : 'New Group'}</h2>
+              <button onClick={() => setShowForm(false)} className="text-[#6b655b] hover:text-[#26221d]"><X size={18} /></button>
             </div>
             <div className="space-y-4">
               <div>
-                <label className="block text-[10px] tracking-[0.2em] uppercase text-[#6e695f] mb-1.5">Material</label>
+                <label className="block text-[10px] tracking-[0.2em] uppercase text-[#6b655b] mb-1.5">Material</label>
                 <SearchableSelect
                   value={form.material}
                   onChange={(v) => setForm({ ...form, material: v })}
@@ -145,13 +145,13 @@ export default function GroupsPage() {
                 />
               </div>
               <div>
-                <label className="block text-[10px] tracking-[0.2em] uppercase text-[#6e695f] mb-1.5">Name</label>
-                <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="e.g. 22K" className="w-full bg-[#0a0806] border border-[#1f1a10] rounded px-3 py-2 text-sm text-[#e5e5e0] focus:outline-none focus:border-[#dbb86b]" />
+                <label className="block text-[10px] tracking-[0.2em] uppercase text-[#6b655b] mb-1.5">Name</label>
+                <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="e.g. 22K" className="w-full bg-[#faf8f4] border border-[#e5ded2] rounded px-3 py-2 text-sm text-[#26221d] focus:outline-none focus:border-[#b8860b]" />
               </div>
               {error && (
-                <div className="text-red-400 text-sm px-3 py-2 rounded bg-red-400/10">{error}</div>
+                <div className="text-red-600 text-sm px-3 py-2 rounded bg-red-50">{error}</div>
               )}
-              <button onClick={save} className="w-full bg-[#dbb86b] text-[#0a0806] py-2 rounded text-sm font-medium hover:bg-[#c9a96e] transition-colors mt-2">
+              <button onClick={save} className="w-full bg-[#b8860b] text-[#ffffff] py-2 rounded text-sm font-medium hover:bg-[#9a7208] transition-colors mt-2">
                 {editing ? 'Update' : 'Create'}
               </button>
             </div>

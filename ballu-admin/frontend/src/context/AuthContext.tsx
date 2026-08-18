@@ -1,6 +1,7 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState, useCallback, ReactNode } from 'react';
+import { toast } from '@/lib/toast';
 
 interface User {
   id: string;
@@ -47,7 +48,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       body: JSON.stringify({ email, password }),
     });
     const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Login failed');
+    if (!res.ok) {
+      toast.error(data.error || 'Login failed');
+      throw new Error(data.error || 'Login failed');
+    }
+    toast.success('Signed in successfully');
     localStorage.setItem('bj_token', data.token);
     setToken(data.token);
     setUser(data.user);

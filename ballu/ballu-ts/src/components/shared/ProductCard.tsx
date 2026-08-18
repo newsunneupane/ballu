@@ -66,7 +66,7 @@ export default function ProductCard({ product, viewMode = 'GRID' }: ProductCardP
           <div className="text-base sm:text-[18px] text-bj-text-gold font-normal leading-tight tracking-wide truncate flex items-center gap-2">
             {product.title}
             {!product.isAvailable && (
-              <span className="text-[8px] tracking-widest uppercase text-red-400 border border-red-400/30 rounded px-1.5 py-0.5 shrink-0">Made to Order</span>
+              <span className="text-[8px] tracking-widest uppercase text-red-400 border border-red-400/30 rounded px-1.5 py-0.5 shrink-0">Unavailable - Need to Order</span>
             )}
           </div>
           <div className="text-[10px] sm:text-xs font-light text-bj-text-muted mt-1 opacity-80 truncate">{product.subTitle}</div>
@@ -115,9 +115,8 @@ export default function ProductCard({ product, viewMode = 'GRID' }: ProductCardP
         <div className="absolute inset-0 z-20 p-4 flex items-start justify-between pointer-events-none">
           <div className="flex flex-col gap-1.5">
             {product.tag && <Badge>{product.tag}</Badge>}
-            {!product.isAvailable && <Badge className="!bg-red-950/80 !text-red-300 !border-red-400/30">Made to Order</Badge>}
             {product.estimatedMakingDays?.min != null && (
-              <Badge variant="outline">
+              <Badge>
                 Ready {product.estimatedMakingDays.min}
                 {product.estimatedMakingDays.max != null && product.estimatedMakingDays.max !== product.estimatedMakingDays.min ? `–${product.estimatedMakingDays.max}` : ''}d
               </Badge>
@@ -131,6 +130,11 @@ export default function ProductCard({ product, viewMode = 'GRID' }: ProductCardP
             <FaWhatsapp size={15} />
           </button>
         </div>
+        {!product.isAvailable && (
+          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-30 pointer-events-none whitespace-nowrap">
+            <Badge className="!bg-red-950/80 !text-red-300 !border-red-400/30">Unavailable - Need to Order</Badge>
+          </div>
+        )}
       </div>
       <div className="relative z-0 px-5 pb-[10px] pt-[23px] bg-bj-bg-card-body">
         <h3 className="text-base font-normal text-bj-text-gold mb-1">{product.title}</h3>

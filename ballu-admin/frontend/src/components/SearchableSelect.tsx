@@ -59,25 +59,25 @@ export default function SearchableSelect({
         type="button"
         disabled={disabled}
         onClick={() => { setOpen((o) => !o); setQuery(''); }}
-        className={`w-full flex items-center justify-between gap-2 bg-[#0a0806] rounded ${sizes} text-left focus:outline-none focus:border-[#dbb86b] disabled:opacity-50 disabled:cursor-not-allowed transition-colors ${open ? 'border border-[#dbb86b]' : 'border border-[#1f1a10]'} ${selected ? 'text-[#e5e5e0]' : 'text-[#6e695f]'}`}
+        className={`w-full flex items-center justify-between gap-2 bg-[#faf8f4] rounded ${sizes} text-left focus:outline-none focus:border-[#b8860b] disabled:opacity-50 disabled:cursor-not-allowed transition-colors ${open ? 'border border-[#b8860b]' : 'border border-[#e5ded2]'} ${selected ? 'text-[#26221d]' : 'text-[#6b655b]'}`}
       >
         <span className="truncate">{selected ? selected.label : placeholder}</span>
-        <ChevronDown size={14} className={`shrink-0 text-[#6e695f] transition-transform ${open ? 'rotate-180' : ''}`} />
+        <ChevronDown size={14} className={`shrink-0 text-[#6b655b] transition-transform ${open ? 'rotate-180' : ''}`} />
       </button>
 
       {open && !disabled && (
-        <div className="absolute z-50 mt-1 w-full min-w-[200px] bg-[#0f0c0a] border border-[#1f1a10] rounded-lg shadow-xl overflow-hidden">
-          <div className="flex items-center gap-2 px-3 py-2 border-b border-[#1f1a10]">
-            <Search size={13} className="text-[#6e695f] shrink-0" />
+        <div className="absolute z-50 mt-1 w-full min-w-[200px] bg-[#ffffff] border border-[#e5ded2] rounded-lg shadow-xl overflow-hidden">
+          <div className="flex items-center gap-2 px-3 py-2 border-b border-[#e5ded2]">
+            <Search size={13} className="text-[#6b655b] shrink-0" />
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search…"
               autoFocus
-              className="w-full bg-transparent text-sm text-[#e5e5e0] focus:outline-none placeholder:text-[#6e695f]"
+              className="w-full bg-transparent text-sm text-[#26221d] focus:outline-none placeholder:text-[#6b655b]"
             />
             {query && (
-              <button type="button" onClick={() => setQuery('')} className="text-[#6e695f] hover:text-[#e5e5e0]">
+              <button type="button" onClick={() => setQuery('')} className="text-[#6b655b] hover:text-[#26221d]">
                 <X size={13} />
               </button>
             )}
@@ -87,7 +87,7 @@ export default function SearchableSelect({
               <button
                 type="button"
                 onClick={() => { onChange(''); setOpen(false); }}
-                className={`w-full text-left px-3 py-2 text-sm hover:bg-white/[0.03] ${!value ? 'text-[#dbb86b]' : 'text-[#8e897e]'}`}
+                className={`w-full text-left px-3 py-2 text-sm hover:bg-black/5 ${!value ? 'text-[#b8860b]' : 'text-[#7d776c]'}`}
               >
                 {clearLabel}
               </button>
@@ -97,13 +97,13 @@ export default function SearchableSelect({
                 key={o.value}
                 type="button"
                 onClick={() => { onChange(o.value); setOpen(false); }}
-                className={`w-full text-left px-3 py-2 text-sm hover:bg-white/[0.03] ${o.value === value ? 'text-[#dbb86b] bg-[#dbb86b]/5' : 'text-[#e5e5e0]'}`}
+                className={`w-full text-left px-3 py-2 text-sm hover:bg-black/5 ${o.value === value ? 'text-[#b8860b] bg-[#b8860b]/5' : 'text-[#26221d]'}`}
               >
                 {o.label}
               </button>
             ))}
             {filtered.length === 0 && (
-              <div className="px-3 py-2 text-sm text-[#6e695f]">No matches</div>
+              <div className="px-3 py-2 text-sm text-[#6b655b]">No matches</div>
             )}
           </div>
         </div>

@@ -176,7 +176,7 @@ export default function ProductDetail() {
             <div className={`${tenorSans.className} text-bj-gold-alt text-[9px] tracking-[0.3em] uppercase mb-5 flex items-center gap-3`}>
               <span>CATALOGUE · {product.tag || "COLLECTION"}</span>
               {!product.isAvailable && (
-                <span className="text-red-400 border border-red-400/30 rounded px-2 py-0.5">Made to Order</span>
+                <span className="text-red-400 border border-red-400/30 rounded px-2 py-0.5">Unavailable - Need to Order</span>
               )}
             </div>
 

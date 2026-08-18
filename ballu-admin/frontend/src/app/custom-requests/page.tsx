@@ -8,9 +8,9 @@ import SearchableSelect from '@/components/SearchableSelect';
 import { Trash2 } from 'lucide-react';
 
 const statusColors: Record<string, string> = {
-  Pending: 'text-amber-400 bg-amber-400/10',
-  Reviewed: 'text-blue-400 bg-blue-400/10',
-  Contacted: 'text-emerald-400 bg-emerald-400/10',
+  Pending: 'text-amber-700 bg-amber-100',
+  Reviewed: 'text-blue-700 bg-blue-100',
+  Contacted: 'text-emerald-700 bg-emerald-100',
 };
 
 const statusOptions = [
@@ -74,7 +74,7 @@ export default function CustomRequestsPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-2xl font-semibold text-[#fbf7f0]">Custom Requests</h1>
+        <h1 className="text-2xl font-semibold text-[#1f1b16]">Custom Requests</h1>
         <SearchableSelect
           value={statusFilter}
           onChange={(v) => setStatusFilter(v)}
@@ -88,17 +88,17 @@ export default function CustomRequestsPage() {
 
       <div className="space-y-3">
         {requests.map((r: any) => (
-          <div key={r._id} className="bg-[#0f0c0a] border border-[#1f1a10] rounded-lg p-5">
+          <div key={r._id} className="bg-[#ffffff] border border-[#e5ded2] rounded-lg p-5">
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-3 mb-2">
-                  <h3 className="text-[#fbf7f0] font-medium">{r.username}</h3>
+                  <h3 className="text-[#1f1b16] font-medium">{r.username}</h3>
                   <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${statusColors[r.status] || ''}`}>
                     {r.status}
                   </span>
-                  <span className="text-[10px] text-[#6e695f] ml-auto">{new Date(r.createdAt).toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true })}</span>
+                  <span className="text-[10px] text-[#6b655b] ml-auto">{new Date(r.createdAt).toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true })}</span>
                 </div>
-                <div className="text-sm text-[#8e897e] space-y-1">
+                <div className="text-sm text-[#7d776c] space-y-1">
                   <p>📞 {r.phoneNumber}</p>
                   {r.pieceType && <p className="text-xs">Piece: {r.pieceType}</p>}
                   <p>
@@ -107,11 +107,11 @@ export default function CustomRequestsPage() {
                     {' · '}Budget: Rs {r.budgetNrs?.toLocaleString()}
                   </p>
                   {r.requirements && <p className="italic text-xs">📝 {r.requirements}</p>}
-                  <p className="text-xs text-[#a8a397] mt-1">{r.description || <span className="text-[#6e695f] italic">No description</span>}</p>
+                  <p className="text-xs text-[#6b655b] mt-1">{r.description || <span className="text-[#6b655b] italic">No description</span>}</p>
                   {r.images?.length > 0 && (
                     <div className="flex gap-2 mt-2">
                       {r.images.map((img: string, i: number) => (
-                        <img key={i} src={cloudinaryUrl(img, { width: 120, aspect: '1:1' })} alt="" className="w-16 h-16 object-cover rounded border border-[#1f1a10]" />
+                        <img key={i} src={cloudinaryUrl(img, { width: 120, aspect: '1:1' })} alt="" className="w-16 h-16 object-cover rounded border border-[#e5ded2]" />
                       ))}
                     </div>
                   )}
@@ -125,13 +125,13 @@ export default function CustomRequestsPage() {
                   size="sm"
                   className="w-36"
                 />
-                <button onClick={() => remove(r._id)} className="text-[#6e695f] hover:text-red-400 transition-colors"><Trash2 size={14} /></button>
+                <button onClick={() => remove(r._id)} className="text-[#6b655b] hover:text-red-600 transition-colors"><Trash2 size={14} /></button>
               </div>
             </div>
           </div>
         ))}
         {requests.length === 0 && (
-          <div className="text-center text-[#6e695f] py-12">No custom requests</div>
+          <div className="text-center text-[#6b655b] py-12">No custom requests</div>
         )}
       </div>
     </div>

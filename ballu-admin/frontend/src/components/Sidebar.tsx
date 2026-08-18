@@ -54,12 +54,12 @@ export default function Sidebar() {
 
   const sidebarContent = (
     <div className="flex flex-col h-full">
-      <div className="px-5 py-6 border-b border-[#1f1a10] flex items-center justify-between">
+      <div className="px-5 py-6 border-b border-[#e5ded2] flex items-center justify-between">
         <div>
-          <h1 className="text-[#dbb86b] text-lg font-semibold tracking-wider">BALLU ADMIN</h1>
-          <p className="text-[#6e695f] text-[10px] tracking-[0.2em] uppercase mt-1">Jewellers CMS</p>
+          <h1 className="text-[#b8860b] text-lg font-semibold tracking-wider">BALLU ADMIN</h1>
+          <p className="text-[#6b655b] text-[10px] tracking-[0.2em] uppercase mt-1">Jewellers CMS</p>
         </div>
-        <button onClick={closeMobile} className="md:hidden text-[#6e695f] hover:text-[#ebd3b4]">
+        <button onClick={closeMobile} className="md:hidden text-[#6b655b] hover:text-[#b8860b]">
           <X size={20} />
         </button>
       </div>
@@ -75,8 +75,8 @@ export default function Sidebar() {
               onClick={closeMobile}
               className={`flex items-center gap-3 px-5 py-2.5 text-sm transition-colors ${
                 isActive
-                  ? 'text-[#dbb86b] bg-[#dbb86b]/5 border-r-2 border-[#dbb86b]'
-                  : 'text-[#8e897e] hover:text-[#ebd3b4] hover:bg-white/[0.02]'
+                  ? 'text-[#b8860b] bg-[#b8860b]/5 border-r-2 border-[#b8860b]'
+                  : 'text-[#7d776c] hover:text-[#b8860b] hover:bg-black/5'
               }`}
             >
               <Icon size={16} strokeWidth={1.5} />
@@ -90,18 +90,18 @@ export default function Sidebar() {
           );
         })}
       </nav>
-      <div className="border-t border-[#1f1a10] shrink-0">
+      <div className="border-t border-[#e5ded2] shrink-0">
         {user && (
-          <div className="px-5 py-3 text-[#6e695f]">
-            <p className="text-xs text-[#8e897e]">{user.name}</p>
+          <div className="px-5 py-3 text-[#6b655b]">
+            <p className="text-xs text-[#7d776c]">{user.name}</p>
             <p className="text-[10px]">{user.email}</p>
           </div>
         )}
         <div className="px-5 py-3 flex items-center justify-between">
-          <a href="http://localhost:3000" target="_blank" rel="noopener noreferrer" className="text-[#6e695f] text-[10px] tracking-[0.2em] hover:text-[#dbb86b] transition-colors">
+          <a href="http://localhost:3000" target="_blank" rel="noopener noreferrer" className="text-[#6b655b] text-[10px] tracking-[0.2em] hover:text-[#b8860b] transition-colors">
             View Site →
           </a>
-          <button onClick={() => { logout(); closeMobile(); }} className="text-[#6e695f] hover:text-red-400 transition-colors flex items-center gap-1 text-[10px] tracking-[0.2em] uppercase">
+          <button onClick={() => { logout(); closeMobile(); }} className="text-[#6b655b] hover:text-red-600 transition-colors flex items-center gap-1 text-[10px] tracking-[0.2em] uppercase">
             <LogOut size={12} /> Logout
           </button>
         </div>
@@ -113,7 +113,7 @@ export default function Sidebar() {
     <>
       <button
         onClick={() => setMobileOpen(true)}
-        className="md:hidden fixed top-4 left-4 z-50 bg-[#0f0c0a] border border-[#1f1a10] rounded p-2 text-[#8e897e] hover:text-[#ebd3b4]"
+        className="md:hidden fixed top-4 left-4 z-50 bg-[#ffffff] border border-[#e5ded2] rounded p-2 text-[#7d776c] hover:text-[#b8860b]"
         aria-label="Open menu"
       >
         <Menu size={20} />
@@ -121,14 +121,14 @@ export default function Sidebar() {
 
       {mobileOpen && (
         <div
-          className="md:hidden fixed inset-0 z-40 bg-black/60"
+          className="md:hidden fixed inset-0 z-40 bg-black/40"
           onClick={closeMobile}
         />
       )}
 
       <aside
         className={`
-          fixed md:sticky top-0 left-0 z-50 w-60 h-screen bg-[#0f0c0a] border-r border-[#1f1a10]
+          fixed md:sticky top-0 left-0 z-50 w-60 h-screen bg-[#ffffff] border-r border-[#e5ded2]
           transition-transform duration-300 overflow-y-auto
           ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}
           md:translate-x-0
