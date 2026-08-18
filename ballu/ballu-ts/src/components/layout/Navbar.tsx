@@ -162,16 +162,24 @@ function MobileMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
 
   return (
     <div
-      className={`md:hidden fixed inset-x-0 bottom-0 bg-bj-bg-secondary/98 border-t border-bj-border backdrop-blur-lg transition-all duration-500 ease-in-out overflow-y-auto z-40 no-scrollbar ${
-        isOpen ? 'top-[56px] md:top-[68px] opacity-100 visible' : 'top-[100%] opacity-0 invisible'
+      className={`md:hidden fixed inset-0 bg-bj-bg-secondary/98 backdrop-blur-lg transition-all duration-500 ease-in-out overflow-y-auto z-[60] no-scrollbar ${
+        isOpen ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible -translate-y-full'
       }`}
     >
-      <div className="flex flex-col items-center justify-center space-y-6 min-h-full pb-24 text-[16px] tracking-[6px] uppercase text-bj-text-nav px-6">
-        {allLinks.map((link) => (
-          <Link key={link.href} href={link.href} onClick={onClose} className="hover:font-semibold py-2 transition-all">
-            {link.label}
-          </Link>
-        ))}
+      <div className="flex flex-col h-full">
+        <div className="flex items-center justify-between px-4 h-14 border-b border-bj-border shrink-0">
+          <span className="text-[14px] tracking-[6px] uppercase text-bj-text-nav">Menu</span>
+          <button onClick={onClose} aria-label="Close menu" className="text-bj-text-nav hover:font-semibold transition-colors p-1">
+            <FiX size={22} />
+          </button>
+        </div>
+        <div className="flex flex-col items-center justify-center flex-1 space-y-6 text-[16px] tracking-[6px] uppercase text-bj-text-nav px-6 pb-24">
+          {allLinks.map((link) => (
+            <Link key={link.href} href={link.href} onClick={onClose} className="hover:font-semibold py-2 transition-all">
+              {link.label}
+            </Link>
+          ))}
+        </div>
       </div>
     </div>
   );
