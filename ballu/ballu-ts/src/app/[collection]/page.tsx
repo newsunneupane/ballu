@@ -3,22 +3,22 @@ import { notFound } from 'next/navigation';
 import { productService } from '@/services/product-service';
 import CatalogueContent from '@/components/sections/CatalogueContent';
 import { connectDB } from '@/lib/db';
-import Category from '@/lib/models/Category';
+import Collection from '@/lib/models/Collection';
 
-export default async function CategoryPage({ params }: { params: Promise<{ category: string }> }) {
-  const { category } = await params;
-  let resolved = productService.getCategoryBySlug(category);
+export default async function CollectionPage({ params }: { params: Promise<{ collection: string }> }) {
+  const { collection } = await params;
+  let resolved = productService.getCollectionBySlug(collection);
 
   if (!resolved) {
     await connectDB();
-    const cat = await Category.findOne({
-      'name.en': { $regex: new RegExp(`^${category.replace(/-/g, ' ').replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') }
+    const cat = await Collection.findOne({
+      'name.en': { $regex: new RegExp(`^${collection.replace(/-/g, ' ').replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') }
     }).lean();
     if (cat) {
       resolved = {
-        category: cat.name.en.toUpperCase(),
+        collection: cat.name.en.toUpperCase(),
         config: {
-          slug: category,
+          slug: collection,
           title: cat.name.en,
           subtitle: cat.name.np,
           breadcrumb: `Catalogue · ${cat.name.en}`,
@@ -34,7 +34,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ categ
   return (
     <Suspense>
       <CatalogueContent
-        defaultCategory={resolved.category}
+        defaultCollection={resolved.collection}
         title={resolved.config.title}
         subtitle={resolved.config.subtitle}
         breadcrumb={resolved.config.breadcrumb}

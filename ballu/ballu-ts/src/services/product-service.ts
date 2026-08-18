@@ -1,14 +1,14 @@
 import { Product, ProductFilters } from '@/types/product';
 import { Collection } from '@/types/collection';
-import { categoryConfigMap, categorySlugMap, categoryFromSlug, categoryPageConfig } from '@/data/collections';
+import { collectionConfigMap, collectionSlugMap, collectionFromSlug, collectionPageConfig } from '@/data/collections';
 
 let productStore: Product[] = [];
-let categoryStore: any[] = [];
+let collectionStore: any[] = [];
 let materialStore: any[] = [];
 let groupStore: any[] = [];
 
 function transformApiItem(item: any): Product {
-  const catEn = item.category?.name?.en?.toUpperCase() || 'BRIDAL';
+  const catEn = item.collection?.name?.en?.toUpperCase() || 'BRIDAL';
   const matEn = item.material?.name?.en?.toUpperCase() || 'GOLD';
   const weightStr = `${item.weightGrams}g`;
   const purity = item.group?.name?.en || item.purity || '';
@@ -18,7 +18,7 @@ function transformApiItem(item: any): Product {
   return {
     id: item._id,
     tag: item.tag || null,
-    category: catEn,
+    collection: catEn,
     type: catEn,
     material: matEn,
     title: item.name?.en || '',
@@ -65,17 +65,17 @@ async function loadFromApi(): Promise<void> {
   productStore = [];
 }
 
-async function loadCategoriesFromApi(): Promise<void> {
+async function loadCollectionsFromApi(): Promise<void> {
   try {
-    const res = await fetch('/api/categories');
+    const res = await fetch('/api/collections');
     if (res.ok) {
-      categoryStore = await res.json();
+      collectionStore = await res.json();
       return;
     }
   } catch {
     /* ignore */
   }
-  categoryStore = [];
+  collectionStore = [];
 }
 
 async function loadMaterialsFromApi(): Promise<void> {
@@ -106,15 +106,15 @@ async function loadGroupsFromApi(): Promise<void> {
 
 export const productService = {
   async ensureLoaded(): Promise<void> {
-    await Promise.all([loadFromApi(), loadCategoriesFromApi(), loadMaterialsFromApi(), loadGroupsFromApi()]);
+    await Promise.all([loadFromApi(), loadCollectionsFromApi(), loadMaterialsFromApi(), loadGroupsFromApi()]);
   },
 
   isLoaded(): boolean {
     return true;
   },
 
-  getCategoriesList(): any[] {
-    return [...categoryStore];
+  getCollectionsList(): any[] {
+    return [...collectionStore];
   },
 
   getMaterialsList(): any[] {
@@ -149,10 +149,10 @@ export const productService = {
 
   getFiltered(filters: Partial<ProductFilters>): Product[] {
     const filtered = productStore.filter((product) => {
-      const matchesCategory =
-        !filters.categories ||
-        filters.categories.includes('ALL') ||
-        filters.categories.includes(product.category);
+      const matchesCollection =
+        !filters.collections ||
+        filters.collections.includes('ALL') ||
+        filters.collections.includes(product.collection);
       const matchesMaterial =
         !filters.material ||
         filters.material === 'ALL' ||
@@ -165,7 +165,7 @@ export const productService = {
       const matchesAvailability = !filters.availableOnly || product.isAvailable;
       const matchesMinPrice = filters.minPrice == null || (product.priceNpr != null && product.priceNpr >= filters.minPrice);
       const matchesMaxPrice = filters.maxPrice == null || (product.priceNpr != null && product.priceNpr <= filters.maxPrice);
-      return matchesCategory && matchesMaterial && matchesPurity && matchesTag && matchesAvailability && matchesMinPrice && matchesMaxPrice;
+      return matchesCollection && matchesMaterial && matchesPurity && matchesTag && matchesAvailability && matchesMinPrice && matchesMaxPrice;
     });
 
     switch (filters.sort) {
@@ -181,12 +181,12 @@ export const productService = {
     }
   },
 
-  getRecommended(opts: { excludeId?: string | number; category?: string; material?: string; limit?: number }): Product[] {
-    const { excludeId, category, material, limit = 8 } = opts;
+  getRecommended(opts: { excludeId?: string | number; collection?: string; material?: string; limit?: number }): Product[] {
+    const { excludeId, collection, material, limit = 8 } = opts;
     const candidates = productStore.filter((p) => String(p.id) !== String(excludeId));
-    const bothMatch = candidates.filter((p) => p.category === category && p.material === material);
+    const bothMatch = candidates.filter((p) => p.collection === collection && p.material === material);
     const eitherMatch = candidates.filter(
-      (p) => (p.category === category || p.material === material) && !bothMatch.includes(p)
+      (p) => (p.collection === collection || p.material === material) && !bothMatch.includes(p)
     );
     const ranked = [...bothMatch, ...eitherMatch].sort((a, b) => (b.viewCount ?? 0) - (a.viewCount ?? 0));
     if (ranked.length >= limit) return ranked.slice(0, limit);
@@ -208,7 +208,7 @@ export const productService = {
         p.title.toLowerCase().includes(keyword) ||
         p.subTitle.toLowerCase().includes(keyword) ||
         (p.description && p.description.toLowerCase().includes(keyword)) ||
-        p.category.toLowerCase().includes(keyword) ||
+        p.collection.toLowerCase().includes(keyword) ||
         p.material.toLowerCase().includes(keyword) ||
         (p.purity && p.purity.toLowerCase().includes(keyword)) ||
         (p.karigar && p.karigar.toLowerCase().includes(keyword)) ||
@@ -218,29 +218,29 @@ export const productService = {
     );
   },
 
-  getCategories(): string[] {
-    return [...new Set(productStore.map((p) => p.category))];
+  getCollections(): string[] {
+    return [...new Set(productStore.map((p) => p.collection))];
   },
 
-  getCategoryBySlug(slug: string): { category: string; config: typeof categoryPageConfig[keyof typeof categoryPageConfig] } | null {
-    const category = categoryFromSlug[slug];
-    if (!category) return null;
-    const config = categoryPageConfig[category];
+  getCollectionBySlug(slug: string): { collection: string; config: typeof collectionPageConfig[keyof typeof collectionPageConfig] } | null {
+    const collection = collectionFromSlug[slug];
+    if (!collection) return null;
+    const config = collectionPageConfig[collection];
     if (!config) return null;
-    return { category, config };
+    return { collection, config };
   },
 
-  getCategoryCollections(): Collection[] {
+  getCollectionsCards(): Collection[] {
     const totals: Record<string, number> = {};
     const materialCounts: Record<string, Record<string, number>> = {};
     for (const p of productStore) {
-      totals[p.category] = (totals[p.category] || 0) + 1;
-      if (!materialCounts[p.category]) materialCounts[p.category] = {};
-      materialCounts[p.category][p.material] = (materialCounts[p.category][p.material] || 0) + 1;
+      totals[p.collection] = (totals[p.collection] || 0) + 1;
+      if (!materialCounts[p.collection]) materialCounts[p.collection] = {};
+      materialCounts[p.collection][p.material] = (materialCounts[p.collection][p.material] || 0) + 1;
     }
 
     const catLookup: Record<string, any> = {};
-    for (const c of categoryStore) {
+    for (const c of collectionStore) {
       const key = c.name?.en?.toUpperCase() || '';
       catLookup[key] = c;
     }
@@ -250,11 +250,11 @@ export const productService = {
     }
 
     let idx = 0;
-    return Object.entries(totals).map(([category, count]) => {
+    return Object.entries(totals).map(([collection, count]) => {
       idx++;
-      const config = categoryConfigMap[category];
-      const catData = catLookup[category];
-      const matCounts = Object.entries(materialCounts[category] || {})
+      const config = collectionConfigMap[collection];
+      const catData = catLookup[collection];
+      const matCounts = Object.entries(materialCounts[collection] || {})
         .sort(([, a], [, b]) => b - a)
         .slice(0, 4)
         .map(([material, cnt]) => ({ material, count: cnt }));
@@ -268,19 +268,19 @@ export const productService = {
           materialCounts: matCounts,
           glowStyle: config.glowStyle,
           borderColor: config.borderColor,
-          slug: categorySlugMap[category] || category.toLowerCase().replace(/\s+/g, '-'),
+          slug: collectionSlugMap[collection] || collection.toLowerCase().replace(/\s+/g, '-'),
         };
       }
 
       return {
         id: String(idx).padStart(2, '0'),
-        nepaliTitle: catData?.name?.np || category,
-        englishTitle: catData?.name?.en || category,
+        nepaliTitle: catData?.name?.np || collection,
+        englishTitle: catData?.name?.en || collection,
         pieces: `${count} ${count === 1 ? 'PIECE' : 'PIECES'}`,
         materialCounts: matCounts,
         glowStyle: 'radial-gradient(circle at 40% 40%, rgba(213,165,96,0.18) 0%, rgba(14,11,8,0) 70%)',
         borderColor: 'border-amber-900/20',
-        slug: category.toLowerCase().replace(/\s+/g, '-'),
+        slug: collection.toLowerCase().replace(/\s+/g, '-'),
       };
     });
   },
@@ -348,7 +348,7 @@ export const productService = {
 
   reset(): void {
     productStore = [];
-    categoryStore = [];
+    collectionStore = [];
     materialStore = [];
     groupStore = [];
   },

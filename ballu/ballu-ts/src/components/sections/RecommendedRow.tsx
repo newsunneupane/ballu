@@ -18,10 +18,10 @@ export default function RecommendedRow() {
 
   useEffect(() => {
     if (!dataReady) return;
-    const { category, material } = getAffinity();
-    if (category || material) {
+    const { collection, material } = getAffinity();
+    if (collection || material) {
       const filtered = productService.getFiltered({
-        categories: category ? [category] : ['ALL'],
+        collections: collection ? [collection] : ['ALL'],
         material: material || 'ALL',
         sort: 'most-viewed',
       });

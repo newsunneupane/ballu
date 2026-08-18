@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import CustomRequest from '@/lib/models/CustomRequest';
 
-const ALLOWED_FIELDS = ['username', 'phoneNumber', 'category', 'material', 'pieceType', 'budgetNrs', 'description', 'images'];
+const ALLOWED_FIELDS = ['username', 'phoneNumber', 'collection', 'material', 'pieceType', 'budgetNrs', 'description', 'images'];
 
 function sanitizeBody(body: Record<string, unknown>) {
   const allowed: Record<string, unknown> = {};
@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
 
     await connectDB();
     const request = await CustomRequest.create(sanitized);
-    const toPopulate: string[] = ['category'];
+    const toPopulate: string[] = ['collection'];
     if (sanitized.material) toPopulate.push('material');
     const populated = await request.populate(toPopulate);
     return NextResponse.json(populated, { status: 201, headers: { 'Cache-Control': 'no-store' } });

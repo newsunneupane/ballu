@@ -122,7 +122,7 @@ function FeaturedCard({ potw }: { potw: any }) {
   const purity = item?.purity || '';
   const weight = item?.weightGrams ? `${item.weightGrams} G` : '';
   const detailStr = [purity, weight].filter(Boolean).join(' . ');
-  const categoryName = potw?.category?.name?.en || '';
+  const collectionName = potw?.collection?.name?.en || '';
   const materialName = potw?.material?.name?.en || '';
 
   return (
@@ -146,7 +146,7 @@ function FeaturedCard({ potw }: { potw: any }) {
         <div className="space-y-1">
           <h3 className="text-[20px] mx-2 font-normal text-bj-text-heading">{item?.name?.en || 'Piece of the Week'}</h3>
           <p className="text-[10px] mx-2 tracking-wider font-sans opacity-50">
-            {detailStr || [materialName, categoryName].filter(Boolean).join(' · ') || '—'}
+            {detailStr || [materialName, collectionName].filter(Boolean).join(' · ') || '—'}
           </p>
           <div className="pt-1 mx-2">
             <span className="inline-flex items-center gap-1 text-[12px] tracking-widest font-semibold text-bj-gold-richer group/view cursor-pointer">

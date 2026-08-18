@@ -8,7 +8,7 @@ import { errorResponse } from '@/lib/api-utils';
 export const dynamic = 'force-dynamic';
 
 interface BulkItem {
-  category?: string;
+  collection?: string;
   group?: string;
   name?: { en?: string; np?: string };
   weightGrams?: number;
@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
     const conditions = prepared
       .filter((i) => i.name?.en && i.name?.np)
       .map((i) => ({
-        category: i.category,
+        collection: i.collection,
         material: i.material,
         'name.en': { $regex: new RegExp(`^${i.name!.en!.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') },
         'name.np': i.name!.np,

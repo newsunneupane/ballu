@@ -7,7 +7,7 @@ export async function GET() {
   await connectDB();
   const settings = await StoreSettings.findOne()
     .populate('pieceOfTheWeek.material', 'name')
-    .populate('pieceOfTheWeek.category', 'name')
+    .populate('pieceOfTheWeek.collection', 'name')
     .populate('pieceOfTheWeek.item', 'name images purity weightGrams material wastagePercent makingCharges accessoriesCharge boutiqueDeduction diamondValue caratWeight isAvailable showPrice estimatedMakingDays')
     .lean();
   if (!settings) {

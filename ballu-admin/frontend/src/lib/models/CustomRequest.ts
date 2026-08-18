@@ -1,9 +1,9 @@
-import mongoose, { Schema, Document, Types } from 'mongoose';
+import mongoose, { Schema, Types } from 'mongoose';
 
-export interface ICustomRequest extends Document {
+export interface ICustomRequest {
+  collection: Types.ObjectId;
   username: string;
   phoneNumber: string;
-  category: Types.ObjectId;
   material?: Types.ObjectId;
   pieceType?: string;
   budgetNrs: number;
@@ -17,7 +17,7 @@ const CustomRequestSchema = new Schema<ICustomRequest>(
   {
     username: { type: String, required: true },
     phoneNumber: { type: String, required: true },
-    category: { type: Schema.Types.ObjectId, ref: 'Category', required: true },
+    collection: { type: Schema.Types.ObjectId, ref: 'Collection', required: true },
     material: { type: Schema.Types.ObjectId, ref: 'Material' },
     pieceType: { type: String },
     budgetNrs: { type: Number, required: true },

@@ -102,7 +102,7 @@ export default function CustomRequestsPage() {
                   <p>📞 {r.phoneNumber}</p>
                   {r.pieceType && <p className="text-xs">Piece: {r.pieceType}</p>}
                   <p>
-                    Collection: {r.category?.name?.en || 'N/A'}
+                    Collection: {r.collection?.name?.en || 'N/A'}
                     {r.material?.name?.en ? ` · Material: ${r.material.name.en}` : ''}
                     {' · '}Budget: Rs {r.budgetNrs?.toLocaleString()}
                   </p>

@@ -4,7 +4,7 @@ import { requireAuth } from '@/lib/auth/middleware';
 import { errorResponse } from '@/lib/api-utils';
 import Item from '@/lib/models/Item';
 import Material from '@/lib/models/Material';
-import Category from '@/lib/models/Category';
+import Collection from '@/lib/models/Collection';
 import CustomRequest from '@/lib/models/CustomRequest';
 import ItemInquiry from '@/lib/models/ItemInquiry';
 
@@ -17,11 +17,11 @@ export async function GET(req: NextRequest) {
 
     await connectDB();
 
-    const [items, materials, categories, customRequests, pendingRequests, itemInquiries, pendingInquiries] =
+    const [items, materials, collections, customRequests, pendingRequests, itemInquiries, pendingInquiries] =
       await Promise.all([
         Item.countDocuments(),
         Material.countDocuments(),
-        Category.countDocuments(),
+        Collection.countDocuments(),
         CustomRequest.countDocuments(),
         CustomRequest.countDocuments({ status: 'Pending' }),
         ItemInquiry.countDocuments(),
@@ -29,7 +29,7 @@ export async function GET(req: NextRequest) {
       ]);
 
     return NextResponse.json(
-      { items, materials, categories, customRequests, pendingRequests, itemInquiries, pendingInquiries },
+      { items, materials, collections, customRequests, pendingRequests, itemInquiries, pendingInquiries },
       { headers: { 'Cache-Control': 'no-store' } }
     );
   } catch (err) {

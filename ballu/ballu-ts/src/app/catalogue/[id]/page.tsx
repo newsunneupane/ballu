@@ -7,7 +7,7 @@ import { Cormorant_Garamond, Tenor_Sans } from "next/font/google";
 import { productService } from "@/services/product-service";
 import { useProductData } from "@/hooks/useProductData";
 import { cloudinaryUrl } from "@/lib/cloudinary";
-import { categorySlugMap } from "@/data/collections";
+import { collectionSlugMap } from "@/data/collections";
 import { useCurrency } from "@/hooks/useCurrency";
 import { buildWhatsappLink } from "@/lib/utils/whatsapp";
 import { useStoreSettings, whatsappNumber } from "@/hooks/useStoreSettings";
@@ -50,7 +50,7 @@ export default function ProductDetail() {
 
   useEffect(() => {
     if (!product) return;
-    recordView({ id: product.id, category: product.category, material: product.material });
+    recordView({ id: product.id, collection: product.collection, material: product.material });
     const sessionKey = `bj_viewed_${product.id}`;
     if (sessionStorage.getItem(sessionKey)) return;
     sessionStorage.setItem(sessionKey, '1');
@@ -58,7 +58,7 @@ export default function ProductDetail() {
   }, [product?.id]);
 
   const similarProducts = product
-    ? productService.getRecommended({ excludeId: product.id, category: product.category, material: product.material, limit: 4 })
+    ? productService.getRecommended({ excludeId: product.id, collection: product.collection, material: product.material, limit: 4 })
     : [];
 
   useEffect(() => {
@@ -75,9 +75,9 @@ export default function ProductDetail() {
 
   const hasGallery = images.length > 1;
 
-  const categorySlug =
-    categorySlugMap[product?.category as keyof typeof categorySlugMap] ||
-    (product?.category || "").toLowerCase().replace(/\s+/g, "-");
+  const collectionSlug =
+    collectionSlugMap[product?.collection as keyof typeof collectionSlugMap] ||
+    (product?.collection || "").toLowerCase().replace(/\s+/g, "-");
 
   if (!dataReady) {
     return (
@@ -106,7 +106,7 @@ export default function ProductDetail() {
           <span>·</span>
           <Link href="/catalogue" className="hover:text-bj-gold-alt cursor-pointer transition-colors">Catalogue</Link>
           <span>·</span>
-          <Link href={`/${categorySlug}`} className="hover:text-bj-gold-alt cursor-pointer transition-colors">{product.category}</Link>
+          <Link href={`/${collectionSlug}`} className="hover:text-bj-gold-alt cursor-pointer transition-colors">{product.collection}</Link>
           <span>·</span>
           <span>{product.title}</span>
         </nav>

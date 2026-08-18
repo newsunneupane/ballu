@@ -1,3 +1,3 @@
 export { CATEGORIES, MATERIALS } from './products';
-export { categoryConfigMap, categorySlugMap, categoryFromSlug, categoryPageConfig } from './collections';
+export { collectionConfigMap, collectionSlugMap, collectionFromSlug, collectionPageConfig } from './collections';
 export { siteConfig, brandFeatures, PIECE_TYPES, BUDGET_RANGE } from './site';

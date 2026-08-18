@@ -22,8 +22,8 @@ const tenorSans = Tenor_Sans({
 });
 
 export default function CommissionPage() {
-  const [categories, setCategories] = useState<any[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const [collections, setCollections] = useState<any[]>([]);
+  const [selectedCollection, setSelectedCollection] = useState<string>("");
   const [pieceType, setPieceType] = useState("");
   const [customPieceType, setCustomPieceType] = useState("");
   const [selectedMaterial, setSelectedMaterial] = useState<string>("");
@@ -39,10 +39,10 @@ export default function CommissionPage() {
   const [error, setError] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const { data: cats = [] } = useQuery({
-    queryKey: ['categories'],
+  const { data: cols = [] } = useQuery({
+    queryKey: ['collections'],
     queryFn: async () => {
-      const r = await fetch('/api/categories');
+      const r = await fetch('/api/collections');
       return r.ok ? r.json() : [];
     },
   });
@@ -63,7 +63,7 @@ export default function CommissionPage() {
     },
   });
 
-  if (cats.length > 0 && !selectedCategory) setSelectedCategory(cats[0]._id);
+  if (cols.length > 0 && !selectedCollection) setSelectedCollection(cols[0]._id);
   if (mats.length > 0 && !selectedMaterial) setSelectedMaterial(mats[0]._id);
 
   const MAX_IMAGE_SIZE = 2 * 1024 * 1024;
@@ -139,7 +139,7 @@ export default function CommissionPage() {
   };
 
   const handleSubmit = async () => {
-    if (!name.trim() || !phone.trim() || !selectedCategory) {
+    if (!name.trim() || !phone.trim() || !selectedCollection) {
       setError("Please fill in your name and phone number.");
       return;
     }
@@ -157,7 +157,7 @@ export default function CommissionPage() {
         body: JSON.stringify({
           username: name.trim(),
           phoneNumber: phone.trim(),
-          category: selectedCategory,
+          collection: selectedCollection,
           material: selectedMaterial || undefined,
           pieceType: finalPieceType,
           budgetNrs: budget,

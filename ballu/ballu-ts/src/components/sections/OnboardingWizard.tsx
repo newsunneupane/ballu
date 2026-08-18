@@ -35,10 +35,10 @@ export default function OnboardingWizard() {
     enabled: mounted,
   });
 
-  const { data: categories = [] } = useQuery<Option[]>({
-    queryKey: ['onboarding-categories'],
+  const { data: collections = [] } = useQuery<Option[]>({
+    queryKey: ['onboarding-collections'],
     queryFn: async () => {
-      const res = await fetch('/api/categories');
+      const res = await fetch('/api/collections');
       return res.ok ? res.json() : [];
     },
     enabled: mounted && step === 1,
@@ -46,14 +46,14 @@ export default function OnboardingWizard() {
 
   if (!mounted) return null;
 
-  const close = (material?: Option, category?: Option) => {
+  const close = (material?: Option, collection?: Option) => {
     markOnboardingSeen();
     setVisible(false);
     setTimeout(() => {
       setMounted(false);
       const params = new URLSearchParams();
       if (material) params.set('material', material.name.en);
-      if (category) params.set('category', category.name.en);
+      if (collection) params.set('collection', collection.name.en);
       const qs = params.toString();
       if (qs) router.push(`/catalogue?${qs}`);
     }, 400);
@@ -111,7 +111,7 @@ export default function OnboardingWizard() {
               For which occasion?
             </h1>
             <div className="flex flex-wrap items-center justify-center gap-3">
-              {categories.map((c) => (
+              {collections.map((c) => (
                 <button
                   key={c._id}
                   onClick={() => close(material || undefined, c)}
@@ -120,7 +120,7 @@ export default function OnboardingWizard() {
                   {c.name.en}
                 </button>
               ))}
-              {categories.length === 0 && (
+              {collections.length === 0 && (
                 <span className={`${tenorSans.className} text-xs text-bj-text-dim`}>Loading…</span>
               )}
             </div>

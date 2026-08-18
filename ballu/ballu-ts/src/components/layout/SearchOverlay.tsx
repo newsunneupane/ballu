@@ -131,7 +131,7 @@ export default function SearchOverlay({ onClose }: { onClose: () => void }) {
                         </p>
                         <div className="flex items-center gap-2 mt-0.5">
                           <span className="text-[10px] text-bj-text-muted uppercase tracking-wider font-sans">
-                            {product.category}
+                            {product.collection}
                           </span>
                           <span className="text-bj-text-separator text-[10px]">|</span>
                           <span className="flex items-center gap-1">

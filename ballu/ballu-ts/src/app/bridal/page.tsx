@@ -5,7 +5,7 @@ export default function BridalPage() {
   return (
     <Suspense>
       <CatalogueContent
-        defaultCategory="BRIDAL"
+        defaultCollection="BRIDAL"
         title="Bridal Heritage."
         subtitle="बेहुलीको शृङ्गार"
         breadcrumb="Home · Bridal"

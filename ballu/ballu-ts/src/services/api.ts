@@ -20,8 +20,8 @@ export const api = {
     },
     get: (id: string) => request<any>(`/items/${id}`),
   },
-  categories: {
-    list: () => request<any[]>('/categories'),
+  collections: {
+    list: () => request<any[]>('/collections'),
   },
   materials: {
     list: () => request<any[]>('/materials'),

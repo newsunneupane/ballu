@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs';
 import { connectDB } from '@/lib/db';
 import User from '@/lib/models/User';
 import Material from '@/lib/models/Material';
-import Category from '@/lib/models/Category';
+import Collection from '@/lib/models/Collection';
 import Group from '@/lib/models/Group';
 import Item from '@/lib/models/Item';
 import { requireAuth } from '@/lib/auth/middleware';
@@ -130,7 +130,7 @@ export async function POST(req: NextRequest) {
       materialGroups[matKey] = ids;
     }
 
-    const categoryData = [
+    const collectionData = [
       { en: 'Bridal', np: 'वैवाहिक', desc: 'Bridal jewellery collection' },
       { en: 'Festive', np: 'पर्व', desc: 'Festive season collection' },
       { en: 'Daily Wear', np: 'दैनिक', desc: 'Everyday essentials' },
@@ -139,14 +139,14 @@ export async function POST(req: NextRequest) {
       { en: 'Gift', np: 'उपहार', desc: 'Gifting collection' },
       { en: 'Others', np: 'अन्य', desc: 'Other jewellery designs' },
     ];
-    const categoryIds: Record<string, string> = {};
-    for (const c of categoryData) {
-      let cat = await Category.findOne({ 'name.en': c.en });
+    const collectionIds: Record<string, string> = {};
+    for (const c of collectionData) {
+      let cat = await Collection.findOne({ 'name.en': c.en });
       if (!cat) {
-        cat = await Category.create({ name: { en: c.en, np: c.np }, description: c.desc });
-        created.push(`Category: ${c.en}`);
+        cat = await Collection.create({ name: { en: c.en, np: c.np }, description: c.desc });
+        created.push(`Collection: ${c.en}`);
       }
-      categoryIds[c.en] = cat._id.toString();
+      collectionIds[c.en] = cat._id.toString();
     }
 
     if (!seedItems) {
@@ -155,7 +155,7 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    const catKeys = Object.keys(categoryIds);
+    const catKeys = Object.keys(collectionIds);
     const matKeys = Object.keys(materialIds);
     const items = ITEM_NAMES.map((name) => {
       const catKey = pick(catKeys);
@@ -169,7 +169,7 @@ export async function POST(req: NextRequest) {
       const caratWeight = diamondValue > 0 ? Math.round(rand(0.3, 3) * 100) / 100 : undefined;
 
       return {
-        category: categoryIds[catKey],
+        collection: collectionIds[catKey],
         material: materialIds[matKey],
         group: pick(materialGroups[matKey]),
         name,

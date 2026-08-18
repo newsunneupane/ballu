@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
     const status = searchParams.get('status');
     if (status) filter.status = status;
 
-    const requests = await CustomRequest.find(filter).populate('category', 'name').populate('material', 'name').sort({ createdAt: -1 });
+    const requests = await CustomRequest.find(filter).populate('collection', 'name').populate('material', 'name').sort({ createdAt: -1 });
     return NextResponse.json(requests, {
       headers: { 'Cache-Control': 'no-store' },
     });
@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
     await connectDB();
     const body = await req.json();
     const request = await CustomRequest.create(body);
-    const toPopulate: string[] = ['category'];
+    const toPopulate: string[] = ['collection'];
     if (body.material) toPopulate.push('material');
     const populated = await request.populate(toPopulate);
     return NextResponse.json(populated, { status: 201, headers: { 'Cache-Control': 'no-store' } });

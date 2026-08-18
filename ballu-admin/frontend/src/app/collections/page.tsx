@@ -5,17 +5,17 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
 import { Plus, Pencil, Trash2, X } from 'lucide-react';
 
-export default function CategoriesPage() {
+export default function CollectionsPage() {
   const queryClient = useQueryClient();
-  const { data: categories = [] } = useQuery({
-    queryKey: ['categories'],
-    queryFn: api.categories.list,
+  const { data: collections = [] } = useQuery({
+    queryKey: ['collections'],
+    queryFn: api.collections.list,
   });
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<any>(null);
   const [form, setForm] = useState({ nameEn: '', nameNp: '', description: '' });
 
-  const invalidate = () => queryClient.invalidateQueries({ queryKey: ['categories'] });
+  const invalidate = () => queryClient.invalidateQueries({ queryKey: ['collections'] });
 
   const openNew = () => {
     setEditing(null);
@@ -36,9 +36,9 @@ export default function CategoriesPage() {
     const payload = { name: { en: form.nameEn, np: form.nameNp }, description: form.description };
     try {
       if (editing) {
-        await api.categories.update(editing._id, payload);
+        await api.collections.update(editing._id, payload);
       } else {
-        await api.categories.create(payload);
+        await api.collections.create(payload);
       }
       setShowForm(false);
       invalidate();
@@ -53,7 +53,7 @@ export default function CategoriesPage() {
     if (!confirm('Delete this collection?')) return;
     try {
       setDeleteError('');
-      await api.categories.delete(id);
+      await api.collections.delete(id);
       invalidate();
     } catch (err: any) {
       setDeleteError(err.message);
@@ -80,7 +80,7 @@ export default function CategoriesPage() {
             </tr>
           </thead>
           <tbody>
-            {categories.map((c: any) => (
+            {collections.map((c: any) => (
               <tr key={c._id} className="border-b border-[#e5ded2]/50 last:border-0 hover:bg-black/5">
                 <td className="px-5 py-3 text-[#26221d]">{c.name.en}</td>
                 <td className="px-5 py-3 text-[#26221d]">{c.name.np}</td>
@@ -91,8 +91,8 @@ export default function CategoriesPage() {
                 </td>
               </tr>
             ))}
-            {categories.length === 0 && (
-              <tr><td colSpan={4} className="px-5 py-8 text-center text-[#6b655b]">No categories yet</td></tr>
+            {collections.length === 0 && (
+              <tr><td colSpan={4} className="px-5 py-8 text-center text-[#6b655b]">No collections yet</td></tr>
             )}
             {deleteError && (
               <tr><td colSpan={4} className="px-5 py-3 text-center text-red-600 text-sm bg-red-50">{deleteError}</td></tr>

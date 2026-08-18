@@ -14,14 +14,14 @@ export async function GET(req: NextRequest) {
     await connectDB();
     const { searchParams } = new URL(req.url);
     const filter: Record<string, unknown> = {};
-    const category = searchParams.get('category');
+    const collection = searchParams.get('collection');
     const material = searchParams.get('material');
     const tag = searchParams.get('tag');
-    if (category) {
-      if (!isValidObjectId(category)) {
-        return NextResponse.json({ error: 'Invalid category parameter' }, { status: 400 });
+    if (collection) {
+      if (!isValidObjectId(collection)) {
+        return NextResponse.json({ error: 'Invalid collection parameter' }, { status: 400 });
       }
-      filter.category = category;
+      filter.collection = collection;
     }
     if (material) {
       if (!isValidObjectId(material)) {
@@ -37,7 +37,7 @@ export async function GET(req: NextRequest) {
     }
 
     const items = await Item.find(filter)
-      .populate('category', 'name')
+      .populate('collection', 'name')
       .populate('material', 'name')
       .populate('group', 'name')
       .sort({ createdAt: -1 })

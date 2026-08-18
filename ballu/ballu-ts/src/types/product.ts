@@ -11,7 +11,7 @@ export interface Pricing {
 export interface Product {
   id: string | number;
   tag: string | null;
-  category: string;
+  collection: string;
   type: string;
   material: string;
   title: string;
@@ -36,7 +36,7 @@ export interface Product {
 export type SortOption = 'newest' | 'price-asc' | 'price-desc' | 'most-viewed';
 
 export interface ProductFilters {
-  categories: string[];
+  collections: string[];
   material: string;
   purity?: string;
   tag: string;

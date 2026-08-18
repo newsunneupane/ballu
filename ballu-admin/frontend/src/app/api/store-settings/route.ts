@@ -6,12 +6,12 @@ import { errorResponse } from '@/lib/api-utils';
 
 export const dynamic = 'force-dynamic';
 
-function sanitizePieceOfTheWeek(pieceOfTheWeek: { item?: string; material?: string; category?: string } | null | undefined) {
+function sanitizePieceOfTheWeek(pieceOfTheWeek: { item?: string; material?: string; collection?: string } | null | undefined) {
   if (!pieceOfTheWeek || !pieceOfTheWeek.item) return null;
   return {
     item: pieceOfTheWeek.item,
     material: pieceOfTheWeek.material || undefined,
-    category: pieceOfTheWeek.category || undefined,
+    collection: pieceOfTheWeek.collection || undefined,
   };
 }
 

@@ -14,7 +14,7 @@ export interface IStoreSettings extends Document {
   tickerItems: string[];
   pieceOfTheWeek?: {
     material: Types.ObjectId;
-    category: Types.ObjectId;
+    collection: Types.ObjectId;
     item: Types.ObjectId;
   };
 }
@@ -38,7 +38,7 @@ const StoreSettingsSchema = new Schema<IStoreSettings>(
     pieceOfTheWeek: {
       type: {
         material: { type: Schema.Types.ObjectId, ref: 'Material' },
-        category: { type: Schema.Types.ObjectId, ref: 'Category' },
+        collection: { type: Schema.Types.ObjectId, ref: 'Collection' },
         item: { type: Schema.Types.ObjectId, ref: 'Item' },
       },
       default: undefined,

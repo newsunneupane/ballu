@@ -8,7 +8,7 @@ Built with Next.js 16, TypeScript, and Tailwind CSS.
 |---|---|
 | `/` | Home |
 | `/bridal` | Bridal collection |
-| `/[category]` | Dynamic category pages (festive, daily-wear, engagement, office, gift) |
+| `/[collection]` | Dynamic collection pages (festive, daily-wear, engagement, office, gift) |
 | `/catalogue` | Full catalogue with filters |
 | `/catalogue/[id]` | Product detail |
 | `/personalize` | Commission form |

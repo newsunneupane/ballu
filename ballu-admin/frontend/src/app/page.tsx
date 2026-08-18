@@ -9,7 +9,7 @@ export default function DashboardPage() {
   const { data: stats, isLoading } = useQuery({
     queryKey: ['dashboard-stats'],
     queryFn: () => api.request<{
-      items: number; materials: number; categories: number;
+      items: number; materials: number; collections: number;
       customRequests: number; pendingRequests: number;
       itemInquiries: number; pendingInquiries: number;
     }>('/dashboard/stats'),
@@ -25,7 +25,7 @@ export default function DashboardPage() {
   const cards = [
     { label: 'Items', value: stats?.items, icon: Package, color: 'text-blue-700', href: '/items' },
     { label: 'Materials', value: stats?.materials, icon: Gem, color: 'text-emerald-700', href: '/materials' },
-    { label: 'Collections', value: stats?.categories, icon: Tag, color: 'text-purple-700', href: '/categories' },
+    { label: 'Collections', value: stats?.collections, icon: Tag, color: 'text-purple-700', href: '/collections' },
     { label: 'Custom Requests', value: stats?.customRequests, icon: MessageSquare, color: 'text-amber-700', href: '/custom-requests' },
     { label: 'Pending Requests', value: stats?.pendingRequests, icon: MessageSquare, color: 'text-red-600', href: '/custom-requests' },
     { label: 'Item Inquiries', value: stats?.itemInquiries, icon: PhoneCall, color: 'text-cyan-700', href: '/item-inquiries' },

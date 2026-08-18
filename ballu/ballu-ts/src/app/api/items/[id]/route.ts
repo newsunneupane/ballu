@@ -9,7 +9,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
   try {
     const { id } = await params;
     await connectDB();
-    const item = await Item.findById(id).populate('category', 'name').populate('material', 'name').populate('group', 'name').lean();
+    const item = await Item.findById(id).populate('collection', 'name').populate('material', 'name').populate('group', 'name').lean();
     if (!item) return NextResponse.json({ error: 'Item not found' }, { status: 404, headers: { 'Cache-Control': 'no-store' } });
 
     try {

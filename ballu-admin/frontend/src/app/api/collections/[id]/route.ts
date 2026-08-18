@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
-import Category from '@/lib/models/Category';
+import Collection from '@/lib/models/Collection';
 import { requireAuth } from '@/lib/auth/middleware';
 import { errorResponse } from '@/lib/api-utils';
 
@@ -12,9 +12,9 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
     if (authResult) return authResult;
     const { id } = await params;
     await connectDB();
-    const category = await Category.findById(id);
-    if (!category) return NextResponse.json({ error: 'Collection not found' }, { status: 404, headers: { 'Cache-Control': 'no-store' } });
-    return NextResponse.json(category, {
+    const collection = await Collection.findById(id);
+    if (!collection) return NextResponse.json({ error: 'Collection not found' }, { status: 404, headers: { 'Cache-Control': 'no-store' } });
+    return NextResponse.json(collection, {
       headers: { 'Cache-Control': 'no-store' },
     });
   } catch (err) {
@@ -31,7 +31,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     const body = await req.json();
 
     if (body.name?.en || body.name?.np) {
-      const existing = await Category.findOne({
+      const existing = await Collection.findOne({
         _id: { $ne: id },
         $or: [
           ...(body.name?.en ? [{ 'name.en': { $regex: new RegExp(`^${body.name.en.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') } }] : []),
@@ -43,9 +43,9 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       }
     }
 
-    const category = await Category.findByIdAndUpdate(id, body, { new: true, runValidators: true });
-    if (!category) return NextResponse.json({ error: 'Category not found' }, { status: 404, headers: { 'Cache-Control': 'no-store' } });
-    return NextResponse.json(category, {
+    const collection = await Collection.findByIdAndUpdate(id, body, { new: true, runValidators: true });
+    if (!collection) return NextResponse.json({ error: 'Collection not found' }, { status: 404, headers: { 'Cache-Control': 'no-store' } });
+    return NextResponse.json(collection, {
       headers: { 'Cache-Control': 'no-store' },
     });
   } catch (err) {
@@ -59,8 +59,8 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     if (authError) return authError;
     const { id } = await params;
     await connectDB();
-    const category = await Category.findByIdAndDelete(id);
-    if (!category) return NextResponse.json({ error: 'Collection not found' }, { status: 404, headers: { 'Cache-Control': 'no-store' } });
+    const collection = await Collection.findByIdAndDelete(id);
+    if (!collection) return NextResponse.json({ error: 'Collection not found' }, { status: 404, headers: { 'Cache-Control': 'no-store' } });
     return NextResponse.json({ message: 'Collection deleted' }, {
       headers: { 'Cache-Control': 'no-store' },
     });

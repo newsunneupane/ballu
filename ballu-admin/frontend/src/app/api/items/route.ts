@@ -15,15 +15,15 @@ export async function GET(req: NextRequest) {
     await connectDB();
     const { searchParams } = new URL(req.url);
     const filter: Record<string, unknown> = {};
-    const category = searchParams.get('category');
+    const collection = searchParams.get('collection');
     const material = searchParams.get('material');
     const tag = searchParams.get('tag');
-    if (category) filter.category = category;
+    if (collection) filter.collection = collection;
     if (material) filter.material = material;
     if (tag) filter.tag = tag;
 
     const items = await Item.find(filter)
-      .populate('category', 'name')
+      .populate('collection', 'name')
       .populate('material', 'name')
       .populate('group', 'name')
       .sort({ createdAt: -1 })
@@ -68,10 +68,10 @@ export async function POST(req: NextRequest) {
     await connectDB();
     const body = await req.json();
 
-    if (!body.category) {
+    if (!body.collection) {
       return badRequest('Collection is required');
     }
-    if (!isObjectId(body.category)) {
+    if (!isObjectId(body.collection)) {
       return badRequest('Invalid collection');
     }
     if (!body.name?.en || !body.name?.np) {
@@ -117,7 +117,7 @@ export async function POST(req: NextRequest) {
     const material = (group as { material: { toString(): string } }).material.toString();
 
     const existing = await Item.findOne({
-      category: body.category,
+      collection: body.collection,
       material: body.material,
       $or: [
         { 'name.en': { $regex: new RegExp(`^${body.name?.en?.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') || ''}$`, 'i') } },
@@ -125,11 +125,11 @@ export async function POST(req: NextRequest) {
       ],
     });
     if (existing) {
-      return NextResponse.json({ error: 'An item with this name already exists in this category & material' }, { status: 409, headers: { 'Cache-Control': 'no-store' } });
+      return NextResponse.json({ error: 'An item with this name already exists in this collection & material' }, { status: 409, headers: { 'Cache-Control': 'no-store' } });
     }
 
     const item = await Item.create({ ...body, material, purity, manualPriceNpr: body.manualPriceNpr != null ? Number(body.manualPriceNpr) : undefined });
-    const populated = await item.populate(['category', 'material', 'group']);
+    const populated = await item.populate(['collection', 'material', 'group']);
     return NextResponse.json(populated, { status: 201, headers: { 'Cache-Control': 'no-store' } });
   } catch (err) {
     return errorResponse(err);

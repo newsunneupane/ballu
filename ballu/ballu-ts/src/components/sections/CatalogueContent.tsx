@@ -34,7 +34,7 @@ const tenorSans = Tenor_Sans({
 });
 
 interface CatalogueContentProps {
-  defaultCategory?: string;
+  defaultCollection?: string;
   title?: string;
   subtitle?: string;
   breadcrumb?: string;
@@ -42,18 +42,18 @@ interface CatalogueContentProps {
 }
 
 export default function CatalogueContent({
-  defaultCategory,
+  defaultCollection,
   title,
   subtitle,
   breadcrumb,
   hideCategories,
 }: CatalogueContentProps) {
   const searchParams = useSearchParams();
-  const urlCategory = searchParams.get('category')?.toUpperCase();
+  const urlCollection = searchParams.get('collection')?.toUpperCase();
   const urlMaterial = searchParams.get('material')?.toUpperCase();
 
-  const [activeCategories, setActiveCategories] = useState<string[]>(
-    urlCategory ? [urlCategory] : defaultCategory ? [defaultCategory] : ['ALL']
+  const [activeCollections, setActiveCollections] = useState<string[]>(
+    urlCollection ? [urlCollection] : defaultCollection ? [defaultCollection] : ['ALL']
   );
   const [activeMaterial, setActiveMaterial] = useState(urlMaterial || 'ALL');
   const [activeGroup, setActiveGroup] = useState('ALL');
@@ -66,12 +66,12 @@ export default function CatalogueContent({
   const { containerRef, isFixed } = useFilterSticky(50);
   const dataReady = useProductData();
 
-  const handleCategoryClick = (cat: string) => {
+  const handleCollectionClick = (cat: string) => {
     if (cat === 'ALL') {
-      setActiveCategories(['ALL']);
+      setActiveCollections(['ALL']);
       return;
     }
-    let updated = [...activeCategories];
+    let updated = [...activeCollections];
     if (updated.includes('ALL')) {
       updated = updated.filter((c) => c !== 'ALL');
     }
@@ -81,13 +81,13 @@ export default function CatalogueContent({
     } else {
       updated.push(cat);
     }
-    setActiveCategories(updated);
+    setActiveCollections(updated);
   };
 
-  const categoryButtons = useMemo(() => {
-    const dbCategories = productService.getCategoriesList();
-    if (dbCategories.length > 0) {
-      return ['ALL', ...dbCategories.map((c: any) => c.name?.en?.toUpperCase() || '')];
+  const collectionButtons = useMemo(() => {
+    const dbCollections = productService.getCollectionsList();
+    if (dbCollections.length > 0) {
+      return ['ALL', ...dbCollections.map((c: any) => c.name?.en?.toUpperCase() || '')];
     }
     return [...HARDCODED_CATEGORIES];
   }, [dataReady]);
@@ -114,7 +114,7 @@ export default function CatalogueContent({
   }, [dataReady]);
 
   const filteredProducts = productService.getFiltered({
-    categories: activeCategories,
+    collections: activeCollections,
     material: activeMaterial,
     purity: activeGroup,
     tag: activeTag,
@@ -152,12 +152,12 @@ export default function CatalogueContent({
           <div className="flex flex-col gap-3 max-w-[100vw]">
             {!hideCategories && (
               <div className="flex overflow-x-auto whitespace-nowrap gap-2 items-center no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0 py-1">
-                {categoryButtons.map((cat) => {
-                  const isSelected = activeCategories.includes(cat);
+                {collectionButtons.map((cat) => {
+                  const isSelected = activeCollections.includes(cat);
                   return (
                     <button
                       key={cat}
-                      onClick={() => handleCategoryClick(cat)}
+                      onClick={() => handleCollectionClick(cat)}
                       className={`${tenorSans.className} inline-block px-3 py-1 text-[8px] hover:-translate-y-[2px] font-small tracking-widest transition-all border rounded-4xl uppercase shrink-0 ${
                         isSelected
                            ? 'border-bj-gold-alt text-bj-gold-alt  bg-bj-bg-elevated'
@@ -316,7 +316,7 @@ export default function CatalogueContent({
             <div className={`${tenorSans.className} border-b border-bj-border text-[10px] tracking-[0.25em] text-bj-text-dim uppercase grid grid-cols-[50px_2fr_1fr_100px] sm:grid-cols-[64px_2fr_1fr_1fr_1fr_1fr_1fr_120px] pb-4 items-center font-medium`}>
               <div />
               <div className="pl-4">Piece</div>
-              <div className="hidden sm:block">Category</div>
+              <div className="hidden sm:block">Collection</div>
               <div className="hidden sm:block">Material</div>
               <div className="hidden sm:block">Purity</div>
               <div className="hidden sm:block">Weight</div>

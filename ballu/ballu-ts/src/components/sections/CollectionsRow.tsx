@@ -29,7 +29,7 @@ const MATERIAL_COLORS: Record<string, string> = {
 
 export default function CollectionsRow() {
   const dataReady = useProductData();
-  const collections = productService.getCategoryCollections();
+  const collections = productService.getCollectionsCards();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);

@@ -1,7 +1,7 @@
-import mongoose, { Schema, Document, Types } from 'mongoose';
+import mongoose, { Schema, Types } from 'mongoose';
 
-export interface IItem extends Document {
-  category: Types.ObjectId;
+export interface IItem {
+  collection: Types.ObjectId;
   material: Types.ObjectId;
   group?: Types.ObjectId;
   name: { en: string; np: string };
@@ -26,7 +26,7 @@ export interface IItem extends Document {
 
 const ItemSchema = new Schema<IItem>(
   {
-    category: { type: Schema.Types.ObjectId, ref: 'Category', required: true },
+    collection: { type: Schema.Types.ObjectId, ref: 'Collection', required: true },
     material: { type: Schema.Types.ObjectId, ref: 'Material', required: true },
     group: { type: Schema.Types.ObjectId, ref: 'Group' },
     name: { en: { type: String, required: true }, np: { type: String, required: true } },

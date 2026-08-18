@@ -1,18 +1,18 @@
-export interface CategoryConfig {
+export interface CollectionConfig {
   nepaliTitle: string;
   englishTitle: string;
   glowStyle: string;
   borderColor: string;
 }
 
-export interface CategoryPageConfig {
+export interface CollectionPageConfig {
   slug: string;
   title: string;
   subtitle: string;
   breadcrumb: string;
 }
 
-export const categorySlugMap: Record<string, string> = {
+export const collectionSlugMap: Record<string, string> = {
   BRIDAL: 'bridal',
   FESTIVE: 'festive',
   'DAILY WEAR': 'daily-wear',
@@ -22,12 +22,12 @@ export const categorySlugMap: Record<string, string> = {
   OTHERS: 'others',
 };
 
-export const categoryFromSlug: Record<string, string> = {};
-for (const [cat, slug] of Object.entries(categorySlugMap)) {
-  categoryFromSlug[slug] = cat;
+export const collectionFromSlug: Record<string, string> = {};
+for (const [cat, slug] of Object.entries(collectionSlugMap)) {
+  collectionFromSlug[slug] = cat;
 }
 
-export const categoryPageConfig: Record<string, CategoryPageConfig> = {
+export const collectionPageConfig: Record<string, CollectionPageConfig> = {
   BRIDAL: {
     slug: 'bridal',
     title: 'Bridal Heritage.',
@@ -72,7 +72,7 @@ export const categoryPageConfig: Record<string, CategoryPageConfig> = {
   },
 };
 
-export const categoryConfigMap: Record<string, CategoryConfig> = {
+export const collectionConfigMap: Record<string, CollectionConfig> = {
   BRIDAL: {
     nepaliTitle: 'विवाह',
     englishTitle: 'Bridal Heritage',

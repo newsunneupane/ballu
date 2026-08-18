@@ -12,7 +12,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     if (authError) return authError;
     const { id } = await params;
     await connectDB();
-    const request = await CustomRequest.findById(id).populate('category', 'name').populate('material', 'name');
+    const request = await CustomRequest.findById(id).populate('collection', 'name').populate('material', 'name');
     if (!request) return NextResponse.json({ error: 'CustomRequest not found' }, { status: 404, headers: { 'Cache-Control': 'no-store' } });
     return NextResponse.json(request, {
       headers: { 'Cache-Control': 'no-store' },
@@ -29,7 +29,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     const { id } = await params;
     await connectDB();
     const body = await req.json();
-    const request = await CustomRequest.findByIdAndUpdate(id, body, { new: true, runValidators: true }).populate('category', 'name').populate('material', 'name');
+    const request = await CustomRequest.findByIdAndUpdate(id, body, { new: true, runValidators: true }).populate('collection', 'name').populate('material', 'name');
     if (!request) return NextResponse.json({ error: 'CustomRequest not found' }, { status: 404, headers: { 'Cache-Control': 'no-store' } });
     return NextResponse.json(request, {
       headers: { 'Cache-Control': 'no-store' },

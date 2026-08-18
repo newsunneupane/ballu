@@ -10,7 +10,7 @@ function getToken(): string | null {
 const RESOURCE_NAMES: Record<string, string> = {
   materials: 'Material',
   groups: 'Group',
-  categories: 'Collection',
+  collections: 'Collection',
   items: 'Item',
   'custom-requests': 'Custom request',
   'item-inquiries': 'Inquiry',
@@ -86,12 +86,12 @@ export const api = {
     update: (id: string, data: any) => request<any>(`/groups/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
     delete: (id: string) => request<any>(`/groups/${id}`, { method: 'DELETE' }),
   },
-  categories: {
-    list: () => request<any[]>('/categories'),
-    get: (id: string) => request<any>(`/categories/${id}`),
-    create: (data: any) => request<any>('/categories', { method: 'POST', body: JSON.stringify(data) }),
-    update: (id: string, data: any) => request<any>(`/categories/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
-    delete: (id: string) => request<any>(`/categories/${id}`, { method: 'DELETE' }),
+  collections: {
+    list: () => request<any[]>('/collections'),
+    get: (id: string) => request<any>(`/collections/${id}`),
+    create: (data: any) => request<any>('/collections', { method: 'POST', body: JSON.stringify(data) }),
+    update: (id: string, data: any) => request<any>(`/collections/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+    delete: (id: string) => request<any>(`/collections/${id}`, { method: 'DELETE' }),
   },
   items: {
     list: (params?: Record<string, string>) => {

@@ -74,7 +74,7 @@ export default function ProductCard({ product, viewMode = 'GRID' }: ProductCardP
           <div className="text-[10px] sm:text-xs font-light text-bj-text-muted mt-1 opacity-80 truncate">{product.subTitle}</div>
           <div className="sm:hidden text-[10px] text-bj-text-dim tracking-wide mt-1">{product.material} • {product.karat} • {product.weight.toLowerCase()}{product.caratWeight ? ` • ${product.caratWeight}ct` : ''}</div>
         </div>
-        <div className="text-sm font-thin text-bj-text-gold opacity-80 hidden sm:block">{product.type || product.category}</div>
+        <div className="text-sm font-thin text-bj-text-gold opacity-80 hidden sm:block">{product.type || product.collection}</div>
         <div className="text-sm font-thin text-bj-text-gold opacity-80 hidden sm:block">{product.material}</div>
         <div className="text-sm font-thin text-bj-text-gold opacity-80 hidden sm:block">{product.karat}</div>
         <div className="text-sm font-light text-bj-text-gold opacity-80 hidden sm:block">{product.weight.toLowerCase()}</div>

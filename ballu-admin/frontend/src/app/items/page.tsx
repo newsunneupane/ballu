@@ -12,7 +12,7 @@ type WeightUnit = 'g' | 'tola';
 
 const initialForm = {
   nameEn: '', nameNp: '', description: '', tag: '', group: '',
-  category: '', weightValue: '', weightUnit: 'g' as WeightUnit,
+  collection: '', weightValue: '', weightUnit: 'g' as WeightUnit,
   wastagePercent: '', makingCharges: '', accessoriesCharge: '', boutiqueDeduction: '', diamondValue: '',
   caratWeight: '', stonesDetails: '', karigarName: '', images: [] as string[],
   isAvailable: true, showPrice: true, makingDaysMin: '', makingDaysMax: '', manualPrice: '',
@@ -30,14 +30,14 @@ export default function ItemsPage() {
   const [imageError, setImageError] = useState('');
   const imageInputRef = useRef<HTMLInputElement>(null);
 
-  const [filterCategory, setFilterCategory] = useState('');
+  const [filterCollection, setFilterCollection] = useState('');
   const [filterMaterial, setFilterMaterial] = useState('');
   const [search, setSearch] = useState('');
 
   const [selected, setSelected] = useState<Set<string>>(new Set());
 
   const params: Record<string, string> = {};
-  if (filterCategory) params.category = filterCategory;
+  if (filterCollection) params.collection = filterCollection;
   if (filterMaterial) params.material = filterMaterial;
   const qKey = Object.keys(params).length ? params : undefined;
 
@@ -53,9 +53,9 @@ export default function ItemsPage() {
     queryKey: ['groups'],
     queryFn: () => api.groups.list(),
   });
-  const { data: categories = [] } = useQuery({
-    queryKey: ['categories'],
-    queryFn: api.categories.list,
+  const { data: collections = [] } = useQuery({
+    queryKey: ['collections'],
+    queryFn: api.collections.list,
   });
 
   const invalidateItems = () => queryClient.invalidateQueries({ queryKey: ['items'] });
@@ -107,10 +107,10 @@ export default function ItemsPage() {
 
   const openNew = () => {
     setEditing(null);
-    const othersCat = categories.find((c: any) => c.name?.en === 'Others');
+    const othersCat = collections.find((c: any) => c.name?.en === 'Others');
     setForm({
       ...initialForm,
-      category: othersCat?._id || categories[0]?._id || '',
+      collection: othersCat?._id || collections[0]?._id || '',
       wastagePercent: '0', makingCharges: '0', accessoriesCharge: '0',
       boutiqueDeduction: '0', diamondValue: '0',
     });
@@ -122,7 +122,7 @@ export default function ItemsPage() {
     setForm({
       nameEn: item.name.en, nameNp: item.name.np, description: item.description || '',
       tag: item.tag || '', group: item.group?._id || '',
-      category: item.category?._id || '',
+      collection: item.collection?._id || '',
       weightValue: String(item.weightGrams), weightUnit: 'g',
       wastagePercent: String(item.wastagePercent ?? 0),
       makingCharges: String(item.makingCharges), accessoriesCharge: String(item.accessoriesCharge ?? 0),
@@ -173,7 +173,7 @@ export default function ItemsPage() {
     setError('');
     setValidationErrors([]);
     const errors: string[] = [];
-    if (!form.category) errors.push('Collection is required');
+    if (!form.collection) errors.push('Collection is required');
     if (!form.group) errors.push('Group is required');
     if (!form.nameEn.trim()) errors.push('Name (English) is required');
     if (!form.nameNp.trim()) errors.push('Name (Nepali) is required');
@@ -189,7 +189,7 @@ export default function ItemsPage() {
       description: form.description,
       tag: form.tag || undefined,
       group: form.group,
-      category: form.category,
+      collection: form.collection,
       weightGrams: weightGramsValue,
       wastagePercent: Number(form.wastagePercent),
       makingCharges: Number(form.makingCharges),
@@ -324,9 +324,9 @@ export default function ItemsPage() {
           />
         </div>
         <SearchableSelect
-          value={filterCategory}
-          onChange={(v) => { setFilterCategory(v); setSelected(new Set()); }}
-          options={categories.map((c: any) => ({ value: c._id, label: c.name.en }))}
+          value={filterCollection}
+          onChange={(v) => { setFilterCollection(v); setSelected(new Set()); }}
+          options={collections.map((c: any) => ({ value: c._id, label: c.name.en }))}
           placeholder="All Collections"
           clearLabel="All Collections"
           size="sm"
@@ -388,7 +388,7 @@ export default function ItemsPage() {
                     <span className="ml-2 text-[9px] tracking-wider uppercase text-red-600 border border-red-500/40 rounded px-1.5 py-0.5">Unavailable</span>
                   )}
                 </td>
-                <td className="px-4 py-3 text-[#7d776c]">{item.category?.name?.en || '—'}</td>
+                <td className="px-4 py-3 text-[#7d776c]">{item.collection?.name?.en || '—'}</td>
                 <td className="px-4 py-3 text-[#7d776c]">{item.material?.name?.en || '—'}</td>
                 <td className="px-4 py-3 text-right text-[#26221d] tabular-nums">{item.weightGrams}g</td>
                 <td className="px-4 py-3 text-right text-[#b8860b] tabular-nums font-medium">
@@ -433,9 +433,9 @@ export default function ItemsPage() {
               <div>
 <label className="block text-[10px] tracking-[0.2em] uppercase text-[#6b655b] mb-1.5">Collection</label>
                   <SearchableSelect
-                    value={form.category}
-                    onChange={(v) => setForm({ ...form, category: v })}
-                    options={categories.map((c: any) => ({ value: c._id, label: c.name.en }))}
+                    value={form.collection}
+                    onChange={(v) => setForm({ ...form, collection: v })}
+                    options={collections.map((c: any) => ({ value: c._id, label: c.name.en }))}
                     placeholder="Select collection"
                 />
               </div>
@@ -663,7 +663,7 @@ export default function ItemsPage() {
               onChange={(e) => setBulkJson(e.target.value)}
               rows={12}
               className="w-full bg-[#faf8f4] border border-[#e5ded2] rounded px-3 py-2 text-sm text-[#26221d] font-mono focus:outline-none focus:border-[#b8860b]"
-              placeholder='[{&quot;category&quot;: &quot;...&quot;, &quot;group&quot;: &quot;...&quot;, &quot;name&quot;: {&quot;en&quot;: &quot;Item Name&quot;, &quot;np&quot;: &quot;...&quot;}, &quot;weightGrams&quot;: 10}]'
+              placeholder='[{&quot;collection&quot;: &quot;...&quot;, &quot;group&quot;: &quot;...&quot;, &quot;name&quot;: {&quot;en&quot;: &quot;Item Name&quot;, &quot;np&quot;: &quot;...&quot;}, &quot;weightGrams&quot;: 10}]'
             />
             {bulkResult && (
               <div className={`mt-3 text-sm px-3 py-2 rounded ${bulkResult.startsWith('Error') ? 'text-red-600 bg-red-50' : 'text-green-700 bg-green-100'}`}>

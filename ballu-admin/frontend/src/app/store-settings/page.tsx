@@ -20,7 +20,7 @@ interface FormState {
   phoneNumbers: string[];
   timings: TimingSlot[];
   tickerItems: string[];
-  pieceOfTheWeek: { material: string; category: string; item: string };
+  pieceOfTheWeek: { material: string; collection: string; item: string };
 }
 
 const emptySlot = (): TimingSlot => ({ dayFrom: 'Mon', dayTo: 'Sat', timeFrom: '10', timeTo: '19' });
@@ -32,7 +32,7 @@ export default function StoreSettingsPage() {
     phoneNumbers: [''],
     timings: [emptySlot()],
     tickerItems: [''],
-    pieceOfTheWeek: { material: '', category: '', item: '' },
+    pieceOfTheWeek: { material: '', collection: '', item: '' },
   });
   const [saved, setSaved] = useState(false);
 
@@ -40,9 +40,9 @@ export default function StoreSettingsPage() {
     queryKey: ['materials'],
     queryFn: api.materials.list,
   });
-  const { data: categories = [] } = useQuery({
-    queryKey: ['categories'],
-    queryFn: api.categories.list,
+  const { data: collections = [] } = useQuery({
+    queryKey: ['collections'],
+    queryFn: api.collections.list,
   });
   const { data: settings } = useQuery({
     queryKey: ['store-settings'],
@@ -50,11 +50,11 @@ export default function StoreSettingsPage() {
   });
 
   const { data: filteredItems = [] } = useQuery({
-    queryKey: ['items', { material: form.pieceOfTheWeek.material, category: form.pieceOfTheWeek.category }],
+    queryKey: ['items', { material: form.pieceOfTheWeek.material, collection: form.pieceOfTheWeek.collection }],
     queryFn: () => {
       const params: Record<string, string> = {};
       if (form.pieceOfTheWeek.material) params.material = form.pieceOfTheWeek.material;
-      if (form.pieceOfTheWeek.category) params.category = form.pieceOfTheWeek.category;
+      if (form.pieceOfTheWeek.collection) params.collection = form.pieceOfTheWeek.collection;
       return api.items.list(Object.keys(params).length ? params : undefined);
     },
   });
@@ -62,7 +62,7 @@ export default function StoreSettingsPage() {
   const initForm = () => {
     if (!settings) return;
     const savedMaterial = settings.pieceOfTheWeek?.material?._id || settings.pieceOfTheWeek?.material || '';
-    const savedCategory = settings.pieceOfTheWeek?.category?._id || settings.pieceOfTheWeek?.category || '';
+    const savedCollection = settings.pieceOfTheWeek?.collection?._id || settings.pieceOfTheWeek?.collection || '';
     const gold = materials.find((m: any) => m.name?.en === 'Gold');
     setForm({
       contactEmail: settings.contactEmail || '',
@@ -71,7 +71,7 @@ export default function StoreSettingsPage() {
       tickerItems: settings.tickerItems?.length ? settings.tickerItems : [''],
       pieceOfTheWeek: {
         material: savedMaterial || (gold ? gold._id : ''),
-        category: savedCategory || '',
+        collection: savedCollection || '',
         item: settings.pieceOfTheWeek?.item?._id || settings.pieceOfTheWeek?.item || '',
       },
     });
@@ -129,7 +129,7 @@ export default function StoreSettingsPage() {
       pieceOfTheWeek: form.pieceOfTheWeek.item
         ? {
             material: form.pieceOfTheWeek.material || undefined,
-            category: form.pieceOfTheWeek.category || undefined,
+            collection: form.pieceOfTheWeek.collection || undefined,
             item: form.pieceOfTheWeek.item,
           }
         : null,
@@ -234,7 +234,7 @@ export default function StoreSettingsPage() {
               <label className="block text-[10px] tracking-[0.2em] uppercase text-[#6b655b] mb-1.5">Material</label>
               <select
                 value={form.pieceOfTheWeek.material}
-                onChange={(e) => setForm({ ...form, pieceOfTheWeek: { material: e.target.value, category: '', item: '' } })}
+                onChange={(e) => setForm({ ...form, pieceOfTheWeek: { material: e.target.value, collection: '', item: '' } })}
                 className="w-full bg-[#ffffff] border border-[#e5ded2] rounded px-3 py-2 text-sm text-[#26221d] focus:outline-none focus:border-[#b8860b]"
               >
                 <option value="">All Materials</option>
@@ -246,12 +246,12 @@ export default function StoreSettingsPage() {
             <div>
               <label className="block text-[10px] tracking-[0.2em] uppercase text-[#6b655b] mb-1.5">Collection</label>
               <select
-                value={form.pieceOfTheWeek.category}
-                onChange={(e) => setForm({ ...form, pieceOfTheWeek: { ...form.pieceOfTheWeek, category: e.target.value, item: '' } })}
+                value={form.pieceOfTheWeek.collection}
+                onChange={(e) => setForm({ ...form, pieceOfTheWeek: { ...form.pieceOfTheWeek, collection: e.target.value, item: '' } })}
                 className="w-full bg-[#ffffff] border border-[#e5ded2] rounded px-3 py-2 text-sm text-[#26221d] focus:outline-none focus:border-[#b8860b]"
               >
                 <option value="">All Collections</option>
-                {categories.map((c: any) => (
+                {collections.map((c: any) => (
                   <option key={c._id} value={c._id}>{c.name.en}</option>
                 ))}
               </select>
@@ -263,9 +263,9 @@ export default function StoreSettingsPage() {
                 onChange={(e) => {
                     const itemId = e.target.value;
                     const selectedItem = filteredItems.find((i: any) => i._id === itemId);
-                    const catId = selectedItem?.category?._id || selectedItem?.category || '';
+                    const colId = selectedItem?.collection?._id || selectedItem?.collection || '';
                     const matId = selectedItem?.material?._id || selectedItem?.material || '';
-                    setForm({ ...form, pieceOfTheWeek: { ...form.pieceOfTheWeek, item: itemId, material: matId, category: catId } });
+                    setForm({ ...form, pieceOfTheWeek: { ...form.pieceOfTheWeek, item: itemId, material: matId, collection: colId } });
                   }}
                 className="w-full bg-[#ffffff] border border-[#e5ded2] rounded px-3 py-2 text-sm text-[#26221d] focus:outline-none focus:border-[#b8860b]"
               >

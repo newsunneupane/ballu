@@ -14,7 +14,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
     if (authResult) return authResult;
     const { id } = await params;
     await connectDB();
-    const item = await Item.findById(id).populate('category', 'name').populate('material', 'name').populate('group', 'name').lean();
+    const item = await Item.findById(id).populate('collection', 'name').populate('material', 'name').populate('group', 'name').lean();
     if (!item) return NextResponse.json({ error: 'Item not found' }, { status: 404, headers: { 'Cache-Control': 'no-store' } });
 
     try {
@@ -54,10 +54,10 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     await connectDB();
     const body = await req.json();
 
-    if (!body.category) {
+    if (!body.collection) {
       return badRequest('Collection is required');
     }
-    if (!isObjectId(body.category)) {
+    if (!isObjectId(body.collection)) {
       return badRequest('Invalid collection');
     }
     if (!body.name?.en || !body.name?.np) {
@@ -105,7 +105,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     if (body.name?.en || body.name?.np) {
       const existing = await Item.findOne({
         _id: { $ne: id },
-        category: body.category,
+        collection: body.collection,
         material: body.material,
         $or: [
           ...(body.name?.en ? [{ 'name.en': { $regex: new RegExp(`^${body.name.en.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') } }] : []),
@@ -113,11 +113,11 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
         ],
       });
       if (existing) {
-        return NextResponse.json({ error: 'An item with this name already exists in this category & material' }, { status: 409, headers: { 'Cache-Control': 'no-store' } });
+        return NextResponse.json({ error: 'An item with this name already exists in this collection & material' }, { status: 409, headers: { 'Cache-Control': 'no-store' } });
       }
     }
 
-    const item = await Item.findByIdAndUpdate(id, { ...body, material, purity, manualPriceNpr: body.manualPriceNpr != null ? Number(body.manualPriceNpr) : undefined }, { new: true, runValidators: true }).populate(['category', 'material', 'group']);
+    const item = await Item.findByIdAndUpdate(id, { ...body, material, purity, manualPriceNpr: body.manualPriceNpr != null ? Number(body.manualPriceNpr) : undefined }, { new: true, runValidators: true }).populate(['collection', 'material', 'group']);
     if (!item) return NextResponse.json({ error: 'Item not found' }, { status: 404, headers: { 'Cache-Control': 'no-store' } });
     return NextResponse.json(item, {
       headers: { 'Cache-Control': 'no-store' },
