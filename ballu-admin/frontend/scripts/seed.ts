@@ -4,8 +4,8 @@ import * as dotenv from 'dotenv';
 import * as path from 'path';
 
 // Full reset + reseed for the new data format (Material -> Group -> Item):
-//   - Deletes older-format data: items, groups, materials, categories, dailyrates.
-//   - Seeds admin user, materials (with rates), groups, categories and sample
+//   - Deletes older-format data: items, groups, materials, collections, dailyrates.
+//   - Seeds admin user, materials (with rates), groups, collections and sample
 //     items (each linked to a group; material is derived from the group).
 //
 // Run once against the target DB with: npx tsx scripts/seed.ts
@@ -79,7 +79,7 @@ async function seed() {
 
   // --- Clear older-format data ---
   const cleared: string[] = [];
-  for (const name of ['items', 'groups', 'materials', 'categories', 'dailyrates']) {
+  for (const name of ['items', 'groups', 'materials', 'collections', 'dailyrates']) {
     const res = await db.collection(name).deleteMany({});
     cleared.push(`${name}: ${res.deletedCount}`);
   }
@@ -167,14 +167,14 @@ async function seed() {
     materialGroups[m.en] = ids;
   }
 
-  // --- Categories ---
-  const categorySchema = new mongoose.Schema({
+  // --- Collections ---
+  const collectionSchema = new mongoose.Schema({
     name: { en: String, np: String },
     description: String,
   }, { timestamps: true });
-  const Category = mongoose.models.Category || mongoose.model('Category', categorySchema);
+  const Collection = mongoose.models.Collection || mongoose.model('Collection', collectionSchema);
 
-  const categoryData = [
+  const collectionData = [
     { en: 'Bridal', np: 'वैवाहिक', desc: 'Bridal jewellery collection' },
     { en: 'Festive', np: 'पर्व', desc: 'Festive season collection' },
     { en: 'Daily Wear', np: 'दैनिक', desc: 'Everyday essentials' },
@@ -183,16 +183,16 @@ async function seed() {
     { en: 'Gift', np: 'उपहार', desc: 'Gifting collection' },
     { en: 'Others', np: 'अन्य', desc: 'Other jewellery designs' },
   ];
-  const categoryIds: Record<string, string> = {};
-  for (const c of categoryData) {
-    const cat = await Category.create({ name: { en: c.en, np: c.np }, description: c.desc });
-    categoryIds[c.en] = cat._id.toString();
-    created.push(`Category: ${c.en}`);
+  const collectionIds: Record<string, string> = {};
+  for (const c of collectionData) {
+    const col = await Collection.create({ name: { en: c.en, np: c.np }, description: c.desc });
+    collectionIds[c.en] = col._id.toString();
+    created.push(`Collection: ${c.en}`);
   }
 
   // --- Items (linked to groups) ---
   const itemSchema = new mongoose.Schema({
-    category: { type: mongoose.Schema.Types.ObjectId, ref: 'Category', required: true },
+    collection: { type: mongoose.Schema.Types.ObjectId, ref: 'Collection', required: true },
     material: { type: mongoose.Schema.Types.ObjectId, ref: 'Material', required: true },
     group: { type: mongoose.Schema.Types.ObjectId, ref: 'Group', required: true },
     name: { en: String, np: String },
@@ -217,11 +217,11 @@ async function seed() {
   }, { timestamps: true });
   const Item = mongoose.models.Item || mongoose.model('Item', itemSchema);
 
-  const catKeys = Object.keys(categoryIds);
+  const colKeys = Object.keys(collectionIds);
   const matKeys = Object.keys(materialIds);
 
   const items = ITEM_NAMES.map((name) => {
-    const catKey = pick(catKeys);
+    const colKey = pick(colKeys);
     const matKey = pick(matKeys);
     const weightGrams = rand(2, 60);
     const wastagePercent = rand(0, 12);
@@ -233,11 +233,11 @@ async function seed() {
     const group = pick(materialGroups[matKey]);
 
     return {
-      category: categoryIds[catKey],
+      collection: collectionIds[colKey],
       material: materialIds[matKey],
       group,
       name,
-      description: `Handcrafted ${name.en.toLowerCase()} — ${catKey.toLowerCase()} piece in ${matKey.toLowerCase()}.`,
+      description: `Handcrafted ${name.en.toLowerCase()} — ${colKey.toLowerCase()} piece in ${matKey.toLowerCase()}.`,
       tag: pick(TAGS),
       purity: pick(PURITIES),
       weightGrams,
