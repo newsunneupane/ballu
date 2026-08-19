@@ -25,6 +25,8 @@ export const metadata = {
   description: "Heirloom jewellery crafted for a quieter wear. Three generations of artistry from a single bench in the heart of the city.",
 };
 
+export const revalidate = 300;
+
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const [{ items, collections, materials, groups }, dehydratedState] = await Promise.all([
     loadCatalogData(),

@@ -32,7 +32,7 @@ const nextConfig = {
       {
         source: '/:path((?!_next|api|favicon.ico).*)',
         headers: [
-          { key: 'Cache-Control', value: 'public, max-age=0, must-revalidate' },
+          { key: 'Cache-Control', value: 'public, max-age=0, must-revalidate, s-maxage=300, stale-while-revalidate=600' },
         ],
       },
     ];
