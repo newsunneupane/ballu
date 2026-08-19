@@ -7,6 +7,11 @@ export interface StoreSettings {
   phoneNumbers?: string[];
   timings?: { dayFrom: string; dayTo: string; timeFrom: string; timeTo: string }[];
   tickerItems?: string[];
+  pieceOfTheWeek?: {
+    material?: any;
+    collection?: any;
+    item?: any;
+  };
 }
 
 export function useStoreSettings() {
@@ -17,6 +22,7 @@ export function useStoreSettings() {
       if (!res.ok) return null;
       return res.json();
     },
+    refetchOnMount: 'always',
   });
 }
 

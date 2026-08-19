@@ -9,24 +9,7 @@ export async function middleware(req: NextRequest) {
     return res;
   }
 
-  let country = req.headers.get('x-vercel-ip-country');
-
-  if (!country) {
-    const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim();
-    if (ip) {
-      try {
-        const geoRes = await fetch(`http://ip-api.com/json/${ip}?fields=countryCode`, {
-          signal: AbortSignal.timeout(1500),
-        });
-        if (geoRes.ok) {
-          const data = await geoRes.json();
-          country = data?.countryCode || null;
-        }
-      } catch {
-        country = null;
-      }
-    }
-  }
+  const country = req.headers.get('x-vercel-ip-country');
 
   res.cookies.set(COUNTRY_COOKIE, country || 'NP', {
     path: '/',
@@ -37,5 +20,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: '/((?!_next/static|_next/image|favicon.ico|api).*)',
+  matcher: '/((?!_next|api|favicon.ico).*)',
 };

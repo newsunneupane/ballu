@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useRouter } from 'next/navigation';
 import { Cormorant_Garamond, Cormorant_SC, Noto_Serif_Devanagari } from 'next/font/google';
 import Button from '@/components/ui/Button';
@@ -9,6 +9,7 @@ import { ArrowRight, StarIcon } from '@/components/shared/Icons';
 import { AmbientParticles, GradientOrbit, GradientOverlay, HeroAnimations } from '@/components/shared/AmbientBackground';
 import { cloudinaryUrl } from '@/lib/cloudinary';
 import { SITE } from '@/lib/constants';
+import { useStoreSettings } from '@/hooks/useStoreSettings';
 
 const cormorant = Cormorant_Garamond({
   subsets: ['latin'],
@@ -30,16 +31,8 @@ const notoDevanagari = Noto_Serif_Devanagari({
 
 export default function HeroSection() {
   const router = useRouter();
-  const [potw, setPotw] = useState<any>(null);
-
-  useEffect(() => {
-    fetch('/api/store-settings')
-      .then((r) => r.json())
-      .then((settings) => {
-        if (settings?.pieceOfTheWeek?.item) setPotw(settings.pieceOfTheWeek);
-      })
-      .catch(() => {});
-  }, []);
+  const { data: settings } = useStoreSettings();
+  const potw = settings?.pieceOfTheWeek?.item ? settings.pieceOfTheWeek : null;
 
   return (
     <div

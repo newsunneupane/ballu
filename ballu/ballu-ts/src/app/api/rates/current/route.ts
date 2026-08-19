@@ -5,11 +5,11 @@ export async function GET() {
   try {
     const rates = await getRatesData();
     return NextResponse.json({ rates }, {
-      headers: { 'Cache-Control': 'public, max-age=3600, stale-while-revalidate=86400' },
+      headers: { 'Cache-Control': 'public, max-age=0, must-revalidate, s-maxage=3600, stale-while-revalidate=86400' },
     });
   } catch {
     return NextResponse.json({ rates: [] }, {
-      headers: { 'Cache-Control': 'public, max-age=3600, stale-while-revalidate=86400' },
+      headers: { 'Cache-Control': 'public, max-age=0, must-revalidate, s-maxage=3600, stale-while-revalidate=86400' },
     });
   }
 }

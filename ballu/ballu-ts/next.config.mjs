@@ -6,6 +6,13 @@ const nextConfig = {
     root: fileURLToPath(new URL('.', import.meta.url)),
   },
   reactCompiler: true,
+  experimental: {
+    useSkewCookie: true,
+    staleTimes: {
+      dynamic: 0,
+      static: 30,
+    },
+  },
   async headers() {
     return [
       {
@@ -23,8 +30,7 @@ const nextConfig = {
         ],
       },
       {
-        source: '/:path((?!_next/static|_next/image|api|favicon.ico).*)',
-        has: [{ type: 'header', key: 'accept', value: 'text/html.*' }],
+        source: '/:path((?!_next|api|favicon.ico).*)',
         headers: [
           { key: 'Cache-Control', value: 'public, max-age=0, must-revalidate' },
         ],
