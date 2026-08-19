@@ -26,6 +26,11 @@ const tenorSans = Tenor_Sans({
   weight: ["400"],
 });
 
+const materialLabel = (m: string | undefined) => {
+  const name = (m || '').toLowerCase();
+  return name ? name.charAt(0).toUpperCase() + name.slice(1) : 'Metal';
+};
+
 export default function ProductDetail() {
   const params = useParams();
   const id = params?.id as string;
@@ -154,12 +159,14 @@ export default function ProductDetail() {
                 </>
               )}
 
-              <div className="absolute top-4 right-4 border border-bj-gold-alt bg-bj-bg-ticker/40 backdrop-blur-md text-bj-gold-alt px-3 py-1.5 flex items-center gap-2">
-                <span className="text-[8px]">✦</span>
-                <span className={`${tenorSans.className} text-[8px] tracking-[0.25em] uppercase font-semibold`}>
-                  Hallmarked 916
-                </span>
-              </div>
+              {product.material?.toUpperCase() === 'GOLD' && (
+                <div className="absolute top-4 right-4 border border-bj-gold-alt bg-bj-bg-ticker/40 backdrop-blur-md text-bj-gold-alt px-3 py-1.5 flex items-center gap-2">
+                  <span className="text-[8px]">✦</span>
+                  <span className={`${tenorSans.className} text-[8px] tracking-[0.25em] uppercase font-semibold`}>
+                    Hallmarked 916
+                  </span>
+                </div>
+              )}
 
               <div className="absolute bottom-6 left-6 flex gap-1.5">
                 {images.map((_, i) => (
@@ -227,7 +234,7 @@ export default function ProductDetail() {
 
                   <div className={`${tenorSans.className} flex flex-col gap-3 text-[12px] text-bj-text-description mb-5`}>
                     <div className="flex justify-between">
-                      <span>Gold value ({product.purity} - {product.weight} @ {format(product.pricing.ratePerGramNpr)}/g)</span>
+                      <span>{materialLabel(product.material)} value ({product.purity} - {product.weight} @ {format(product.pricing.ratePerGramNpr)}/g)</span>
                       <span className={`${cormorant.className} text-[15px] italic text-bj-text-alt`}>{format(product.pricing.goldValueNpr)}</span>
                     </div>
                     <div className="flex justify-between">

@@ -25,6 +25,12 @@ interface FormState {
 
 const emptySlot = (): TimingSlot => ({ dayFrom: 'Mon', dayTo: 'Sat', timeFrom: '10', timeTo: '19' });
 
+const itemSubLabel = (i: { group?: { name?: string } | string | null; material?: { name?: { en?: string } } | string | null; purity?: string | null } | null | undefined) =>
+  (i?.group && typeof i.group === 'object' && i.group.name) ||
+  (i?.material && typeof i.material === 'object' && i.material.name?.en) ||
+  i?.purity ||
+  '';
+
 export default function StoreSettingsPage() {
   const queryClient = useQueryClient();
   const [form, setForm] = useState<FormState>({
@@ -35,6 +41,7 @@ export default function StoreSettingsPage() {
     pieceOfTheWeek: { material: '', collection: '', item: '' },
   });
   const [saved, setSaved] = useState(false);
+  const [initialized, setInitialized] = useState(false);
 
   const { data: materials = [] } = useQuery({
     queryKey: ['materials'],
@@ -75,9 +82,10 @@ export default function StoreSettingsPage() {
         item: settings.pieceOfTheWeek?.item?._id || settings.pieceOfTheWeek?.item || '',
       },
     });
+    setInitialized(true);
   };
 
-  if (settings && !form.contactEmail && settings.contactEmail) initForm();
+  if (settings && materials.length > 0 && !initialized) initForm();
 
   const updatePhone = (index: number, value: string) => {
     const phones = [...form.phoneNumbers];
@@ -272,7 +280,7 @@ export default function StoreSettingsPage() {
                 <option value="">All Items</option>
                 {filteredItems.map((i: any) => (
                   <option key={i._id} value={i._id}>
-                    {i.name?.en} {i.purity ? `· ${i.purity}` : ''} {i.weightGrams ? `· ${i.weightGrams}g` : ''}
+                    {i.name?.en} {itemSubLabel(i) ? `· ${itemSubLabel(i)}` : ''} {i.weightGrams ? `· ${i.weightGrams}g` : ''}
                   </option>
                 ))}
               </select>
@@ -291,7 +299,7 @@ export default function StoreSettingsPage() {
                       <div>
                         <p className="text-sm text-[#1f1b16] font-medium">{selected.name?.en}</p>
                         <p className="text-[10px] text-[#6b655b] mt-0.5">
-                          {selected.purity ? `${selected.purity} · ` : ''}
+                          {itemSubLabel(selected) ? `${itemSubLabel(selected)} · ` : ''}
                           {selected.weightGrams ? `${selected.weightGrams}g` : ''}
                           {selected.finalPrice != null ? ` · Rs ${selected.finalPrice.toLocaleString()}` : ''}
                         </p>

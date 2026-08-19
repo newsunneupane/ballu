@@ -1,5 +1,5 @@
 import { Product } from '@/types/product';
-import { PHONE } from '@/lib/constants';
+import { PHONE, SITE } from '@/lib/constants';
 
 export function whatsappBaseUrl(phoneNumber?: string | null): string {
   const digits = (phoneNumber || PHONE).replace(/[^0-9]/g, '');
@@ -20,13 +20,12 @@ export function buildWhatsappLink(
   priceLabel: string | null,
   phoneNumber?: string | null
 ): string {
-  const url = typeof window !== 'undefined' ? `${window.location.origin}/catalogue/${product.id}` : `/catalogue/${product.id}`;
   const group = groupName(product);
   const parts = [
     `Hi, I'm interested in ${product.title}${group ? ` (${group})` : ''}`,
     `(ID: ${product.id})`,
     priceLabel ? `— ${priceLabel}` : '',
-    url,
+    `— ${SITE.fullName}`,
   ].filter(Boolean);
   return `${whatsappBaseUrl(phoneNumber)}?text=${encodeURIComponent(parts.join(' '))}`;
 }
