@@ -66,21 +66,22 @@ export default function OnboardingWizard() {
 
   return (
     <div
-      className={`fixed inset-0 z-[200] flex items-center justify-center px-6 transition-opacity duration-400 ${
+      className={`fixed inset-0 z-[200] overflow-y-auto transition-opacity duration-400 ${
         visible ? 'opacity-100' : 'opacity-0 pointer-events-none'
       }`}
     >
-      <div className="absolute inset-0 bg-bj-bg-ticker/95 backdrop-blur-md" />
+      <div className="fixed inset-0 bg-bj-bg-ticker/95 backdrop-blur-md" />
 
       <button
         onClick={() => close(material || undefined)}
         aria-label="Skip"
-        className={`${tenorSans.className} absolute top-6 right-6 sm:top-10 sm:right-10 z-10 flex items-center gap-2 text-[10px] tracking-[0.3em] uppercase text-bj-text-muted hover:text-bj-gold-alt transition-colors`}
+        className={`${tenorSans.className} fixed top-6 right-6 sm:top-10 sm:right-10 z-20 flex items-center gap-2 text-[10px] tracking-[0.3em] uppercase text-bj-text-muted hover:text-bj-gold-alt transition-colors`}
       >
         Skip <FiX size={14} />
       </button>
 
-      <div key={step} className="relative z-10 w-full max-w-xl fade-in-up text-center">
+      <div className="relative z-10 flex min-h-full items-center justify-center px-6 py-12">
+      <div key={step} className="w-full max-w-xl fade-in-up text-center">
         <div className={`${tenorSans.className} text-[9px] tracking-[0.4em] uppercase text-bj-gold-alt mb-4`}>
           Step {step + 1} of 2
         </div>
@@ -132,6 +133,7 @@ export default function OnboardingWizard() {
             </button>
           </>
         )}
+      </div>
       </div>
     </div>
   );
