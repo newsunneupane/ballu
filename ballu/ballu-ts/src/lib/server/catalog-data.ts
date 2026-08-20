@@ -146,11 +146,55 @@ export const getStoreSettingsData = unstable_cache(
       }
     }
 
+    if (Array.isArray(settings.heroBanners) && settings.heroBanners.length > 0) {
+      settings.heroBanners = await resolveHeroBanners(settings.heroBanners as any[]);
+    }
+
     return settings;
   },
   ['catalog-store-settings'],
   { revalidate, tags: [STORE_SETTINGS_TAG, 'catalog-store-settings'] }
 );
+
+async function resolveHeroBanners(banners: any[]) {
+  const resolved = await Promise.all(
+    banners.map(async (banner) => {
+      const result: any = { ...banner };
+      if (!banner.refId) return result;
+      try {
+        if (banner.type === 'collection') {
+          const entity = await Collection.findById(banner.refId).select('name').lean();
+          if (entity) {
+            result.name = (entity.name as any)?.en;
+            result.nameNp = (entity.name as any)?.np;
+          }
+        } else if (banner.type === 'material') {
+          const entity = await Material.findById(banner.refId).select('name').lean();
+          if (entity) {
+            result.name = (entity.name as any)?.en;
+            result.nameNp = (entity.name as any)?.np;
+          }
+        } else if (banner.type === 'group') {
+          const entity = await Group.findById(banner.refId).populate('material', 'name').lean();
+          if (entity) {
+            result.name = (entity as any).name;
+            result.material = (entity as any).material;
+          }
+        } else if (banner.type === 'item') {
+          const entity = await Item.findById(banner.refId).select('name').lean();
+          if (entity) {
+            result.name = (entity.name as any)?.en;
+            result.nameNp = (entity.name as any)?.np;
+          }
+        }
+      } catch {
+        /* skip unresolvable banners */
+      }
+      return result.name ? result : null;
+    })
+  );
+  return resolved.filter(Boolean);
+}
 
 export const getRatesData = unstable_cache(
   async () => {

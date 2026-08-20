@@ -87,23 +87,23 @@ export default function CollectionsRow() {
         .card-luxury-svg { display: none; }
         [data-theme="light"] .card-luxury-svg { display: block; }
         [data-theme="light"] .collection-card {
-          background: radial-gradient(ellipse at 50% 40%, #f7efe0 0%, #ede0cc 50%, #e5d5bb 100%);
-          border-color: #dbb86b !important;
-          box-shadow: 0 1px 2px rgba(219,184,107,0.12);
+          background: #ffffff;
+          border-color: #cc0000 !important;
+          box-shadow: 0 1px 2px rgba(204,0,0,0.12);
         }
         [data-theme="light"] .collection-card:hover {
-          box-shadow: 0 8px 30px rgba(219,184,107,0.3), 0 2px 8px rgba(219,184,107,0.12);
+          box-shadow: 0 8px 30px rgba(204,0,0,0.3), 0 2px 8px rgba(204,0,0,0.12);
         }
         [data-theme="light"] .collection-card .card-circle,
         [data-theme="light"] .collection-card .card-circle > div {
-          border-color: #dbb86b !important;
+          border-color: #cc0000 !important;
         }
         [data-theme="light"] .collection-card .card-circle {
           opacity: 0.35;
         }
         [data-theme="light"] .collection-card .card-badge {
-          background: rgba(219,184,107,0.12);
-          border-color: rgba(219,184,107,0.25);
+          background: rgba(204,0,0,0.12);
+          border-color: rgba(204,0,0,0.25);
           color: #6b4f2a;
         }
         [data-theme="light"] .collection-card .card-glow {
@@ -117,6 +117,17 @@ export default function CollectionsRow() {
         [data-theme="light"] .collection-card .card-nepali-title {
           opacity: 1;
         }
+        [data-theme="light"] .collections-row-btn {
+          background: #cc0000 !important;
+          color: #ffffff !important;
+          box-shadow: 0 0 15px rgba(204,0,0,0.4) !important;
+        }
+        [data-theme="light"] .collections-row-btn:hover {
+          background: #b30000 !important;
+        }
+        [data-theme="light"] .collections-row-heading {
+          color: #cc0000 !important;
+        }
       `}</style>
 
       <div className="max-w-7xl w-full mx-auto px-6 md:px-12 lg:px-16 pt-16 pb-8">
@@ -126,7 +137,7 @@ export default function CollectionsRow() {
 
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-8">
           <div className="flex flex-col space-y-3 max-w-4xl">
-            <h1 className={`${cormorantSC.variable} ${cormorant.variable} antialiased text-[clamp(1.8rem,5vw,3.5rem)] font-light leading-[1.1] text-bj-text-heading tracking-tight font-serif-editorial`}>
+            <h1 className={`${cormorantSC.variable} ${cormorant.variable} antialiased collections-row-heading text-[clamp(1.8rem,5vw,3.5rem)] font-light leading-[1.1] text-bj-text-heading tracking-tight font-serif-editorial`}>
               <span className="block fade-in-up" style={{ animationDelay: '0ms' }}>
                 Curated, never crowded.
               </span>
@@ -134,10 +145,10 @@ export default function CollectionsRow() {
           </div>
 
           <div className="flex items-center gap-3 self-end md:self-auto pb-2">
-            <IconButton active={canScrollLeft} onClick={() => handleScroll('left')} disabled={!canScrollLeft}>
+            <IconButton active={canScrollLeft} onClick={() => handleScroll('left')} disabled={!canScrollLeft} className="collections-row-btn">
               <ChevronLeft />
             </IconButton>
-            <IconButton active={canScrollRight} onClick={() => handleScroll('right')} disabled={!canScrollRight}>
+            <IconButton active={canScrollRight} onClick={() => handleScroll('right')} disabled={!canScrollRight} className="collections-row-btn">
               <ChevronRight />
             </IconButton>
           </div>

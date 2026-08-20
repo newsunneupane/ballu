@@ -59,17 +59,17 @@
 }
 
 [data-theme="light"] {
-  --bj-bg: #fbf7f0;
+  --bj-bg: #ffffff;
   --bj-text-opacity: 1;
-  --bj-bg-secondary: #f8f2e3;
+  --bj-bg-secondary: #ffffff;
   --bj-bg-card: #ffffff;
-  --bj-bg-card-body: #fefcf8;
-  --bj-bg-elevated: #faf6ef;
-  --bj-bg-alt: #fbf7f0;
-  --bj-bg-alt2: #f4edd9;
-  --bj-bg-alt3: #f0e8d6;
+  --bj-bg-card-body: #ffffff;
+  --bj-bg-elevated: #ffffff;
+  --bj-bg-alt: #ffffff;
+  --bj-bg-alt2: #ffffff;
+  --bj-bg-alt3: #ffffff;
   --bj-bg-ticker: #0a0806;
-  --bj-bg-hero: #f4edd9;
+  --bj-bg-hero: #f8f2e3;
 
   --bj-text-heading: #0d0a08;
   --bj-text-body: #1f1812;
@@ -83,10 +83,10 @@
   --bj-text-placeholder: #c4b9a6;
   --bj-text-separator: #d4caba;
 
-  --bj-border: #b88930;
-  --bj-border-light: #684209;
-  --bj-border-card: #684209;
-  --bj-border-hover: #684209;
+  --bj-border: #cc0000;
+  --bj-border-light: #cc0000;
+  --bj-border-card: #cc0000;
+  --bj-border-hover: #cc0000;
 
   --bj-overlay: rgba(255, 255, 255, 0.85);
   --bj-hover-bg: rgba(219, 184, 107, 0.08);
@@ -176,7 +176,16 @@
   }
 
   .border-bj-border.bg-bj-bg-card:hover {
-    border-color: #b88930 !important;
+    border-color: #cc0000 !important;
+  }
+
+  .border-bj-gold-alt,
+  .hover\:border-bj-gold-alt:hover,
+  .border-bj-gold-dark,
+  .border-\[\#cda274\],
+  .focus\:border-\[\#cda274\]:focus,
+  .focus-within\:border-\[\#dbb86b\]:focus-within {
+    border-color: #cc0000 !important;
   }
 
   button.border-\[\#cda274\] {
@@ -234,7 +243,7 @@
   .jewellers-text {
     text-shadow: 0 1px 2px rgba(0,0,0,0.15);
     font-weight: 700 !important;
-    color: #684209 !important;
+    color: #cc0000 !important;
   }
 
   .hero-section .text-bj-gold,
@@ -256,7 +265,7 @@
   }
 
   .nav-link::after {
-    background-color: #b88930 !important;
+    background-color: #cc0000 !important;
   }
 
   .pieces-count {
@@ -267,6 +276,59 @@
     background: #684209 !important;
     backdrop-filter: none !important;
     border-color: rgba(37, 211, 102, 0.55) !important;
+  }
+
+  .text-bj-gold,
+  .text-bj-gold-light,
+  .text-bj-gold-dark,
+  .text-bj-gold-alt,
+  .text-bj-gold-rich,
+  .text-bj-gold-richer,
+  .text-bj-gold-thin,
+  .text-bj-text-gold,
+  .text-\[#c9a96e\],
+  .text-\[#cda274\],
+  .text-\[#dbb86b\],
+  .text-visit-gold,
+  .text-visit-postoffice,
+  .hero-section .text-bj-gold,
+  .hero-section .text-bj-gold-light,
+  .hero-section .text-bj-gold-dark,
+  .hero-section .text-bj-gold-alt,
+  .hero-section .text-bj-gold-rich,
+  .hero-section .text-bj-gold-richer,
+  .hero-section .text-bj-gold-thin,
+  .hero-section .text-bj-text-gold,
+  .potw-card .text-bj-gold,
+  .potw-card .text-bj-gold-light,
+  .potw-card .text-bj-gold-dark,
+  .potw-card .text-bj-gold-alt,
+  .potw-card .text-bj-gold-rich,
+  .potw-card .text-bj-gold-richer,
+  .potw-card .text-bj-gold-thin,
+  .potw-card .text-bj-text-gold,
+  .border-bj-gold-alt.text-bj-gold-alt,
+  .border-t.border-bj-border .text-bj-text-gold,
+  .text-bj-text-gold.opacity-80,
+  button.border-\[#cda274\],
+  .footer-section .footer-gold {
+    color: #cc0000 !important;
+  }
+
+.recommended-row-heading {
+    color: #cc0000 !important;
+  }
+
+  .visit-heading {
+    color: #000000 !important;
+  }
+
+  .visit-heading-year {
+    color: #cc0000 !important;
+  }
+
+  .catalogue-title {
+    color: #cc0000 !important;
   }
 }
 

@@ -79,7 +79,7 @@ export default function AboutContactPage() {
             Find Us
           </div>
 
-          <h1 className={`${cormorant.className} text-5xl md:text-[80px] lg:text-[96px] leading-[1.1] text-bj-text-heading font-light tracking-tight `}>
+          <h1 className={`${cormorant.className} visit-heading text-5xl md:text-[80px] lg:text-[96px] leading-[1.1] text-bj-text-heading font-light tracking-tight `}>
             Two doors from <br />
             <span className="italic text-visit-postoffice pr-1">the post office.</span>
           </h1>
@@ -170,9 +170,9 @@ export default function AboutContactPage() {
               Our Story <span className="opacity-50">·</span> चालीस वर्ष
             </div>
             
-            <h2 className={`${cormorant.className} text-[44px] md:text-[56px] lg:text-[64px] text-bj-text-heading font-light leading-[1.1] mb-8`}>
+            <h2 className={`${cormorant.className} visit-heading text-[44px] md:text-[56px] lg:text-[64px] text-bj-text-heading font-light leading-[1.1] mb-8`}>
               From a single bench, in <br />
-              1986.
+              <span className="visit-heading-year italic">1986.</span>
             </h2>
             
             <p className={`${tenorSans.className} text-bj-text-description text-[14px] leading-[1.8] mb-10`}>

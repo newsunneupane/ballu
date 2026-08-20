@@ -103,7 +103,7 @@ export function AmbientParticles() {
 
 export function GradientOrbit() {
   return (
-    <div className="pointer-events-none absolute inset-0 -z-10 bg-bj-bg-secondary" style={{ overflow: 'hidden' }}>
+    <div className="pointer-events-none absolute inset-0 -z-10 bg-bj-bg-hero" style={{ overflow: 'hidden' }}>
       <div style={{ position: 'absolute', inset: '-80%', willChange: 'transform' }}>
         <div className="bj-grad-shift" style={{ position: 'absolute', inset: 0 }}>
           <svg width="100%" height="100%" viewBox="0 0 100 125" preserveAspectRatio="xMidYMid slice" style={{ display: 'block' }}>
@@ -123,7 +123,7 @@ export function GradientOrbit() {
                 <stop className="bo-halo" offset="100%" stopColor="#d4a857" stopOpacity="0" />
               </radialGradient>
             </defs>
-            <rect width="100" height="125" style={{ fill: 'var(--bj-bg-secondary)' }} />
+            <rect width="100" height="125" style={{ fill: 'var(--bj-bg-hero)' }} />
             <rect width="100" height="125" fill="url(#halo)" />
             <rect width="100" height="125" fill="url(#g1)" />
             <rect width="100" height="125" fill="url(#g2)" />
@@ -181,36 +181,29 @@ export function HeroAnimations() {
       .bj-orbit-slow-rev { transform-origin: center; animation: bj-rotr 110s linear infinite; }
       .bj-grad-shift { animation: bj-grad 90s linear infinite; transform-origin: center; }
       .hero-top-particles { display: none; }
-      [data-theme="light"] .hero-top-particles { display: block; }
-      
-      /* --- LUXURY LIGHT MODE OVERRIDES --- */
-      
-      /* Delicate champagne sparkles with a soft, ethereal glow rather than harsh shadow */
-      [data-theme="light"] .hero-particles svg {
-        stroke: #C5A059 !important;
-        fill: #C5A059 !important;
-        filter: drop-shadow(0 0 6px rgba(197, 160, 89, 0.4)) !important;
+
+      /* Hero background: totally black in dark mode, totally white in light mode.
+         Keep the dark-gold sparkle SVG in both modes. */
+      .hero-section {
+        background: #000000;
+        --bj-bg-hero: #000000;
+        --bj-gold-light: #f5e3b8;
       }
-      
-      /* Luminous pearl and soft champagne background gradients */
-      [data-theme="light"] .bo-stop:nth-child(1) { stop-color: #FFFFFF; stop-opacity: 0.95; }
-      [data-theme="light"] .bo-stop:nth-child(2) { stop-color: #F4E8D1; stop-opacity: 0.75; }
-      [data-theme="light"] .bo-stop:nth-child(3) { stop-color: #E3C598; stop-opacity: 0.35; }
-      [data-theme="light"] .bo-stop:nth-child(4) { stop-color: #C5A059; stop-opacity: 0.05; }
-      
-      [data-theme="light"] .bo-stop2:nth-child(1) { stop-color: #F4E8D1; stop-opacity: 0.6; }
-      [data-theme="light"] .bo-stop2:nth-child(2) { stop-color: #E3C598; stop-opacity: 0; }
-      
-      /* Ultra-fine, delicate rings like fine jewelry wire */
-      [data-theme="light"] .bo-ring { stroke: #D4AF37 !important; }
-      [data-theme="light"] .bo-rings { transform: scale(1.4); transform-origin: 50% 50%; }
-      [data-theme="light"] .bo-ring-1 { stroke-width: 0.25; opacity: 0.6; }
-      [data-theme="light"] .bo-ring-2 { stroke-width: 0.15; opacity: 0.5; }
-      [data-theme="light"] .bo-ring-3 { stroke-width: 0.1; opacity: 0.4; }
-      
-      /* Soft center halo light */
-      [data-theme="light"] .bo-halo:nth-child(1) { stop-color: #FFFFFF; stop-opacity: 0.8; }
-      [data-theme="light"] .bo-halo:nth-child(2) { stop-color: #F4E8D1; stop-opacity: 0; }
+      [data-theme="light"] .hero-section {
+        background: #ffffff;
+        --bj-bg-hero: #ffffff;
+      }
+      [data-theme="light"] .hero-section .hero-slider-title { color: #cc0000 !important; }
+      [data-theme="light"] .hero-section .hero-btn {
+        background-color: #cc0000 !important;
+        color: #ffffff !important;
+      }
+      .hero-section .hero-dot-active {
+        background-color: var(--bj-gold) !important;
+      }
+      [data-theme="light"] .hero-section .hero-dot-active {
+        background-color: #cc0000 !important;
+      }
     `}</style>
   );
 }

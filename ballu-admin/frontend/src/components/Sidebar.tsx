@@ -14,6 +14,7 @@ import {
   Package,
   MessageSquare,
   PhoneCall,
+  Presentation,
   Settings,
   LogOut,
   Menu,
@@ -28,6 +29,7 @@ const navItems = [
   { href: '/items', label: 'Items', icon: Package },
   { href: '/custom-requests', label: 'Custom Requests', icon: MessageSquare, badgeKey: 'pendingRequests' as const },
   { href: '/item-inquiries', label: 'Item Inquiries', icon: PhoneCall, badgeKey: 'pendingInquiries' as const },
+  { href: '/hero-banner', label: 'Hero Banner', icon: Presentation },
   { href: '/store-settings', label: 'Store Settings', icon: Settings },
 ];
 

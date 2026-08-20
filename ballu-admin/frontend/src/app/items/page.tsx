@@ -45,6 +45,11 @@ export default function ItemsPage() {
     queryKey: ['items', qKey],
     queryFn: () => api.items.list(qKey),
   });
+  const { data: allItems = [] } = useQuery({
+    queryKey: ['items', 'all'],
+    queryFn: () => api.items.list(),
+    staleTime: 30000,
+  });
   const { data: materials = [] } = useQuery({
     queryKey: ['materials'],
     queryFn: api.materials.list,
@@ -177,6 +182,13 @@ export default function ItemsPage() {
     if (!form.group) errors.push('Group is required');
     if (!form.nameEn.trim()) errors.push('Name (English) is required');
     if (!form.nameNp.trim()) errors.push('Name (Nepali) is required');
+    const nameKey = form.nameEn.trim().toLowerCase();
+    const dup = allItems.find(
+      (it: any) => it._id !== editing?._id && (it.name?.en || '').trim().toLowerCase() === nameKey
+    );
+    if (dup) {
+      errors.push(`Can't create the duplicate item: an item named "${form.nameEn.trim()}" already exists.`);
+    }
     if (!form.weightValue || weightGramsValue <= 0) errors.push('Weight is required');
     if (errors.length > 0) {
       setValidationErrors(errors);

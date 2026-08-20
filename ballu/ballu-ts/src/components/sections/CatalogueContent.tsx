@@ -51,12 +51,13 @@ export default function CatalogueContent({
   const searchParams = useSearchParams();
   const urlCollection = searchParams.get('collection')?.toUpperCase();
   const urlMaterial = searchParams.get('material')?.toUpperCase();
+  const urlGroup = searchParams.get('group')?.toUpperCase();
 
   const [activeCollections, setActiveCollections] = useState<string[]>(
     urlCollection ? [urlCollection] : defaultCollection ? [defaultCollection] : ['ALL']
   );
   const [activeMaterial, setActiveMaterial] = useState(urlMaterial || 'ALL');
-  const [activeGroup, setActiveGroup] = useState('ALL');
+  const [activeGroup, setActiveGroup] = useState(urlGroup || 'ALL');
   const [activeTag, setActiveTag] = useState('ALL');
   const [availableOnly, setAvailableOnly] = useState(false);
   const [minPrice, setMinPrice] = useState('');
@@ -133,7 +134,7 @@ export default function CatalogueContent({
             {breadcrumb ? ` · ${breadcrumb.split(' · ').slice(1).join(' · ')}` : ' · Catalogue'}
           </div>
           <div className="flex flex-col space-y-1 max-w-4xl">
-            <h1 className="antialiased text-[42px] sm:text-[75px] md:text-[90px] font-light leading-[1.1] text-bj-text-heading tracking-tight">
+            <h1 className="antialiased catalogue-title text-[42px] sm:text-[75px] md:text-[90px] font-light leading-[1.1] text-bj-text-heading tracking-tight">
               <span className="block">{title || 'The Drawer.'}</span>
             </h1>
           </div>

@@ -15,13 +15,13 @@ export default function BrandTrust() {
     <div className="brand-section bg-bj-bg-secondary text-bj-text-heading w-full min-h-[60vh] flex flex-col justify-between relative overflow-hidden font-sans border-t border-white/5">
       <style>{`
         [data-theme="light"] .brand-section { border-color: rgba(0,0,0,0.08) !important; }
-        [data-theme="light"] .brand-grid, [data-theme="light"] .brand-grid > div, [data-theme="light"] .brand-grid > div > div { border-color: #c49a45 !important; }
+        [data-theme="light"] .brand-grid, [data-theme="light"] .brand-grid > div, [data-theme="light"] .brand-grid > div > div { border-color: #cc0000 !important; }
         [data-theme="light"] .brand-grid h3 { color: #000000 !important; }
         [data-theme="light"] .brand-grid p { color: #000000 !important; opacity: 0.7 !important; }
         [data-theme="light"] .brand-orbit { opacity: 0.6; }
         [data-theme="light"] .brand-orbit .bo-black { stroke: #000000 !important; }
         [data-theme="light"] .brand-orbit .bo-darkgold { stroke: #996515 !important; }
-        [data-theme="light"] .brand-orbit .brand-orbit-circle { border-color: #996515 !important; }
+        [data-theme="light"] .brand-orbit .brand-orbit-circle { border-color: #cc0000 !important; }
       `}</style>
       <div className="max-w-7xl w-full  mx-auto px-6 md:px-12 lg:px-16 pt-10 pb-40 flex flex-col items-center text-center relative overflow-hidden">
         <div className="text-bj-gold tracking-widest mb-6 opacity-80 relative z-10">☆</div>

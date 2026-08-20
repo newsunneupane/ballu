@@ -1,12 +1,12 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Cormorant_Garamond, Cormorant_SC, Noto_Serif_Devanagari } from 'next/font/google';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import { ArrowRight, StarIcon } from '@/components/shared/Icons';
-import { AmbientParticles, GradientOrbit, GradientOverlay, HeroAnimations } from '@/components/shared/AmbientBackground';
+import { AmbientParticles, HeroAnimations } from '@/components/shared/AmbientBackground';
 import { cloudinaryUrl } from '@/lib/cloudinary';
 import { SITE } from '@/lib/constants';
 import { useStoreSettings } from '@/hooks/useStoreSettings';
@@ -30,8 +30,18 @@ const notoDevanagari = Noto_Serif_Devanagari({
 });
 
 export default function HeroSection() {
-  const router = useRouter();
   const { data: settings } = useStoreSettings();
+  const banners = settings?.heroBanners?.length ? settings.heroBanners : null;
+
+  if (banners && banners.length > 0) {
+    return <HeroSlider banners={banners} />;
+  }
+
+  return <StaticHero settings={settings} />;
+}
+
+function StaticHero({ settings }: { settings?: any }) {
+  const router = useRouter();
   const potw = settings?.pieceOfTheWeek?.item ? settings.pieceOfTheWeek : null;
 
   return (
@@ -39,8 +49,6 @@ export default function HeroSection() {
       className={`${cormorant.variable} ${cormorantSC.variable} ${notoDevanagari.variable} hero-section min-h-screen w-full text-bj-text-heading p-6 md:p-10 flex flex-col justify-between font-serif-editorial relative overflow-x-hidden`}
     >
       <HeroAnimations />
-      <GradientOrbit />
-      <GradientOverlay />
       <AmbientParticles />
 
       <div className="text-[11px] tracking-[0.4em] text-bj-gold-thin text-thin uppercase opacity-80 font-sans fade-in-up fade-in-up-1 z-10">
@@ -104,6 +112,78 @@ export default function HeroSection() {
         <div className="absolute right-8 md:right-20 top-1/2 -translate-y-1/2 z-10 hidden lg:block">
           <FeaturedCard potw={potw} />
         </div>
+      </div>
+    </div>
+  );
+}
+
+function HeroSlider({ banners }: { banners: any[] }) {
+  const router = useRouter();
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  useEffect(() => {
+    if (banners.length <= 1) return;
+    const timer = setInterval(() => {
+      setActiveIndex((prev) => (prev + 1) % banners.length);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, [banners.length]);
+
+  const active = banners[activeIndex] || banners[0];
+
+  const navigate = (banner: any) => {
+    if (banner.type === 'item') {
+      router.push(`/catalogue/${banner.refId}`);
+      return;
+    }
+    const params = new URLSearchParams();
+    if (banner.type === 'collection') params.set('collection', banner.name || '');
+    else if (banner.type === 'material') params.set('material', banner.name || '');
+    else if (banner.type === 'group') {
+      params.set('material', banner.material?.name?.en || '');
+      params.set('group', banner.name || '');
+    }
+    router.push(`/catalogue?${params.toString()}`);
+  };
+
+  return (
+    <div
+      className={`${cormorant.variable} ${cormorantSC.variable} ${notoDevanagari.variable} hero-section min-h-[80vh] w-full text-bj-text-heading relative overflow-hidden font-serif-editorial flex flex-col px-0 pb-3 md:pb-4`}
+    >
+      <HeroAnimations />
+      <AmbientParticles />
+
+      <div className="relative z-10 flex-1 overflow-hidden">
+        {banners.map((banner, i) => (
+          <div
+            key={i}
+            className={`absolute inset-0 transition-opacity duration-1000 ${i === activeIndex ? 'opacity-100' : 'opacity-0'}`}
+          >
+            <div
+              className="absolute inset-0 bg-cover bg-center"
+              style={{ backgroundImage: `url(${cloudinaryUrl(banner.image, { width: 1920, aspect: '16:9' })})` }}
+            />
+          </div>
+        ))}
+      </div>
+
+      <div className="absolute bottom-3 md:bottom-4 right-3 md:right-4 z-30">
+        <Button variant="primary" size="sm" magnetic className="hero-btn" icon={<ArrowRight />} onClick={() => navigate(active)}>
+          {active?.type === 'item' ? 'Shop' : 'Explore'}
+        </Button>
+      </div>
+
+      <div className="relative z-20 flex items-center justify-center gap-2 pt-2">
+        {banners.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => setActiveIndex(i)}
+            aria-label={`Go to slide ${i + 1}`}
+className={`w-1.5 h-1.5 rotate-45 transition-all duration-500 ${
+                i === activeIndex ? 'hero-dot-active scale-125' : 'bg-bj-text-muted/50 hover:bg-bj-text-muted/80'
+              }`}
+          />
+        ))}
       </div>
     </div>
   );

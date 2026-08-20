@@ -1,14 +1,13 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Tenor_Sans, Cormorant_Garamond } from 'next/font/google';
+import { Cormorant_Garamond } from 'next/font/google';
 import { productService } from '@/services/product-service';
 import { useProductData } from '@/hooks/useProductData';
 import { getAffinity } from '@/lib/visitTracking';
 import { Product } from '@/types/product';
 import ProductCard from '@/components/shared/ProductCard';
 
-const tenorSans = Tenor_Sans({ subsets: ['latin'], weight: ['400'] });
 const cormorant = Cormorant_Garamond({ subsets: ['latin'], weight: ['300', '400', '500', '600'] });
 
 export default function RecommendedRow() {
@@ -26,7 +25,7 @@ export default function RecommendedRow() {
         sort: 'most-viewed',
       });
       if (filtered.length > 0) {
-        setHeading('Recommended for You');
+        setHeading('Recommended For You');
         setProducts(filtered.slice(0, 8));
         return;
       }
@@ -39,10 +38,7 @@ export default function RecommendedRow() {
 
   return (
     <div className="bg-bj-bg-elevated px-4 sm:px-6 md:px-16 lg:px-15 py-16 md:py-24">
-      <div className={`${tenorSans.className} text-[9px] tracking-[0.3em] uppercase text-bj-text-dim mb-2`}>
-        Curated For You
-      </div>
-      <h2 className={`${cormorant.className} text-3xl md:text-4xl font-light text-bj-text-heading mb-10`}>
+      <h2 className={`${cormorant.className} recommended-row-heading text-3xl md:text-4xl font-light text-bj-text-heading mb-10`}>
         {heading}
       </h2>
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">

@@ -12,6 +12,16 @@ export interface StoreSettings {
     collection?: any;
     item?: any;
   };
+  heroBanners?: {
+    type: 'collection' | 'material' | 'group' | 'item';
+    refId: string;
+    image: string;
+    title?: string;
+    subtitle?: string;
+    name?: string;
+    nameNp?: string;
+    material?: { _id: string; name: { en: string; np: string } };
+  }[];
 }
 
 export function useStoreSettings() {
