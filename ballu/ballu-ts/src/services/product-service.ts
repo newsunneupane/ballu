@@ -13,7 +13,7 @@ export function isProductStoreSeeded(): boolean {
 }
 
 function transformApiItem(item: any): Product {
-  const catEn = item.collection?.name?.en?.toUpperCase() || 'BRIDAL';
+  const catEn = item.collection?.name?.en?.toUpperCase() || 'OTHERS';
   const matEn = item.material?.name?.en?.toUpperCase() || 'GOLD';
   const weightStr = `${item.weightGrams}g`;
   const purity = item.group?.name?.en || item.purity || '';
@@ -264,12 +264,14 @@ export const productService = {
       catLookup[key] = c;
     }
 
-    if (!('OTHERS' in totals)) {
-      totals.OTHERS = 0;
-    }
+    const entries = Object.entries(totals).sort(([a], [b]) => {
+      if (a === 'OTHERS') return 1;
+      if (b === 'OTHERS') return -1;
+      return 0;
+    });
 
     let idx = 0;
-    return Object.entries(totals).map(([collection, count]) => {
+    return entries.map(([collection, count]) => {
       idx++;
       const config = collectionConfigMap[collection];
       const catData = catLookup[collection];
