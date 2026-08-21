@@ -138,22 +138,26 @@ function NavLink({ href, children }: { href: string; children: React.ReactNode }
 
 function Logo({ isShrunk }: { isShrunk: boolean }) {
   return (
-    <div className="text-center flex flex-row space-x-2 items-baseline">
+    <Link
+      href="/"
+      aria-label="Go to homepage"
+      className="text-center flex flex-row space-x-2 items-baseline cursor-pointer group/logo"
+    >
       <div
-        className={`italic text-bj-text-nav leading-none transition-all duration-500 ease-in-out ${
+        className={`italic text-bj-text-nav leading-none transition-all duration-500 ease-in-out group-hover/logo:opacity-80 ${
           isShrunk ? 'text-[22px] md:text-[23px]' : 'text-[24px] md:text-[25px]'
         }`}
       >
         {SITE.name}
       </div>
       <div
-        className={`${cormorantSC.className} jewellers-text  tracking-[0.35em] leading-none [font-variant:small-caps] transition-all duration-500 ease-in-out ${
+        className={`${cormorantSC.className} jewellers-text  tracking-[0.35em] leading-none [font-variant:small-caps] transition-all duration-500 ease-in-out group-hover/logo:opacity-80 ${
           isShrunk ? 'text-[18px] md:text-[20px]' : 'text-[20px] md:text-[23px]'
         }`}
       >
         {SITE.suffix}
       </div>
-    </div>
+    </Link>
   );
 }
 

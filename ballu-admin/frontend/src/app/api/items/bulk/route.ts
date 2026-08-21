@@ -9,6 +9,7 @@ import { revalidateCatalog } from '@/lib/revalidateCatalog';
 export const dynamic = 'force-dynamic';
 
 interface BulkItem {
+  collections?: string[];
   collection?: string;
   group?: string;
   name?: { en?: string; np?: string };
@@ -40,8 +41,15 @@ export async function POST(req: NextRequest) {
       if (!group) {
         return NextResponse.json({ error: 'Each item requires a valid group' }, { status: 400, headers: { 'Cache-Control': 'no-store' } });
       }
+      const collections = (
+        Array.isArray(item.collections) ? item.collections : item.collection ? [item.collection] : []
+      ).map((c) => String(c)).filter((c) => /^[a-f\d]{24}$/i.test(c));
+      if (collections.length === 0) {
+        return NextResponse.json({ error: 'Each item requires at least one valid collection id' }, { status: 400, headers: { 'Cache-Control': 'no-store' } });
+      }
       prepared.push({
         ...item,
+        collections: [...new Set(collections)],
         material: (group as { material: unknown }).material,
         purity: (group as { name: string }).name,
         manualPriceNpr: item.manualPriceNpr != null ? Number(item.manualPriceNpr) : undefined,
@@ -51,7 +59,7 @@ export async function POST(req: NextRequest) {
     const conditions = prepared
       .filter((i) => i.name?.en && i.name?.np)
       .map((i) => ({
-        collection: i.collection,
+        collections: i.collections![0],
         material: i.material,
         'name.en': { $regex: new RegExp(`^${i.name!.en!.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') },
         'name.np': i.name!.np,

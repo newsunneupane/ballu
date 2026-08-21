@@ -16,7 +16,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
     if (authResult) return authResult;
     const { id } = await params;
     await connectDB();
-    const item = await Item.findById(id).populate('collection', 'name').populate('material', 'name').populate('group', 'name').lean();
+    const item = await Item.findById(id).populate('collections', 'name').populate('material', 'name').populate('group', 'name').lean();
     if (!item) return NextResponse.json({ error: 'Item not found' }, { status: 404, headers: { 'Cache-Control': 'no-store' } });
 
     try {
@@ -56,10 +56,11 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     await connectDB();
     const body = await req.json();
 
-    if (!body.collection) {
-      return badRequest('Collection is required');
+    if (!Array.isArray(body.collections) || body.collections.length === 0) {
+      return badRequest('At least one collection is required');
     }
-    if (!isObjectId(body.collection)) {
+    body.collections = [...new Set(body.collections.map((c: unknown) => String(c)))];
+    if (body.collections.some((c: string) => !isObjectId(c))) {
       return badRequest('Invalid collection');
     }
     if (!body.name?.en || !body.name?.np) {
@@ -168,7 +169,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       }
     }
 
-    const item = await Item.findByIdAndUpdate(id, { ...body, material, purity, manualPriceNpr: body.manualPriceNpr != null ? Number(body.manualPriceNpr) : undefined }, { new: true, runValidators: true }).populate(['collection', 'material', 'group']);
+    const item = await Item.findByIdAndUpdate(id, { ...body, material, purity, manualPriceNpr: body.manualPriceNpr != null ? Number(body.manualPriceNpr) : undefined }, { new: true, runValidators: true }).populate(['collections', 'material', 'group']);
     if (!item) return NextResponse.json({ error: 'Item not found' }, { status: 404, headers: { 'Cache-Control': 'no-store' } });
     revalidateCatalog();
     return NextResponse.json(item, {

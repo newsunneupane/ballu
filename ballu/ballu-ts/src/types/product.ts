@@ -12,6 +12,7 @@ export interface Product {
   id: string | number;
   tag: string | null;
   collection: string;
+  collections: string[];
   type: string;
   material: string;
   title: string;

@@ -13,7 +13,13 @@ export function isProductStoreSeeded(): boolean {
 }
 
 function transformApiItem(item: any): Product {
-  const catEn = item.collection?.name?.en?.toUpperCase() || 'OTHERS';
+  const rawCols: any[] = Array.isArray(item.collections) && item.collections.length > 0
+    ? item.collections
+    : item.collection ? [item.collection] : [];
+  const colNames = [...new Set(
+    rawCols.map((c) => (c?.name?.en || '').trim().toUpperCase()).filter(Boolean)
+  )];
+  const catEn = colNames[0] || 'OTHERS';
   const matEn = item.material?.name?.en?.toUpperCase() || 'GOLD';
   const weightStr = `${item.weightGrams}g`;
   const purity = item.group?.name?.en || item.purity || '';
@@ -24,6 +30,7 @@ function transformApiItem(item: any): Product {
     id: item._id,
     tag: item.tag || null,
     collection: catEn,
+    collections: colNames.length > 0 ? colNames : ['OTHERS'],
     type: catEn,
     material: matEn,
     title: item.name?.en || '',
@@ -171,7 +178,7 @@ export const productService = {
       const matchesCollection =
         !filters.collections ||
         filters.collections.includes('ALL') ||
-        filters.collections.includes(product.collection);
+        filters.collections.some((c) => product.collections.includes(c));
       const matchesMaterial =
         !filters.material ||
         filters.material === 'ALL' ||
@@ -203,9 +210,11 @@ export const productService = {
   getRecommended(opts: { excludeId?: string | number; collection?: string; material?: string; limit?: number }): Product[] {
     const { excludeId, collection, material, limit = 8 } = opts;
     const candidates = productStore.filter((p) => String(p.id) !== String(excludeId));
-    const bothMatch = candidates.filter((p) => p.collection === collection && p.material === material);
+    const bothMatch = collection
+      ? candidates.filter((p) => p.collections.includes(collection) && p.material === material)
+      : [];
     const eitherMatch = candidates.filter(
-      (p) => (p.collection === collection || p.material === material) && !bothMatch.includes(p)
+      (p) => ((collection && p.collections.includes(collection)) || p.material === material) && !bothMatch.includes(p)
     );
     const ranked = [...bothMatch, ...eitherMatch].sort((a, b) => (b.viewCount ?? 0) - (a.viewCount ?? 0));
     if (ranked.length >= limit) return ranked.slice(0, limit);
@@ -227,7 +236,7 @@ export const productService = {
         p.title.toLowerCase().includes(keyword) ||
         p.subTitle.toLowerCase().includes(keyword) ||
         (p.description && p.description.toLowerCase().includes(keyword)) ||
-        p.collection.toLowerCase().includes(keyword) ||
+        p.collections.some((c) => c.toLowerCase().includes(keyword)) ||
         p.material.toLowerCase().includes(keyword) ||
         (p.purity && p.purity.toLowerCase().includes(keyword)) ||
         (p.karigar && p.karigar.toLowerCase().includes(keyword)) ||
@@ -238,7 +247,7 @@ export const productService = {
   },
 
   getCollections(): string[] {
-    return [...new Set(productStore.map((p) => p.collection))];
+    return [...new Set(productStore.flatMap((p) => p.collections))];
   },
 
   getCollectionBySlug(slug: string): { collection: string; config: typeof collectionPageConfig[keyof typeof collectionPageConfig] } | null {
@@ -253,9 +262,11 @@ export const productService = {
     const totals: Record<string, number> = {};
     const materialCounts: Record<string, Record<string, number>> = {};
     for (const p of productStore) {
-      totals[p.collection] = (totals[p.collection] || 0) + 1;
-      if (!materialCounts[p.collection]) materialCounts[p.collection] = {};
-      materialCounts[p.collection][p.material] = (materialCounts[p.collection][p.material] || 0) + 1;
+      for (const col of p.collections.length > 0 ? p.collections : ['OTHERS']) {
+        totals[col] = (totals[col] || 0) + 1;
+        if (!materialCounts[col]) materialCounts[col] = {};
+        materialCounts[col][p.material] = (materialCounts[col][p.material] || 0) + 1;
+      }
     }
 
     const catLookup: Record<string, any> = {};
@@ -290,6 +301,7 @@ export const productService = {
           glowStyle: config.glowStyle,
           borderColor: config.borderColor,
           slug: collectionSlugMap[collection] || collection.toLowerCase().replace(/\s+/g, '-'),
+          image: catData?.image || undefined,
         };
       }
 
@@ -302,6 +314,7 @@ export const productService = {
         glowStyle: 'radial-gradient(circle at 40% 40%, rgba(213,165,96,0.18) 0%, rgba(14,11,8,0) 70%)',
         borderColor: 'border-amber-900/20',
         slug: collection.toLowerCase().replace(/\s+/g, '-'),
+        image: catData?.image || undefined,
       };
     });
   },
@@ -349,11 +362,17 @@ export const productService = {
           errors.push(`Invalid product: ${JSON.stringify(item)}`);
           continue;
         }
+        const normalized = {
+          ...item,
+          collections: Array.isArray(item.collections) && item.collections.length > 0
+            ? item.collections
+            : item.collection ? [item.collection] : ['OTHERS'],
+        };
         const existing = productStore.findIndex((p) => String(p.id) === String(item.id));
         if (existing >= 0) {
-          productStore[existing] = { ...productStore[existing], ...item };
+          productStore[existing] = { ...productStore[existing], ...normalized };
         } else {
-          productStore.push(item as Product);
+          productStore.push(normalized as Product);
         }
         count++;
       }

@@ -22,7 +22,10 @@ export async function GET(req: NextRequest) {
     const items = await getItemsData();
 
     const filtered = items.filter((item: any) => {
-      if (collection && String((item.collection as any)?._id || '') !== collection) return false;
+      if (collection) {
+        const cols: any[] = item.collections || [];
+        if (!cols.some((c) => String(c?._id || c) === collection)) return false;
+      }
       if (material && String((item.material as any)?._id || '') !== material) return false;
       if (tag && item.tag !== tag) return false;
       return true;

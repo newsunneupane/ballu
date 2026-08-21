@@ -1,14 +1,14 @@
 import { SiteConfig, BrandFeature } from '@/types/common';
 
 export const siteConfig: SiteConfig = {
-  name: 'Ballu',
+  name: 'Balu',
   suffix: 'JEWELLERS',
   tagline: 'Heirlooms, made for a quieter wear.',
   description: 'Forty years on the same bench in Kakarvitta. Hallmarked gold, hand-finished silver, made-to-order bridal sets.',
   goldRate: '₨ 14,260/G',
   silverRate: '₨ 175/G',
   phone: '+977 9842 000 000',
-  email: 'aalu@ballujewellers.np',
+  email: 'aalu@balujewellers.np',
   address: 'मुख्य बजार · काँकडभिट्टा · झापा',
   hours: 'Mon–Sat 10–7 · Sun 11–5',
   social: {

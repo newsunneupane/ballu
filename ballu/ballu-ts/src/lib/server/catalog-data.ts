@@ -20,15 +20,25 @@ function stripItemCount(name?: { en?: string; np?: string }): { en: string; np: 
   return { en: clean(name.en), np: clean(name.np) };
 }
 
+function normalizeCollections(item: Record<string, unknown>): void {
+  const cols = item.collections as { length?: number } | undefined;
+  if (!cols || (cols.length ?? 0) === 0) {
+    const legacy = item.collection;
+    item.collections = legacy ? [legacy] : [];
+  }
+}
+
 export const getItemsData = unstable_cache(
   async () => {
     await connectDB();
     const items = await Item.find()
-      .populate('collection', 'name')
+      .populate('collections', 'name')
       .populate('material', 'name')
       .populate('group', 'name')
       .sort({ createdAt: -1 })
       .lean();
+
+    items.forEach((item) => normalizeCollections(item as unknown as Record<string, unknown>));
 
     const itemsWithPricing = await Promise.all(
       items.map(async (item) => {
@@ -62,11 +72,12 @@ export const getItemByIdData = unstable_cache(
   async (id: string) => {
     await connectDB();
     const item = await Item.findById(id)
-      .populate('collection', 'name')
+      .populate('collections', 'name')
       .populate('material', 'name')
       .populate('group', 'name')
       .lean();
     if (!item) return null;
+    normalizeCollections(item as unknown as Record<string, unknown>);
     const clean = { ...item, name: stripItemCount((item as { name?: { en?: string; np?: string } }).name) };
 
     try {
@@ -122,7 +133,7 @@ export const getStoreSettingsData = unstable_cache(
     const settings = await StoreSettings.findOne()
       .populate('pieceOfTheWeek.material', 'name')
       .populate('pieceOfTheWeek.collection', 'name')
-      .populate('pieceOfTheWeek.item', 'name images purity weightGrams material wastagePercent makingCharges accessoriesCharge boutiqueDeduction diamondValue caratWeight isAvailable showPrice estimatedMakingDays')
+      .populate('pieceOfTheWeek.item', 'name images purity weightGrams material group wastagePercent makingCharges accessoriesCharge boutiqueDeduction diamondValue caratWeight isAvailable showPrice estimatedMakingDays')
       .lean();
 
     if (!settings) {
@@ -142,6 +153,7 @@ export const getStoreSettingsData = unstable_cache(
       try {
         const pricing = await calculateFinalPrice({
           materialId: item.material?.toString() || '',
+          groupId: item.group?.toString(),
           weightGrams: item.weightGrams,
           wastagePercent: item.wastagePercent || 0,
           makingCharges: item.makingCharges || 0,

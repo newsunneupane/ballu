@@ -1,7 +1,7 @@
 import mongoose, { Schema, Types } from 'mongoose';
 
 export interface IItem {
-  collection: Types.ObjectId;
+  collections: Types.ObjectId[];
   material: Types.ObjectId;
   group?: Types.ObjectId;
   name: { en: string; np: string };
@@ -26,7 +26,7 @@ export interface IItem {
 
 const ItemSchema = new Schema<IItem>(
   {
-    collection: { type: Schema.Types.ObjectId, ref: 'Collection', required: true },
+    collections: { type: [{ type: Schema.Types.ObjectId, ref: 'Collection' }], required: true, validate: [(v: unknown[]) => Array.isArray(v) && v.length > 0, 'At least one collection is required'] },
     material: { type: Schema.Types.ObjectId, ref: 'Material', required: true },
     group: { type: Schema.Types.ObjectId, ref: 'Group' },
     name: { en: { type: String, required: true }, np: { type: String, required: true } },

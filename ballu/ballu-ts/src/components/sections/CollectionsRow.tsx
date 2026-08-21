@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Cormorant_Garamond, Cormorant_SC } from 'next/font/google';
 import { productService } from '@/services/product-service';
 import { useProductData } from '@/hooks/useProductData';
+import { cloudinaryUrl } from '@/lib/cloudinary';
 import { ChevronLeft, ChevronRight } from '@/components/shared/Icons';
 import IconButton from '@/components/ui/IconButton';
 
@@ -60,25 +61,25 @@ export default function CollectionsRow() {
     <div className="text-bj-text-heading min-h-[30vh] flex flex-col justify-end bg-bj-bg-secondary">
       <style>{`
         @keyframes subtleLiftThenVibrate {
-          0% { transform: scaleY(1) translateX(0); }
-          30% { transform: scaleY(0.985) translateX(0); }
-          45% { transform: scaleY(0.985) translateX(-1px); }
-          60% { transform: scaleY(0.985) translateX(1px); }
-          75% { transform: scaleY(0.985) translateX(-0.5px); }
-          90% { transform: scaleY(0.985) translateX(0.5px); }
-          100% { transform: scaleY(0.985) translateX(0); }
+          0% { transform: translateY(0) translateX(0); }
+          30% { transform: translateY(-3px) translateX(0); }
+          45% { transform: translateY(-3px) translateX(-1px); }
+          60% { transform: translateY(-3px) translateX(1px); }
+          75% { transform: translateY(-3px) translateX(-0.5px); }
+          90% { transform: translateY(-3px) translateX(0.5px); }
+          100% { transform: translateY(-3px) translateX(0); }
         }
         @keyframes vibrateThenSettleDown {
-          0% { transform: scaleY(0.985) translateX(0); }
-          15% { transform: scaleY(0.985) translateX(-1px); }
-          30% { transform: scaleY(0.985) translateX(1px); }
-          45% { transform: scaleY(0.985) translateX(-0.5px); }
-          60% { transform: scaleY(0.985) translateX(0); }
-          100% { transform: scaleY(1) translateX(0); }
+          0% { transform: translateY(-3px) translateX(0); }
+          15% { transform: translateY(-2px) translateX(-1px); }
+          30% { transform: translateY(-1px) translateX(1px); }
+          45% { transform: translateY(-1px) translateX(-0.5px); }
+          60% { transform: translateY(0) translateX(0); }
+          100% { transform: translateY(0) translateX(0); }
         }
         .vibrate-card-hover {
-          transform-origin: top !important;
-          transition: shadow 0.3s ease-out;
+          transform: translateZ(0);
+          transition: box-shadow 0.3s ease-out;
           animation: vibrateThenSettleDown 0.35s ease-out forwards;
         }
         .vibrate-card-hover:hover {
@@ -100,11 +101,6 @@ export default function CollectionsRow() {
         }
         [data-theme="light"] .collection-card .card-circle {
           opacity: 0.35;
-        }
-        [data-theme="light"] .collection-card .card-badge {
-          background: rgba(204,0,0,0.12);
-          border-color: rgba(204,0,0,0.25);
-          color: #6b4f2a;
         }
         [data-theme="light"] .collection-card .card-glow {
           mix-blend-mode: normal;
@@ -168,49 +164,69 @@ export default function CollectionsRow() {
                 href={`/${item.slug}`}
                 className={`
                   flex-none w-[82vw] sm:w-[45vw] lg:w-[355px] aspect-[3/4]
-                  collection-card bg-bj-bg-card border ${item.borderColor} relative overflow-hidden group 
-                  flex flex-col justify-between p-6 md:p-8 
+                  collection-card bg-bj-bg-card border ${item.borderColor} relative overflow-hidden group
+                  flex flex-col justify-between
                   hover:shadow-2xl vibrate-card-hover
                 `}
               >
-                <div
-                  className="card-glow absolute inset-0 pointer-events-none mix-blend-screen opacity-90 transition-opacity duration-500 group-hover:opacity-100"
-                  style={{ backgroundImage: item.glowStyle }}
-                />
+                {!item.image && (
+                  <>
+                    <div
+                      className="card-glow absolute inset-0 pointer-events-none mix-blend-screen opacity-90 transition-opacity duration-500 group-hover:opacity-100"
+                      style={{ backgroundImage: item.glowStyle }}
+                    />
 
+                    <div className="card-luxury-svg absolute inset-0 pointer-events-none" aria-hidden="true">
+                      <svg className="w-full h-full" viewBox="0 0 355 473" preserveAspectRatio="xMidYMid slice" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                          <pattern id={`mv-${item.id}`} x="0" y="0" width="240" height="240" patternUnits="userSpaceOnUse">
+                            <path d="M0 50 Q60 30 120 60 T240 40" stroke="#dbb86b" strokeWidth="0.3" opacity="0.07" fill="none"/>
+                            <path d="M0 110 Q80 130 140 95 T240 115" stroke="#dbb86b" strokeWidth="0.2" opacity="0.05" fill="none"/>
+                            <path d="M0 170 Q50 160 100 185 T240 175" stroke="#dbb86b" strokeWidth="0.2" opacity="0.04" fill="none"/>
+                            <path d="M60 0 Q40 60 70 120 T50 240" stroke="#dbb86b" strokeWidth="0.2" opacity="0.05" fill="none"/>
+                            <path d="M170 0 Q190 70 150 130 T180 240" stroke="#dbb86b" strokeWidth="0.15" opacity="0.04" fill="none"/>
+                          </pattern>
+                        </defs>
+                        <rect width="100%" height="100%" fill={`url(#mv-${item.id})`}/>
+                      </svg>
+                    </div>
 
-                <div className="card-luxury-svg absolute inset-0 pointer-events-none" aria-hidden="true">
-                  <svg className="w-full h-full" viewBox="0 0 355 473" preserveAspectRatio="xMidYMid slice" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <defs>
-                      <pattern id={`mv-${item.id}`} x="0" y="0" width="240" height="240" patternUnits="userSpaceOnUse">
-                        <path d="M0 50 Q60 30 120 60 T240 40" stroke="#dbb86b" strokeWidth="0.3" opacity="0.07" fill="none"/>
-                        <path d="M0 110 Q80 130 140 95 T240 115" stroke="#dbb86b" strokeWidth="0.2" opacity="0.05" fill="none"/>
-                        <path d="M0 170 Q50 160 100 185 T240 175" stroke="#dbb86b" strokeWidth="0.2" opacity="0.04" fill="none"/>
-                        <path d="M60 0 Q40 60 70 120 T50 240" stroke="#dbb86b" strokeWidth="0.2" opacity="0.05" fill="none"/>
-                        <path d="M170 0 Q190 70 150 130 T180 240" stroke="#dbb86b" strokeWidth="0.15" opacity="0.04" fill="none"/>
-                      </pattern>
-                    </defs>
-                    <rect width="100%" height="100%" fill={`url(#mv-${item.id})`}/>
-                  </svg>
-                </div>
-
-                <div className="card-circle absolute top-[40%] left-[40%] -translate-x-1/2 -translate-y-1/2 pointer-events-none opacity-[0.12] group-hover:opacity-[0.22] transition-opacity duration-500">
-                  <div className="w-[140px] h-[140px] rounded-full border border-white flex items-center justify-center">
-                    <div className="w-[110px] h-[110px] rounded-full border border-white flex items-center justify-center">
-                      <div className="w-[80px] h-[80px] rounded-full border border-white flex items-center justify-center">
-                        <div className="w-[50px] h-[50px] rounded-full border border-white" />
+                    <div className="card-circle absolute top-[40%] left-[40%] -translate-x-1/2 -translate-y-1/2 pointer-events-none opacity-[0.12] group-hover:opacity-[0.22] transition-opacity duration-500">
+                      <div className="w-[140px] h-[140px] rounded-full border border-white flex items-center justify-center">
+                        <div className="w-[110px] h-[110px] rounded-full border border-white flex items-center justify-center">
+                          <div className="w-[80px] h-[80px] rounded-full border border-white flex items-center justify-center">
+                            <div className="w-[50px] h-[50px] rounded-full border border-white" />
+                          </div>
+                        </div>
                       </div>
                     </div>
+                  </>
+                )}
+
+                {item.image && (
+                  <div className="relative z-10 w-full h-[58%] shrink-0 overflow-hidden bg-bj-bg-card">
+                    <div className="absolute inset-0 transition-transform duration-700 ease-out group-hover:scale-[1.04]">
+                      <img
+                        src={cloudinaryUrl(item.image, { width: 600 })}
+                        alt={item.englishTitle}
+                        className="w-full h-full object-cover"
+                      />
+                      <svg
+                        className="absolute -bottom-px left-0 w-full h-[38px] pointer-events-none"
+                        viewBox="0 0 355 38"
+                        preserveAspectRatio="none"
+                        aria-hidden="true"
+                      >
+                        <path
+                          d="M0 22 C 55 8, 115 30, 178 22 C 245 13, 300 28, 355 16 L 355 38 L 0 38 Z"
+                          style={{ fill: 'var(--bj-bg-card)' }}
+                        />
+                      </svg>
+                    </div>
                   </div>
-                </div>
+                )}
 
-                <div className="relative z-10 self-start">
-                  <span className="card-badge text-[10px] tracking-widest text-bj-text-heading/40 bg-white/5 border border-white/10 px-2.5 py-1 font-sans">
-                    {item.id}
-                  </span>
-                </div>
-
-                <div className="relative z-10 flex flex-col space-y-4 pt-12">
+                <div className="relative z-10 flex flex-col space-y-4 px-6 md:px-8 pb-6 md:pb-8 pt-8 mt-auto">
                   <div>
                     <p className="card-nepali-title font-nepali-serif italic text-bj-gold text-xs tracking-wide font-light mb-1 opacity-90">
                       {item.nepaliTitle}

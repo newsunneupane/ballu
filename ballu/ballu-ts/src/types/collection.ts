@@ -12,4 +12,5 @@ export interface Collection {
   glowStyle: string;
   borderColor: string;
   slug: string;
+  image?: string;
 }

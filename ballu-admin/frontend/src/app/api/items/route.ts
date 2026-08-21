@@ -20,12 +20,12 @@ export async function GET(req: NextRequest) {
     const collection = searchParams.get('collection');
     const material = searchParams.get('material');
     const tag = searchParams.get('tag');
-    if (collection) filter.collection = collection;
+    if (collection) filter.collections = collection;
     if (material) filter.material = material;
     if (tag) filter.tag = tag;
 
     const items = await Item.find(filter)
-      .populate('collection', 'name')
+      .populate('collections', 'name')
       .populate('material', 'name')
       .populate('group', 'name')
       .sort({ createdAt: -1 })
@@ -70,10 +70,11 @@ export async function POST(req: NextRequest) {
     await connectDB();
     const body = await req.json();
 
-    if (!body.collection) {
-      return badRequest('Collection is required');
+    if (!Array.isArray(body.collections) || body.collections.length === 0) {
+      return badRequest('At least one collection is required');
     }
-    if (!isObjectId(body.collection)) {
+    body.collections = [...new Set(body.collections.map((c: unknown) => String(c)))];
+    if (body.collections.some((c: string) => !isObjectId(c))) {
       return badRequest('Invalid collection');
     }
     if (!body.name?.en || !body.name?.np) {
@@ -186,7 +187,7 @@ export async function POST(req: NextRequest) {
     }
 
     const item = await Item.create({ ...body, material, purity, manualPriceNpr: body.manualPriceNpr != null ? Number(body.manualPriceNpr) : undefined });
-    const populated = await item.populate(['collection', 'material', 'group']);
+    const populated = await item.populate(['collections', 'material', 'group']);
     revalidateCatalog();
     return NextResponse.json(populated, { status: 201, headers: { 'Cache-Control': 'no-store' } });
   } catch (err) {

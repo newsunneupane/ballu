@@ -1,7 +1,7 @@
 export const SITE = {
-  name: 'Ballu',
+  name: 'Balu',
   suffix: 'JEWELLERS',
-  fullName: 'Ballu Jewellers',
+  fullName: 'Balu Jewellers',
   tagline: 'Heirlooms, made for a quieter wear.',
   description: 'Forty years on the same bench in Kakarvitta. Hallmarked gold, hand-finished silver, made-to-order bridal sets.',
   est: '1984',

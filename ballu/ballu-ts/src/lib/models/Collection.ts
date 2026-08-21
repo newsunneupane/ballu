@@ -3,10 +3,11 @@ import mongoose, { Schema, Document } from 'mongoose';
 export interface ICollection extends Document {
   name: { en: string; np: string };
   description?: string;
+  image?: string;
 }
 
 const CollectionSchema = new Schema<ICollection>(
-  { name: { en: { type: String, required: true }, np: { type: String, required: true } }, description: { type: String } },
+  { name: { en: { type: String, required: true }, np: { type: String, required: true } }, description: { type: String }, image: { type: String } },
   { timestamps: true }
 );
 

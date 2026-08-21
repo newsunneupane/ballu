@@ -13,7 +13,7 @@ type WeightUnit = 'g' | 'tola';
 
 const initialForm = {
   nameEn: '', nameNp: '', description: '', tag: '', group: '',
-  collection: '', weightValue: '', weightUnit: 'g' as WeightUnit,
+  collections: [] as string[], weightValue: '', weightUnit: 'g' as WeightUnit,
   wastagePercent: '', makingCharges: '', accessoriesCharge: '', boutiqueDeduction: '', diamondValue: '',
   caratWeight: '', stonesDetails: '', karigarName: '', images: [] as string[],
   isAvailable: true, showPrice: true, makingDaysMin: '', makingDaysMax: '', manualPrice: '',
@@ -114,9 +114,10 @@ export default function ItemsPage() {
   const openNew = () => {
     setEditing(null);
     const othersCat = collections.find((c: any) => c.name?.en === 'Others');
+    const defaultCollection = othersCat?._id || collections[0]?._id || '';
     setForm({
       ...initialForm,
-      collection: othersCat?._id || collections[0]?._id || '',
+      collections: defaultCollection ? [defaultCollection] : [],
       wastagePercent: '0', makingCharges: '0', accessoriesCharge: '0',
       boutiqueDeduction: '0', diamondValue: '0',
     });
@@ -128,7 +129,9 @@ export default function ItemsPage() {
     setForm({
       nameEn: item.name.en, nameNp: item.name.np, description: item.description || '',
       tag: item.tag || '', group: item.group?._id || '',
-      collection: item.collection?._id || '',
+      collections: (item.collections?.length
+        ? item.collections.map((c: any) => c?._id || c).filter(Boolean)
+        : item.collection ? [item.collection?._id || item.collection].filter(Boolean) : []) as string[],
       weightValue: String(item.weightGrams), weightUnit: 'g',
       wastagePercent: String(item.wastagePercent ?? 0),
       makingCharges: String(item.makingCharges), accessoriesCharge: String(item.accessoriesCharge ?? 0),
@@ -157,7 +160,7 @@ export default function ItemsPage() {
 
   const selectedGroup = groups.find((g: any) => g._id === form.group);
   const selectedMaterial = materials.find((m: any) => m._id === selectedGroup?.material?._id);
-  const groupRate = selectedGroup?.rateNpr != null ? Number(selectedGroup.rateNpr) : Number(selectedMaterial?.rateNpr || 0);
+  const groupRate = selectedGroup?.rateNpr != null && Number(selectedGroup.rateNpr) > 0 ? Number(selectedGroup.rateNpr) : Number(selectedMaterial?.rateNpr || 0);
 
   const liveBreakdown = (() => {
     const weight = weightGramsValue;
@@ -179,7 +182,7 @@ export default function ItemsPage() {
     setError('');
     setValidationErrors([]);
     const errors: string[] = [];
-    if (!form.collection) errors.push('Collection is required');
+    if (form.collections.length === 0) errors.push('At least one collection is required');
     if (!form.group) errors.push('Group is required');
     if (!form.nameEn.trim()) errors.push('Name (English) is required');
     if (!form.nameNp.trim()) errors.push('Name (Nepali) is required');
@@ -218,7 +221,7 @@ export default function ItemsPage() {
       description: form.description,
       tag: form.tag || undefined,
       group: form.group,
-      collection: form.collection,
+      collections: form.collections,
       weightGrams: weightGramsValue,
       wastagePercent: Number(form.wastagePercent),
       makingCharges: Number(form.makingCharges),
@@ -419,7 +422,14 @@ export default function ItemsPage() {
                     <span className="ml-2 text-[9px] tracking-wider uppercase text-red-600 border border-red-500/40 rounded px-1.5 py-0.5">Unavailable</span>
                   )}
                 </td>
-                <td className="px-4 py-3 text-[#7d776c]">{item.collection?.name?.en || '—'}</td>
+                <td className="px-4 py-3 text-[#7d776c]">
+                  {(() => {
+                    const cols = item.collections?.length ? item.collections : item.collection ? [item.collection] : [];
+                    const names = cols.map((c: any) => c?.name?.en).filter(Boolean);
+                    if (names.length === 0) return '—';
+                    return names.length === 1 ? names[0] : `${names[0]} +${names.length - 1}`;
+                  })()}
+                </td>
                 <td className="px-4 py-3 text-[#7d776c]">{item.group?.name || '—'}</td>
                 <td className="px-4 py-3 text-[#7d776c]">{item.material?.name?.en || '—'}</td>
                 <td className="px-4 py-3 text-right text-[#26221d] tabular-nums">{item.weightGrams}g</td>
@@ -463,13 +473,15 @@ export default function ItemsPage() {
                 <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={2} className="w-full bg-[#faf8f4] border border-[#e5ded2] rounded px-3 py-2 text-sm text-[#26221d] focus:outline-none focus:border-[#b8860b]" />
               </div>
               <div>
-<label className="block text-[10px] tracking-[0.2em] uppercase text-[#6b655b] mb-1.5">Collection</label>
+                <label className="block text-[10px] tracking-[0.2em] uppercase text-[#6b655b] mb-1.5">Collections</label>
                   <SearchableSelect
-                    value={form.collection}
-                    onChange={(v) => setForm({ ...form, collection: v })}
+                    multiple
+                    values={form.collections}
+                    onValuesChange={(v) => setForm({ ...form, collections: v })}
                     options={collections.map((c: any) => ({ value: c._id, label: c.name.en }))}
-                    placeholder="Select collection"
+                    placeholder="Select collections"
                 />
+                <p className="text-[10px] text-[#6b655b] mt-1.5">An item can belong to multiple collections. The first one is used as its primary collection.</p>
               </div>
               <div>
                 <label className="block text-[10px] tracking-[0.2em] uppercase text-[#6b655b] mb-1.5">Group</label>
@@ -701,13 +713,13 @@ export default function ItemsPage() {
               <h2 className="text-lg font-semibold text-[#1f1b16]">Bulk Upload Items</h2>
               <button onClick={() => setShowBulk(false)} className="text-[#6b655b] hover:text-[#26221d]"><X size={18} /></button>
             </div>
-            <p className="text-xs text-[#6b655b] mb-3">Paste a JSON array of items. Each item needs <span className="text-[#b8860b]">collection</span> (ID), <span className="text-[#b8860b]">group</span> (ID — material is derived from the group), <span className="text-[#b8860b]">name</span> (object with <span className="text-[#b8860b]">en</span>/<span className="text-[#b8860b]">np</span>), and <span className="text-[#b8860b]">weightGrams</span>.</p>
+              <p className="text-xs text-[#6b655b] mb-3">Paste a JSON array of items. Each item needs <span className="text-[#b8860b]">collections</span> (array of IDs), <span className="text-[#b8860b]">group</span> (ID — material is derived from the group), <span className="text-[#b8860b]">name</span> (object with <span className="text-[#b8860b]">en</span>/<span className="text-[#b8860b]">np</span>), and <span className="text-[#b8860b]">weightGrams</span>.</p>
             <textarea
               value={bulkJson}
               onChange={(e) => setBulkJson(e.target.value)}
               rows={12}
               className="w-full bg-[#faf8f4] border border-[#e5ded2] rounded px-3 py-2 text-sm text-[#26221d] font-mono focus:outline-none focus:border-[#b8860b]"
-              placeholder='[{&quot;collection&quot;: &quot;...&quot;, &quot;group&quot;: &quot;...&quot;, &quot;name&quot;: {&quot;en&quot;: &quot;Item Name&quot;, &quot;np&quot;: &quot;...&quot;}, &quot;weightGrams&quot;: 10}]'
+              placeholder='[{&quot;collections&quot;: [&quot;...&quot;], &quot;group&quot;: &quot;...&quot;, &quot;name&quot;: {&quot;en&quot;: &quot;Item Name&quot;, &quot;np&quot;: &quot;...&quot;}, &quot;weightGrams&quot;: 10}]'
             />
             {bulkResult && (
               <div className={`mt-3 text-sm px-3 py-2 rounded ${bulkResult.startsWith('Error') ? 'text-red-600 bg-red-50' : 'text-green-700 bg-green-100'}`}>
