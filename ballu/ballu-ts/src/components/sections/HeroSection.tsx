@@ -153,7 +153,7 @@ function HeroSlider({ banners }: { banners: any[] }) {
       <HeroAnimations />
       <AmbientParticles />
 
-      <div className="relative z-10 flex-1 overflow-hidden mx-6 md:mx-10 lg:mx-16 2xl:mx-24 rounded-xl md:rounded-2xl">
+      <div className="relative z-10 flex-1 overflow-hidden mx-6 md:mx-10 lg:mx-16 2xl:mx-24 mt-2 md:mt-3 rounded-xl md:rounded-2xl">
         {banners.map((banner, i) => (
           <div
             key={i}
