@@ -46,7 +46,7 @@ function StaticHero({ settings }: { settings?: any }) {
 
   return (
     <div
-      className={`${cormorant.variable} ${cormorantSC.variable} ${notoDevanagari.variable} hero-section min-h-screen w-full text-bj-text-heading p-6 md:p-10 flex flex-col justify-between font-serif-editorial relative overflow-x-hidden`}
+      className={`${cormorant.variable} ${cormorantSC.variable} ${notoDevanagari.variable} hero-section min-h-screen w-full text-bj-text-heading px-6 md:px-10 lg:px-16 2xl:px-24 py-6 md:py-10 flex flex-col justify-between font-serif-editorial relative overflow-x-hidden`}
     >
       <HeroAnimations />
       <AmbientParticles />
@@ -153,7 +153,7 @@ function HeroSlider({ banners }: { banners: any[] }) {
       <HeroAnimations />
       <AmbientParticles />
 
-      <div className="relative z-10 flex-1 overflow-hidden">
+      <div className="relative z-10 flex-1 overflow-hidden mx-6 md:mx-10 lg:mx-16 2xl:mx-24 rounded-xl md:rounded-2xl">
         {banners.map((banner, i) => (
           <div
             key={i}
@@ -167,7 +167,7 @@ function HeroSlider({ banners }: { banners: any[] }) {
         ))}
       </div>
 
-      <div className="absolute bottom-3 md:bottom-4 right-3 md:right-4 z-30">
+      <div className="absolute bottom-10 md:bottom-12 right-2 md:right-3 z-30">
         <Button variant="primary" size="sm" magnetic className="hero-btn" icon={<ArrowRight />} onClick={() => navigate(active)}>
           {active?.type === 'item' ? 'Shop' : 'Explore'}
         </Button>
@@ -179,7 +179,7 @@ function HeroSlider({ banners }: { banners: any[] }) {
             key={i}
             onClick={() => setActiveIndex(i)}
             aria-label={`Go to slide ${i + 1}`}
-className={`w-1.5 h-1.5 rotate-45 transition-all duration-500 ${
+className={`w-2.5 h-2.5 rotate-45 transition-all duration-500 ${
                 i === activeIndex ? 'hero-dot-active scale-125' : 'bg-bj-text-muted/50 hover:bg-bj-text-muted/80'
               }`}
           />

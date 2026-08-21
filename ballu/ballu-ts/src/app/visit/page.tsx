@@ -135,7 +135,7 @@ export default function AboutContactPage() {
       </section>
 
       <section className="flex flex-col md:flex-row min-h-screen border-t border-bj-border-light">
-        <div className="relative w-full md:w-1/2 min-h-[500px] md:min-h-screen bg-bj-bg-secondary overflow-hidden border-b md:border-b-0 md:border-r border-bj-border-light">
+        <div className="visit-map relative w-full md:w-1/2 min-h-[500px] md:min-h-screen bg-bj-bg-secondary overflow-hidden border-b md:border-b-0 md:border-r border-bj-border-light">
           <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice" className="absolute inset-0 block pointer-events-none">
             <rect width="100" height="100" fill="#1a1612" />
             <g stroke="#c9a96e" strokeWidth="0.3" fill="none" opacity="0.4">
@@ -155,7 +155,7 @@ export default function AboutContactPage() {
 
           <div className="absolute bottom-8 left-8 md:bottom-12 md:left-12 z-10">
             <a href="https://maps.app.goo.gl/byHkwWCEZN7U2pfd6" target="_blank" rel="noopener noreferrer">
-              <Button variant="primary" size="md" icon={<ArrowRight />}>
+              <Button variant="primary" size="md" className="visit-map-btn" icon={<ArrowRight />}>
                 Open in Maps
               </Button>
             </a>

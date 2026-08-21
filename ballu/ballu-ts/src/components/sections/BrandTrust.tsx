@@ -20,7 +20,7 @@ export default function BrandTrust() {
         [data-theme="light"] .brand-grid p { color: #000000 !important; opacity: 0.7 !important; }
         [data-theme="light"] .brand-orbit { opacity: 0.6; }
         [data-theme="light"] .brand-orbit .bo-black { stroke: #000000 !important; }
-        [data-theme="light"] .brand-orbit .bo-darkgold { stroke: #996515 !important; }
+        [data-theme="light"] .brand-orbit .bo-darkgold { stroke: #cc0000 !important; }
         [data-theme="light"] .brand-orbit .brand-orbit-circle { border-color: #cc0000 !important; }
       `}</style>
       <div className="max-w-7xl w-full  mx-auto px-6 md:px-12 lg:px-16 pt-10 pb-40 flex flex-col items-center text-center relative overflow-hidden">

@@ -6,6 +6,7 @@ import { calculateFinalPrice } from '@/lib/utils/priceCalculator';
 import { requireAuth } from '@/lib/auth/middleware';
 import { errorResponse, badRequest, isObjectId } from '@/lib/api-utils';
 import { revalidateCatalog } from '@/lib/revalidateCatalog';
+import { stripCountFromName, escapeRegExp, countSuffixPattern } from '@/lib/utils/itemName';
 
 export const dynamic = 'force-dynamic';
 
@@ -104,17 +105,66 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     const material = (group as { material: { toString(): string } }).material.toString();
 
     if (body.name?.en || body.name?.np) {
-      const existing = await Item.findOne({
+      const baseNameEn = stripCountFromName(body.name?.en || '');
+      const baseNameNp = stripCountFromName(body.name?.np || '');
+      const existing = await Item.find({
         _id: { $ne: id },
-        collection: body.collection,
-        material: body.material,
         $or: [
-          ...(body.name?.en ? [{ 'name.en': { $regex: new RegExp(`^${body.name.en.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') } }] : []),
-          ...(body.name?.np ? [{ 'name.np': body.name.np }] : []),
+          ...(body.name?.en ? [{ 'name.en': { $regex: new RegExp(`^${escapeRegExp(baseNameEn)}${countSuffixPattern()}$`, 'i') } }] : []),
+          ...(body.name?.np ? [{ 'name.np': { $regex: new RegExp(`^${escapeRegExp(baseNameNp)}${countSuffixPattern()}$`) } }] : []),
         ],
       });
-      if (existing) {
-        return NextResponse.json({ error: 'An item with this name already exists in this collection & material' }, { status: 409, headers: { 'Cache-Control': 'no-store' } });
+      if (existing.length > 0) {
+        let incomingPrice: number | null = null;
+        try {
+          incomingPrice =
+            body.manualPriceNpr != null
+              ? Number(body.manualPriceNpr)
+              : await calculateFinalPrice({
+                  materialId: material,
+                  groupId: body.group,
+                  weightGrams: Number(body.weightGrams),
+                  wastagePercent: Number(body.wastagePercent) || 0,
+                  makingCharges: Number(body.makingCharges) || 0,
+                  accessoriesCharge: Number(body.accessoriesCharge) || 0,
+                  boutiqueDeduction: Number(body.boutiqueDeduction) || 0,
+                  diamondValue: Number(body.diamondValue) || 0,
+                });
+        } catch {
+          incomingPrice = null;
+        }
+
+        if (incomingPrice != null) {
+          let priceDuplicate = false;
+          for (const ex of existing) {
+            let exPrice: number | null = null;
+            if (ex.manualPriceNpr != null) {
+              exPrice = Number(ex.manualPriceNpr);
+            } else {
+              try {
+                exPrice = await calculateFinalPrice({
+                  materialId: ex.material.toString(),
+                  groupId: ex.group ? ex.group.toString() : undefined,
+                  weightGrams: ex.weightGrams,
+                  wastagePercent: ex.wastagePercent || 0,
+                  makingCharges: ex.makingCharges || 0,
+                  accessoriesCharge: ex.accessoriesCharge || 0,
+                  boutiqueDeduction: ex.boutiqueDeduction || 0,
+                  diamondValue: ex.diamondValue || 0,
+                });
+              } catch {
+                continue;
+              }
+            }
+            if (exPrice != null && Math.round(exPrice) === Math.round(incomingPrice)) {
+              priceDuplicate = true;
+              break;
+            }
+          }
+          if (priceDuplicate && !body.allowDuplicate) {
+            return NextResponse.json({ error: 'An item with this name and price already exists in this collection & material', duplicate: true }, { status: 409, headers: { 'Cache-Control': 'no-store' } });
+          }
+        }
       }
     }
 

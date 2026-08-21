@@ -66,7 +66,7 @@ export default function OnboardingWizard() {
 
   return (
     <div
-      className={`fixed inset-0 z-[200] overflow-y-auto transition-opacity duration-400 ${
+      className={`bj-onboarding fixed inset-0 z-[200] overflow-y-auto transition-opacity duration-400 ${
         visible ? 'opacity-100' : 'opacity-0 pointer-events-none'
       }`}
     >

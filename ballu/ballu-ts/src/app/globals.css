@@ -649,3 +649,97 @@ body {
     animation: spinCounterClockwise 40s linear infinite;
   }
 }
+
+/* OnboardingWizard: force dark-mode appearance regardless of active theme */
+.bj-onboarding .bg-bj-bg-ticker\/95 {
+  background-color: rgba(0, 0, 0, 0.95) !important;
+}
+
+.bj-onboarding .text-bj-text-heading {
+  color: #fbf7f0 !important;
+  font-weight: 300 !important;
+}
+
+.bj-onboarding .font-light {
+  font-weight: 300 !important;
+}
+
+.bj-onboarding .text-bj-gold-alt {
+  color: #cda274 !important;
+  font-weight: 400 !important;
+  text-shadow: none !important;
+}
+
+.bj-onboarding .text-bj-text-muted {
+  color: #8e897e !important;
+}
+
+.bj-onboarding .text-bj-text-alt {
+  color: #e5e5e0 !important;
+}
+
+.bj-onboarding .text-bj-text-dim {
+  color: #6e695f !important;
+}
+
+.bj-onboarding .border-bj-border {
+  border-color: #2b2415 !important;
+}
+
+.bj-onboarding .hover\:border-bj-gold-alt:hover {
+  border-color: #cda274 !important;
+}
+
+.bj-onboarding .hover\:text-bj-gold-alt:hover {
+  color: #cda274 !important;
+  font-weight: 400 !important;
+  text-shadow: none !important;
+}
+
+/* Catalogue grid/list toggle: red when active in light mode only */
+[data-theme="light"] .catalogue-toggle.bg-\[\#cda274\] {
+  background-color: #cc0000 !important;
+  color: #ffffff !important;
+}
+
+[data-theme="light"] .catalogue-toggle.bg-transparent.text-\[\#cda274\] {
+  color: #000000 !important;
+}
+
+[data-theme="light"] .collection-filter {
+  font-weight: 700 !important;
+}
+
+[data-theme="light"] .tag-filter {
+  font-weight: 700 !important;
+}
+
+[data-theme="light"] .stock-only-label {
+  color: #000000 !important;
+}
+
+[data-theme="light"] .similar-pieces-heading {
+  color: #cc0000 !important;
+  font-weight: 700 !important;
+}
+
+[data-theme="light"] .visit-map {
+  background-color: #f8f2e3 !important;
+}
+
+[data-theme="light"] .visit-map svg rect {
+  fill: #f8f2e3 !important;
+}
+
+[data-theme="light"] .visit-map svg [stroke="#c9a96e"] {
+  stroke: #cc0000 !important;
+}
+
+[data-theme="light"] .visit-map svg [fill="#c9a96e"] {
+  fill: #cc0000 !important;
+}
+
+[data-theme="light"] .visit-map-btn {
+  background-color: #cc0000 !important;
+  color: #ffffff !important;
+}

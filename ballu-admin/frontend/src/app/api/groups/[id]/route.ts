@@ -38,6 +38,9 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     if (!body.material) {
       return NextResponse.json({ error: 'Material is required' }, { status: 400, headers: { 'Cache-Control': 'no-store' } });
     }
+    if (body.rateNpr != null && !Number.isFinite(Number(body.rateNpr))) {
+      return NextResponse.json({ error: 'Invalid rate' }, { status: 400, headers: { 'Cache-Control': 'no-store' } });
+    }
 
     const existing = await Group.findOne({
       _id: { $ne: id },
@@ -48,7 +51,11 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       return NextResponse.json({ error: 'A group with this name already exists for this material' }, { status: 409, headers: { 'Cache-Control': 'no-store' } });
     }
 
-    const group = await Group.findByIdAndUpdate(id, { name: body.name.trim(), material: body.material }, { new: true, runValidators: true }).populate('material', 'name');
+    const group = await Group.findByIdAndUpdate(
+      id,
+      { name: body.name.trim(), material: body.material, rateNpr: body.rateNpr != null ? Number(body.rateNpr) : undefined },
+      { new: true, runValidators: true }
+    ).populate('material', 'name');
     if (!group) return NextResponse.json({ error: 'Group not found' }, { status: 404, headers: { 'Cache-Control': 'no-store' } });
     revalidateCatalog();
     return NextResponse.json(group, {

@@ -178,6 +178,7 @@ export default function CollectionsRow() {
                   style={{ backgroundImage: item.glowStyle }}
                 />
 
+
                 <div className="card-luxury-svg absolute inset-0 pointer-events-none" aria-hidden="true">
                   <svg className="w-full h-full" viewBox="0 0 355 473" preserveAspectRatio="xMidYMid slice" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <defs>

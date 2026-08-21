@@ -39,6 +39,9 @@ export async function POST(req: NextRequest) {
     if (!body.material) {
       return NextResponse.json({ error: 'Material is required' }, { status: 400, headers: { 'Cache-Control': 'no-store' } });
     }
+    if (body.rateNpr != null && !Number.isFinite(Number(body.rateNpr))) {
+      return NextResponse.json({ error: 'Invalid rate' }, { status: 400, headers: { 'Cache-Control': 'no-store' } });
+    }
 
     const existing = await Group.findOne({
       material: body.material,
@@ -48,7 +51,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'A group with this name already exists for this material' }, { status: 409, headers: { 'Cache-Control': 'no-store' } });
     }
 
-    const group = await Group.create({ name: body.name.trim(), material: body.material });
+    const group = await Group.create({
+      name: body.name.trim(),
+      material: body.material,
+      rateNpr: body.rateNpr != null ? Number(body.rateNpr) : undefined,
+    });
     const populated = await group.populate('material', 'name');
     revalidateCatalog();
     return NextResponse.json(populated, { status: 201, headers: { 'Cache-Control': 'no-store' } });

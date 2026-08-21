@@ -1,4 +1,5 @@
 import Material from '@/lib/models/Material';
+import Group from '@/lib/models/Group';
 
 export async function calculateFinalPrice(params: {
   materialId: string;
@@ -10,14 +11,21 @@ export async function calculateFinalPrice(params: {
   boutiqueDeduction: number;
   diamondValue: number;
 }): Promise<number> {
-  const { materialId, weightGrams, wastagePercent, makingCharges, accessoriesCharge, boutiqueDeduction, diamondValue } = params;
+  const { materialId, groupId, weightGrams, wastagePercent, makingCharges, accessoriesCharge, boutiqueDeduction, diamondValue } = params;
 
   const material = await Material.findById(materialId).lean();
   if (!material) {
     throw new Error(`No material found for id ${materialId}`);
   }
 
-  const ratePerGram = Number(material.rateNpr) || 0;
+  let ratePerGram = Number(material.rateNpr) || 0;
+  if (groupId) {
+    const group = await Group.findById(groupId).lean();
+    if (group && Number((group as { rateNpr?: number }).rateNpr) > 0) {
+      ratePerGram = Number((group as { rateNpr?: number }).rateNpr);
+    }
+  }
+
   if (ratePerGram <= 0) {
     throw new Error(`No rate set for material ${(material as { name: { en: string } }).name?.en || materialId}`);
   }

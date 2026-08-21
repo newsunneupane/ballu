@@ -5,6 +5,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
 import { cloudinaryUrl } from '@/lib/cloudinary';
 import { tolaToGrams, gramsToTola } from '@/lib/utils/units';
+import { stripCountFromName } from '@/lib/utils/itemName';
 import SearchableSelect from '@/components/SearchableSelect';
 import { Plus, Pencil, Trash2, X, Upload, ImagePlus, Loader2, Search } from 'lucide-react';
 
@@ -156,7 +157,7 @@ export default function ItemsPage() {
 
   const selectedGroup = groups.find((g: any) => g._id === form.group);
   const selectedMaterial = materials.find((m: any) => m._id === selectedGroup?.material?._id);
-  const groupRate = Number(selectedMaterial?.rateNpr || 0);
+  const groupRate = selectedGroup?.rateNpr != null ? Number(selectedGroup.rateNpr) : Number(selectedMaterial?.rateNpr || 0);
 
   const liveBreakdown = (() => {
     const weight = weightGramsValue;
@@ -182,17 +183,33 @@ export default function ItemsPage() {
     if (!form.group) errors.push('Group is required');
     if (!form.nameEn.trim()) errors.push('Name (English) is required');
     if (!form.nameNp.trim()) errors.push('Name (Nepali) is required');
-    const nameKey = form.nameEn.trim().toLowerCase();
-    const dup = allItems.find(
-      (it: any) => it._id !== editing?._id && (it.name?.en || '').trim().toLowerCase() === nameKey
+    const incomingPrice = form.manualPrice ? Number(form.manualPrice) : liveBreakdown.total;
+    const baseKey = stripCountFromName(form.nameEn).toLowerCase();
+    const sameName = allItems.filter(
+      (it: any) =>
+        it._id !== editing?._id &&
+        stripCountFromName(it.name?.en || '').toLowerCase() === baseKey
     );
-    if (dup) {
-      errors.push(`Can't create the duplicate item: an item named "${form.nameEn.trim()}" already exists.`);
-    }
+    const priceDup = sameName.find((it: any) => it.finalPrice != null && Number(it.finalPrice) === incomingPrice);
     if (!form.weightValue || weightGramsValue <= 0) errors.push('Weight is required');
     if (errors.length > 0) {
       setValidationErrors(errors);
       return;
+    }
+    let allowDuplicate = false;
+    if (priceDup) {
+      const unchanged =
+        !!editing &&
+        stripCountFromName(editing.name?.en || '').toLowerCase() === baseKey &&
+        editing.finalPrice != null &&
+        Number(editing.finalPrice) === incomingPrice;
+      if (!unchanged) {
+        const ok = window.confirm(
+          `"${form.nameEn.trim()}" with price NPR ${incomingPrice.toLocaleString()} already exists. Do you want to repeat this item?`
+        );
+        if (!ok) return;
+        allowDuplicate = true;
+      }
     }
     const makingDaysMin = form.makingDaysMin ? Number(form.makingDaysMin) : undefined;
     const makingDaysMax = form.makingDaysMax ? Number(form.makingDaysMax) : undefined;
@@ -216,6 +233,7 @@ export default function ItemsPage() {
       showPrice: form.showPrice,
       estimatedMakingDays: (makingDaysMin != null || makingDaysMax != null) ? { min: makingDaysMin, max: makingDaysMax } : undefined,
       manualPriceNpr: form.manualPrice ? Number(form.manualPrice) : undefined,
+      allowDuplicate,
     };
 
     try {
@@ -370,6 +388,7 @@ export default function ItemsPage() {
               <th className="text-left px-4 py-3 font-medium">Image</th>
               <th className="text-left px-4 py-3 font-medium">Name</th>
               <th className="text-left px-4 py-3 font-medium">Collection</th>
+              <th className="text-left px-4 py-3 font-medium">Group</th>
               <th className="text-left px-4 py-3 font-medium">Material</th>
               <th className="text-right px-4 py-3 font-medium">Weight</th>
               <th className="text-right px-4 py-3 font-medium">Price</th>
@@ -401,6 +420,7 @@ export default function ItemsPage() {
                   )}
                 </td>
                 <td className="px-4 py-3 text-[#7d776c]">{item.collection?.name?.en || '—'}</td>
+                <td className="px-4 py-3 text-[#7d776c]">{item.group?.name || '—'}</td>
                 <td className="px-4 py-3 text-[#7d776c]">{item.material?.name?.en || '—'}</td>
                 <td className="px-4 py-3 text-right text-[#26221d] tabular-nums">{item.weightGrams}g</td>
                 <td className="px-4 py-3 text-right text-[#b8860b] tabular-nums font-medium">
@@ -461,6 +481,18 @@ export default function ItemsPage() {
                 />
                 {groups.length === 0 && (
                   <p className="text-[10px] text-[#6b655b] mt-1.5">No groups yet. Add them in the Groups page.</p>
+                )}
+              </div>
+              <div>
+                <label className="block text-[10px] tracking-[0.2em] uppercase text-[#6b655b] mb-1.5">Material</label>
+                <input
+                  value={selectedGroup?.material?.name?.en || ''}
+                  readOnly
+                  placeholder={selectedGroup ? 'No material assigned to this group' : 'Select a group to auto-select material'}
+                  className="w-full bg-[#faf8f4] border border-[#e5ded2] rounded px-3 py-2 text-sm text-[#26221d] opacity-70 cursor-not-allowed"
+                />
+                {selectedGroup && !selectedGroup.material && (
+                  <p className="text-[10px] text-red-600 mt-1.5">This group has no material assigned — create or reassign its material in the Groups page.</p>
                 )}
               </div>
               <div>

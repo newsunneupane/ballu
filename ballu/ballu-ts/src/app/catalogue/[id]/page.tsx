@@ -294,10 +294,7 @@ export default function ProductDetail() {
               </div>
             </div>
 
-            <div className="grid grid-cols-[1fr_minmax(120px,auto)] gap-4">
-              <Button variant="primary" size="lg" className="w-full py-4 justify-center">
-                Reserve To View
-              </Button>
+            <div>
               <a
                 href={buildWhatsappLink(product, product.showPrice && product.priceNpr != null ? format(product.priceNpr) : null, whatsappNumber(settings))}
                 target="_blank"
@@ -313,7 +310,7 @@ export default function ProductDetail() {
 
         {similarProducts.length > 0 && (
           <div className="mt-24 lg:mt-32">
-            <h2 className={`${tenorSans.className} text-[9px] tracking-[0.3em] uppercase text-bj-text-muted mb-6`}>
+            <h2 className={`${tenorSans.className} similar-pieces-heading text-[12px] tracking-[0.3em] uppercase text-bj-text-muted mb-6`}>
               Similar Pieces
             </h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">

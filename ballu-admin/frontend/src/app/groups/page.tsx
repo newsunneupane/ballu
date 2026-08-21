@@ -19,19 +19,19 @@ export default function GroupsPage() {
   });
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<any>(null);
-  const [form, setForm] = useState({ name: '', material: '' });
+  const [form, setForm] = useState({ name: '', material: '', rateNpr: '' });
 
   const invalidate = () => queryClient.invalidateQueries({ queryKey: ['groups'] });
 
   const openNew = () => {
     setEditing(null);
-    setForm({ name: '', material: filterMaterial || materials[0]?._id || '' });
+    setForm({ name: '', material: filterMaterial || materials[0]?._id || '', rateNpr: '' });
     setShowForm(true);
   };
 
   const openEdit = (g: any) => {
     setEditing(g);
-    setForm({ name: g.name, material: g.material?._id || '' });
+    setForm({ name: g.name, material: g.material?._id || '', rateNpr: g.rateNpr != null ? String(g.rateNpr) : '' });
     setShowForm(true);
   };
 
@@ -47,7 +47,11 @@ export default function GroupsPage() {
       setError('Please select a material');
       return;
     }
-    const payload = { name: form.name, material: form.material };
+    const payload = {
+      name: form.name,
+      material: form.material,
+      rateNpr: form.rateNpr.trim() !== '' ? Number(form.rateNpr) : undefined,
+    };
     try {
       if (editing) {
         await api.groups.update(editing._id, payload);
@@ -103,6 +107,7 @@ export default function GroupsPage() {
             <tr className="border-b border-[#e5ded2] text-[#6b655b] text-[10px] tracking-[0.2em] uppercase">
               <th className="text-left px-5 py-3 font-medium">Name</th>
               <th className="text-left px-5 py-3 font-medium">Material</th>
+              <th className="text-right px-5 py-3 font-medium">Rate (NPR/g)</th>
               <th className="text-right px-5 py-3 font-medium">Actions</th>
             </tr>
           </thead>
@@ -111,6 +116,7 @@ export default function GroupsPage() {
               <tr key={g._id} className="border-b border-[#e5ded2]/50 last:border-0 hover:bg-black/5">
                 <td className="px-5 py-3 text-[#26221d]">{g.name}</td>
                 <td className="px-5 py-3 text-[#7d776c]">{materialName(g)}</td>
+                <td className="px-5 py-3 text-right text-[#26221d]">{g.rateNpr != null ? g.rateNpr.toLocaleString() : '—'}</td>
                 <td className="px-5 py-3 text-right">
                   <button onClick={() => openEdit(g)} className="text-[#7d776c] hover:text-[#b8860b] transition-colors mr-3"><Pencil size={14} /></button>
                   <button onClick={() => remove(g._id)} className="text-[#7d776c] hover:text-red-600 transition-colors"><Trash2 size={14} /></button>
@@ -118,10 +124,10 @@ export default function GroupsPage() {
               </tr>
             ))}
             {groups.length === 0 && (
-              <tr><td colSpan={3} className="px-5 py-8 text-center text-[#6b655b]">No groups yet</td></tr>
+              <tr><td colSpan={4} className="px-5 py-8 text-center text-[#6b655b]">No groups yet</td></tr>
             )}
             {deleteError && (
-              <tr><td colSpan={3} className="px-5 py-3 text-center text-red-600 text-sm bg-red-50">{deleteError}</td></tr>
+              <tr><td colSpan={4} className="px-5 py-3 text-center text-red-600 text-sm bg-red-50">{deleteError}</td></tr>
             )}
           </tbody>
         </table>
@@ -147,6 +153,19 @@ export default function GroupsPage() {
               <div>
                 <label className="block text-[10px] tracking-[0.2em] uppercase text-[#6b655b] mb-1.5">Name</label>
                 <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="e.g. 22K" className="w-full bg-[#faf8f4] border border-[#e5ded2] rounded px-3 py-2 text-sm text-[#26221d] focus:outline-none focus:border-[#b8860b]" />
+              </div>
+              <div>
+                <label className="block text-[10px] tracking-[0.2em] uppercase text-[#6b655b] mb-1.5">Rate (NPR per gram)</label>
+                <input
+                  value={form.rateNpr}
+                  onChange={(e) => setForm({ ...form, rateNpr: e.target.value })}
+                  type="number"
+                  min="0"
+                  step="any"
+                  placeholder="e.g. 145000"
+                  className="w-full bg-[#faf8f4] border border-[#e5ded2] rounded px-3 py-2 text-sm text-[#26221d] focus:outline-none focus:border-[#b8860b]"
+                />
+                <p className="text-[10px] text-[#6b655b] mt-1.5">Used for item price calculation. Leave blank to use the material&apos;s rate.</p>
               </div>
               {error && (
                 <div className="text-red-600 text-sm px-3 py-2 rounded bg-red-50">{error}</div>

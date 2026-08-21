@@ -159,7 +159,7 @@ export default function CatalogueContent({
                     <button
                       key={cat}
                       onClick={() => handleCollectionClick(cat)}
-                      className={`${tenorSans.className} inline-block px-3 py-1 text-[8px] hover:-translate-y-[2px] font-small tracking-widest transition-all border rounded-4xl uppercase shrink-0 ${
+                      className={`${tenorSans.className} collection-filter inline-block px-3 py-1 text-[8px] hover:-translate-y-[2px] font-small tracking-widest transition-all border rounded-4xl uppercase shrink-0 ${
                         isSelected
                            ? 'border-bj-gold-alt text-bj-gold-alt  bg-bj-bg-elevated'
                           : 'border-bj-border text-bj-text-muted'
@@ -215,7 +215,7 @@ export default function CatalogueContent({
                 <div className="flex border border-bj-border">
                   <button
                     onClick={() => setViewMode('GRID')}
-                    className={`${tenorSans.className} px-3 py-1.5 text-[10px] tracking-[0.15em] transition-all duration-300 uppercase ${
+                    className={`${tenorSans.className} catalogue-toggle px-3 py-1.5 text-[10px] tracking-[0.15em] transition-all duration-300 uppercase ${
                       viewMode === 'GRID'
                         ? 'bg-[#cda274] text-black font-semibold'
                         : 'bg-transparent text-[#cda274] hover:bg-[#cda274]/10'
@@ -225,7 +225,7 @@ export default function CatalogueContent({
                   </button>
                   <button
                     onClick={() => setViewMode('LIST')}
-                    className={`${tenorSans.className} px-3 py-1.5 text-[10px] tracking-[0.15em] transition-all duration-300 uppercase ${
+                    className={`${tenorSans.className} catalogue-toggle px-3 py-1.5 text-[10px] tracking-[0.15em] transition-all duration-300 uppercase ${
                       viewMode === 'LIST'
                         ? 'bg-[#cda274] text-black font-semibold'
                         : 'bg-transparent text-[#cda274] hover:bg-[#cda274]/10'
@@ -248,7 +248,7 @@ export default function CatalogueContent({
                 <button
                   key={t}
                   onClick={() => setActiveTag(t)}
-                  className={`${tenorSans.className} px-2.5 py-1 text-[9px] tracking-widest uppercase border rounded-full transition-all ${
+                  className={`${tenorSans.className} tag-filter px-2.5 py-1 text-[9px] tracking-widest uppercase border rounded-full transition-all ${
                     activeTag === t ? 'border-bj-gold-alt text-bj-gold-alt' : 'border-bj-border text-bj-text-muted'
                   }`}
                 >
@@ -258,7 +258,7 @@ export default function CatalogueContent({
             </div>
           )}
 
-          <label className={`${tenorSans.className} flex items-center gap-2 text-[9px] tracking-[0.2em] uppercase text-bj-text-muted cursor-pointer`}>
+          <label className={`${tenorSans.className} stock-only-label flex items-center gap-2 text-[9px] tracking-[0.2em] uppercase text-bj-text-muted cursor-pointer`}>
             <input type="checkbox" checked={availableOnly} onChange={(e) => setAvailableOnly(e.target.checked)} className="accent-[#cda274]" />
             In Stock Only
           </label>

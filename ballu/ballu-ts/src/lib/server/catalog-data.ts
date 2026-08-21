@@ -14,6 +14,12 @@ export const STORE_SETTINGS_TAG = 'store-settings';
 
 const revalidate = CATALOG_REVALIDATE_SECONDS;
 
+function stripItemCount(name?: { en?: string; np?: string }): { en: string; np: string } | undefined {
+  if (!name) return name;
+  const clean = (s?: string) => (s || '').replace(/\s+(?:\(\d+\)|\d+)$/, '');
+  return { en: clean(name.en), np: clean(name.np) };
+}
+
 export const getItemsData = unstable_cache(
   async () => {
     await connectDB();
@@ -26,21 +32,22 @@ export const getItemsData = unstable_cache(
 
     const itemsWithPricing = await Promise.all(
       items.map(async (item) => {
-        if (!item.material) return { ...item, pricing: null };
+        const clean = { ...item, name: stripItemCount((item as { name?: { en?: string; np?: string } }).name) };
+        if (!clean.material) return { ...clean, pricing: null };
         try {
           const pricing = await calculateFinalPrice({
-            materialId: (item.material as { _id: string })._id.toString(),
-            groupId: item.group ? (item.group as { _id: string })._id.toString() : undefined,
-            weightGrams: item.weightGrams,
-            wastagePercent: item.wastagePercent,
-            makingCharges: item.makingCharges,
-            accessoriesCharge: item.accessoriesCharge,
-            boutiqueDeduction: item.boutiqueDeduction,
-            diamondValue: item.diamondValue,
+            materialId: (clean.material as { _id: string })._id.toString(),
+            groupId: clean.group ? (clean.group as { _id: string })._id.toString() : undefined,
+            weightGrams: clean.weightGrams,
+            wastagePercent: clean.wastagePercent,
+            makingCharges: clean.makingCharges,
+            accessoriesCharge: clean.accessoriesCharge,
+            boutiqueDeduction: clean.boutiqueDeduction,
+            diamondValue: clean.diamondValue,
           });
-          return { ...item, pricing };
+          return { ...clean, pricing };
         } catch {
-          return { ...item, pricing: null };
+          return { ...clean, pricing: null };
         }
       })
     );
@@ -60,21 +67,22 @@ export const getItemByIdData = unstable_cache(
       .populate('group', 'name')
       .lean();
     if (!item) return null;
+    const clean = { ...item, name: stripItemCount((item as { name?: { en?: string; np?: string } }).name) };
 
     try {
       const pricing = await calculateFinalPrice({
-        materialId: (item.material as { _id: string })._id.toString(),
-        groupId: item.group ? (item.group as { _id: string })._id.toString() : undefined,
-        weightGrams: item.weightGrams,
-        wastagePercent: item.wastagePercent,
-        makingCharges: item.makingCharges,
-        accessoriesCharge: item.accessoriesCharge,
-        boutiqueDeduction: item.boutiqueDeduction,
-        diamondValue: item.diamondValue,
+        materialId: (clean.material as { _id: string })._id.toString(),
+        groupId: clean.group ? (clean.group as { _id: string })._id.toString() : undefined,
+        weightGrams: clean.weightGrams,
+        wastagePercent: clean.wastagePercent,
+        makingCharges: clean.makingCharges,
+        accessoriesCharge: clean.accessoriesCharge,
+        boutiqueDeduction: clean.boutiqueDeduction,
+        diamondValue: clean.diamondValue,
       });
-      return { ...item, pricing };
+      return { ...clean, pricing };
     } catch {
-      return { ...item, pricing: null };
+      return { ...clean, pricing: null };
     }
   },
   ['catalog-item-by-id'],
@@ -130,6 +138,7 @@ export const getStoreSettingsData = unstable_cache(
 
     if (settings.pieceOfTheWeek?.item) {
       const item = settings.pieceOfTheWeek.item as any;
+      item.name = stripItemCount(item.name as { en?: string; np?: string } | undefined);
       try {
         const pricing = await calculateFinalPrice({
           materialId: item.material?.toString() || '',
@@ -183,8 +192,9 @@ async function resolveHeroBanners(banners: any[]) {
         } else if (banner.type === 'item') {
           const entity = await Item.findById(banner.refId).select('name').lean();
           if (entity) {
-            result.name = (entity.name as any)?.en;
-            result.nameNp = (entity.name as any)?.np;
+            const cleanName = stripItemCount((entity.name as any) as { en?: string; np?: string } | undefined);
+            result.name = cleanName?.en;
+            result.nameNp = cleanName?.np;
           }
         }
       } catch {
