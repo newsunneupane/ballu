@@ -36,12 +36,12 @@ export default function OnboardingWizard() {
   });
 
   const { data: collections = [] } = useQuery<Option[]>({
-    queryKey: ['onboarding-collections'],
+    queryKey: ['onboarding-collections', material?._id],
     queryFn: async () => {
-      const res = await fetch('/api/collections');
+      const res = await fetch(`/api/collections${material ? `?material=${material._id}` : ''}`);
       return res.ok ? res.json() : [];
     },
-    enabled: mounted && step === 1,
+    enabled: mounted && step === 1 && !!material,
   });
 
   if (!mounted) return null;
@@ -122,7 +122,9 @@ export default function OnboardingWizard() {
                 </button>
               ))}
               {collections.length === 0 && (
-                <span className={`${tenorSans.className} text-xs text-bj-text-dim`}>Loading…</span>
+                <span className={`${tenorSans.className} text-xs text-bj-text-dim`}>
+                  No collections for this material yet
+                </span>
               )}
             </div>
             <button
