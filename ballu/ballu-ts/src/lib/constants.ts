@@ -29,8 +29,6 @@ export const NAV_LINKS = {
     { href: '/personalize', label: 'Personalize' },
   ],
   right: [
-    { href: '/bridal', label: 'Bridal' },
-    { href: '/stories', label: 'Stories' },
     { href: '/visit', label: 'Visit' },
   ],
 } as const;

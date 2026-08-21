@@ -23,7 +23,7 @@ const cormorant = Cormorant_Garamond({
 });
 
 export default function Navbar() {
-  const { isPinned, isShrunk } = useScrollPosition();
+  const { isPinned } = useScrollPosition();
   const [isOpen, setIsOpen] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const [tickerOffset, setTickerOffset] = useState(32);
@@ -48,11 +48,7 @@ export default function Navbar() {
           ${isPinned ? 'shadow-xl' : ''}
         `}
       >
-        <div
-          className={`max-w-[1400px] mx-auto px-4 md:px-10 flex items-center justify-between transition-all duration-500 ease-in-out ${
-            isShrunk ? 'h-[50px]' : 'h-[56px] md:h-[68px]'
-          }`}
-        >
+        <div className="max-w-[1400px] mx-auto px-4 md:px-10 flex items-center justify-between h-[50px]">
           <button
             onClick={() => setIsOpen(!isOpen)}
             className="md:hidden text-bj-text-nav hover:font-semibold focus:outline-none transition-colors p-1"
@@ -63,12 +59,10 @@ export default function Navbar() {
 
           <DesktopNav links={NAV_LINKS.left} />
 
-          <Logo isShrunk={isShrunk} />
+          <Logo />
 
           <div className="flex items-center gap-3 md:gap-5 text-[13px] text-bj-text-nav">
             <div className="hidden md:flex gap-5 tracking-[8px]">
-              <NavLink href="/bridal">Bridal</NavLink>
-              <NavLink href="/stories">Stories</NavLink>
               <NavLink href="/visit">Visit</NavLink>
             </div>
 
@@ -136,7 +130,7 @@ function NavLink({ href, children }: { href: string; children: React.ReactNode }
   );
 }
 
-function Logo({ isShrunk }: { isShrunk: boolean }) {
+function Logo() {
   return (
     <Link
       href="/"
@@ -144,16 +138,12 @@ function Logo({ isShrunk }: { isShrunk: boolean }) {
       className="text-center flex flex-row space-x-2 items-baseline cursor-pointer group/logo"
     >
       <div
-        className={`italic text-bj-text-nav leading-none transition-all duration-500 ease-in-out group-hover/logo:opacity-80 ${
-          isShrunk ? 'text-[22px] md:text-[23px]' : 'text-[24px] md:text-[25px]'
-        }`}
+        className={`italic text-bj-text-nav leading-none transition-opacity duration-300 group-hover/logo:opacity-80 text-[22px] md:text-[23px]`}
       >
         {SITE.name}
       </div>
       <div
-        className={`${cormorantSC.className} jewellers-text  tracking-[0.35em] leading-none [font-variant:small-caps] transition-all duration-500 ease-in-out group-hover/logo:opacity-80 ${
-          isShrunk ? 'text-[18px] md:text-[20px]' : 'text-[20px] md:text-[23px]'
-        }`}
+        className={`${cormorantSC.className} jewellers-text  tracking-[0.35em] leading-none [font-variant:small-caps] transition-opacity duration-300 group-hover/logo:opacity-80 text-[18px] md:text-[20px]`}
       >
         {SITE.suffix}
       </div>
