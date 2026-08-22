@@ -3,6 +3,7 @@ import "./globals.css";
 import { HydrationBoundary } from "@tanstack/react-query";
 import GoldTicker from "@/components/layout/GoldTicker";
 import Navbar from "@/components/layout/Navbar";
+import SubNavbar from "@/components/layout/SubNavbar";
 import Footer from "@/components/layout/Footer";
 import QueryProvider from "@/components/QueryProvider";
 import ThemeProvider from "@/components/layout/ThemeProvider";
@@ -65,6 +66,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                   <Navbar />
                 </header>
                 <main className="relative pt-[56px] md:pt-[68px]">
+                  <SubNavbar />
                   {children}
                 </main>
                 <Footer />

@@ -743,3 +743,36 @@ body {
   background-color: #cc0000 !important;
   color: #ffffff !important;
 }
+
+.subnav-link {
+  position: relative;
+  transition: color 0.2s ease;
+}
+
+.subnav-link-text {
+  position: relative;
+}
+
+.subnav-link-text::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -3px;
+  height: 1px;
+  width: 0;
+  background-color: currentColor;
+  transition: width 0.25s ease;
+}
+
+.subnav-link:hover {
+  color: var(--bj-gold-alt) !important;
+  font-weight: 700;
+}
+
+.subnav-link:hover .subnav-link-text::after {
+  width: 100%;
+}
+
+[data-theme="light"] .subnav-link:hover {
+  color: #cc0000 !important;
+}
