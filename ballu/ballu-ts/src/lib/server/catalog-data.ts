@@ -28,6 +28,10 @@ function normalizeCollections(item: Record<string, unknown>): void {
   }
 }
 
+function toPlain<T>(value: T): T {
+  return JSON.parse(JSON.stringify(value)) as T;
+}
+
 export const getItemsData = unstable_cache(
   async () => {
     await connectDB();
@@ -62,7 +66,7 @@ export const getItemsData = unstable_cache(
       })
     );
 
-    return itemsWithPricing;
+    return toPlain(itemsWithPricing);
   },
   ['catalog-items'],
   { revalidate, tags: [CATALOG_TAG, 'catalog-items'] }
@@ -91,9 +95,9 @@ export const getItemByIdData = unstable_cache(
         boutiqueDeduction: clean.boutiqueDeduction,
         diamondValue: clean.diamondValue,
       });
-      return { ...clean, pricing };
+      return toPlain({ ...clean, pricing });
     } catch {
-      return { ...clean, pricing: null };
+      return toPlain({ ...clean, pricing: null });
     }
   },
   ['catalog-item-by-id'],
@@ -103,7 +107,8 @@ export const getItemByIdData = unstable_cache(
 export const getCollectionsData = unstable_cache(
   async () => {
     await connectDB();
-    return Collection.find().sort({ createdAt: -1 }).lean();
+    const docs = await Collection.find().sort({ createdAt: -1 }).lean();
+    return toPlain(docs);
   },
   ['catalog-collections'],
   { revalidate, tags: [CATALOG_TAG, 'catalog-collections'] }
@@ -112,7 +117,8 @@ export const getCollectionsData = unstable_cache(
 export const getMaterialsData = unstable_cache(
   async () => {
     await connectDB();
-    return Material.find().sort({ createdAt: -1 }).lean();
+    const docs = await Material.find().sort({ createdAt: -1 }).lean();
+    return toPlain(docs);
   },
   ['catalog-materials'],
   { revalidate, tags: [CATALOG_TAG, 'catalog-materials'] }
@@ -121,7 +127,8 @@ export const getMaterialsData = unstable_cache(
 export const getGroupsData = unstable_cache(
   async () => {
     await connectDB();
-    return Group.find().populate('material', 'name').sort({ createdAt: -1 }).lean();
+    const docs = await Group.find().populate('material', 'name').sort({ createdAt: -1 }).lean();
+    return toPlain(docs);
   },
   ['catalog-groups'],
   { revalidate, tags: [CATALOG_TAG, 'catalog-groups'] }
@@ -171,7 +178,7 @@ export const getStoreSettingsData = unstable_cache(
       settings.heroBanners = await resolveHeroBanners(settings.heroBanners as any[]);
     }
 
-    return settings;
+    return toPlain(settings);
   },
   ['catalog-store-settings'],
   { revalidate, tags: [STORE_SETTINGS_TAG, 'catalog-store-settings'] }

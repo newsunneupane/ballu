@@ -68,14 +68,16 @@ export default function SubNavbar() {
   }, []);
 
   return (
-    <nav className="subnav hidden md:flex w-full items-stretch justify-center bg-bj-bg-secondary/90 backdrop-blur-sm px-10">
+    <nav className="subnav hidden md:flex w-full items-stretch justify-center bg-bj-bg-secondary/90 backdrop-blur-sm px-10 py-0">
       {navItems.map((item) => (
         <Link
           key={item.label}
           href={item.href}
           className="subnav-link flex items-center px-6 text-[13px] tracking-[0.18em] uppercase font-sans text-bj-text-muted whitespace-nowrap"
         >
-          <span className="subnav-link-text">{item.label}</span>
+          <span className="subnav-link-text">
+            {item.label}
+          </span>
         </Link>
       ))}
     </nav>

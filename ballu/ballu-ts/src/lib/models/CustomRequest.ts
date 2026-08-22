@@ -26,7 +26,7 @@ const CustomRequestSchema = new Schema<ICustomRequest>(
     images: [{ type: String }],
     status: { type: String, enum: ['Pending', 'Reviewed', 'Contacted'], default: 'Pending' },
   },
-  { timestamps: true }
+  { timestamps: true, suppressReservedKeysWarning: true }
 );
 
 export default mongoose.models.CustomRequest || mongoose.model<ICustomRequest>('CustomRequest', CustomRequestSchema);

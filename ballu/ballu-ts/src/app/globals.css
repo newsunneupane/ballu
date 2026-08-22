@@ -746,33 +746,35 @@ body {
 
 .subnav-link {
   position: relative;
+  font-weight: 700;
   transition: color 0.2s ease;
 }
 
-.subnav-link-text {
-  position: relative;
-}
-
-.subnav-link-text::after {
+.subnav-link::after {
   content: '';
   position: absolute;
-  left: 0;
-  bottom: -3px;
+  left: 24px;
+  right: 24px;
+  bottom: 0;
   height: 1px;
-  width: 0;
-  background-color: currentColor;
-  transition: width 0.25s ease;
+  background-color: #d4b77a;
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform 0.3s ease;
 }
 
 .subnav-link:hover {
   color: var(--bj-gold-alt) !important;
-  font-weight: 700;
 }
 
-.subnav-link:hover .subnav-link-text::after {
-  width: 100%;
+.subnav-link:hover::after {
+  transform: scaleX(1);
 }
 
 [data-theme="light"] .subnav-link:hover {
   color: #cc0000 !important;
+}
+
+[data-theme="light"] .subnav-link:hover::after {
+  background-color: #cc0000 !important;
 }

@@ -67,7 +67,7 @@ const StoreSettingsSchema = new Schema<IStoreSettings>(
     },
     heroBanners: { type: [HeroBannerSchema], default: [] },
   },
-  { timestamps: true }
+  { timestamps: true, suppressReservedKeysWarning: true }
 );
 
 export default mongoose.models.StoreSettings || mongoose.model<IStoreSettings>('StoreSettings', StoreSettingsSchema);
