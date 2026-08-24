@@ -7,7 +7,7 @@ import { cloudinaryUrl } from '@/lib/cloudinary';
 import SearchableSelect from '@/components/SearchableSelect';
 import { Save, Plus, X, ChevronUp, ChevronDown, ImagePlus, Loader2, Presentation } from 'lucide-react';
 
-type BannerType = 'collection' | 'material' | 'group' | 'item';
+type BannerType = 'collection' | 'material' | 'group' | 'item' | 'occasion';
 
 interface Banner {
   type: BannerType;
@@ -23,6 +23,7 @@ const TYPE_OPTIONS: { value: BannerType; label: string }[] = [
   { value: 'material', label: 'Material' },
   { value: 'group', label: 'Group' },
   { value: 'item', label: 'Item' },
+  { value: 'occasion', label: 'Occasion' },
 ];
 
 const emptyBanner = (): Banner => ({ type: 'collection', refId: '', image: '' });
@@ -60,6 +61,10 @@ export default function HeroBannerPage() {
   const { data: items = [] } = useQuery({
     queryKey: ['items'],
     queryFn: () => api.items.list(),
+  });
+  const { data: occasions = [] } = useQuery({
+    queryKey: ['occasions'],
+    queryFn: api.occasions.list,
   });
   const { data: settings } = useQuery({
     queryKey: ['store-settings'],
@@ -129,6 +134,8 @@ export default function HeroBannerPage() {
           value: i._id,
           label: [i.name?.en, itemSubLabel(i)].filter(Boolean).join(' · '),
         }));
+      case 'occasion':
+        return occasions.map((o) => ({ value: o._id, label: o.name?.en || '' }));
     }
   };
 
@@ -213,7 +220,7 @@ export default function HeroBannerPage() {
         </button>
       </div>
       <p className="text-[11px] text-[#6b655b] mb-6">
-        Build a rotating homepage slider (up to {MAX_BANNERS} banners). Each banner links to a collection, material, material group, or item.
+        Build a rotating homepage slider (up to {MAX_BANNERS} banners). Each banner links to a collection, material, material group, item, or occasion.
         Order shown here is the slider order.
       </p>
 

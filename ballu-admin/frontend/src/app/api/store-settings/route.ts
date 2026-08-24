@@ -16,7 +16,7 @@ function sanitizePieceOfTheWeek(pieceOfTheWeek: { item?: string; material?: stri
   };
 }
 
-const BANNER_TYPES = ['collection', 'material', 'group', 'item'];
+const BANNER_TYPES = ['collection', 'material', 'group', 'item', 'occasion'];
 const MAX_BANNERS = 8;
 
 interface HeroBannerInput {

@@ -142,6 +142,8 @@ function HeroSlider({ banners }: { banners: any[] }) {
     else if (banner.type === 'group') {
       params.set('material', banner.material?.name?.en || '');
       params.set('group', banner.name || '');
+    } else if (banner.type === 'occasion') {
+      params.set('occasion', banner.name || '');
     }
     router.push(`/catalogue?${params.toString()}`);
   };

@@ -230,6 +230,13 @@ async function resolveHeroBanners(banners: any[]) {
             result.name = cleanName?.en;
             result.nameNp = cleanName?.np;
           }
+        } else if (banner.type === 'occasion') {
+          const entity = await Occasion.findById(banner.refId).select('name image').lean();
+          if (entity) {
+            result.name = (entity.name as any)?.en;
+            result.nameNp = (entity.name as any)?.np;
+            if (!result.image && (entity as any).image) result.image = (entity as any).image;
+          }
         }
       } catch {
         /* skip unresolvable banners */

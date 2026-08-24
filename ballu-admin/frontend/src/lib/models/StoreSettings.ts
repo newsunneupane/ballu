@@ -7,7 +7,7 @@ export interface ITimingSlot {
   timeTo: string;
 }
 
-export type HeroBannerType = 'collection' | 'material' | 'group' | 'item';
+export type HeroBannerType = 'collection' | 'material' | 'group' | 'item' | 'occasion';
 
 export interface IHeroBanner {
   type: HeroBannerType;
@@ -42,7 +42,7 @@ const TimingSlotSchema = new Schema<ITimingSlot>(
 
 const HeroBannerSchema = new Schema<IHeroBanner>(
   {
-    type: { type: String, enum: ['collection', 'material', 'group', 'item'], required: true },
+    type: { type: String, enum: ['collection', 'material', 'group', 'item', 'occasion'], required: true },
     refId: { type: Schema.Types.ObjectId, required: true },
     image: { type: String, required: true },
     title: { type: String },

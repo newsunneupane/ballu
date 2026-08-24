@@ -65,7 +65,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 <header className="w-full">
                   <Navbar />
                 </header>
-                <main className="relative pt-[56px] md:pt-[68px]">
+                <main className="relative pt-[50px] md:pt-[68px]">
                   <SubNavbar />
                   {children}
                 </main>

@@ -209,9 +209,7 @@ export default function CommissionPage() {
           <p className="italic font-serif text-[16px] sm:text-[18px] text-bj-text-body opacity-80 mb-4 md:mb-8 tracking-wide">
             विशेष अर्डर
           </p>
-          <p className={`${tenorSans.className} text-[12px] sm:text-[13px] text-bj-text-gold opacity-70 leading-[1.6] md:leading-[1.7]`}>
-            No template. Our karigar drafts a sketch within two working days. Pay only on approval.
-          </p>
+          
         </div>
         <div className="absolute bottom-0 left-0 right-0 h-2/3 bg-gradient-to-t from-bj-bg-card to-transparent pointer-events-none" />
       </div>
