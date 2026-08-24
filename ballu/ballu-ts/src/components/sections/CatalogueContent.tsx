@@ -1,15 +1,17 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Cormorant_Garamond, Cormorant_SC, Tenor_Sans } from 'next/font/google';
+import { FiSliders, FiX } from 'react-icons/fi';
 import { productService } from '@/services/product-service';
 import { CATEGORIES as HARDCODED_CATEGORIES } from '@/data/products';
 import { SortOption } from '@/types/product';
 import { useFilterSticky } from '@/hooks/useFilterSticky';
 import { useProductData } from '@/hooks/useProductData';
 import ProductCard from '@/components/shared/ProductCard';
+import CatalogueFilterBar from '@/components/sections/CatalogueFilterBar';
 
 const SORT_OPTIONS: { value: SortOption; label: string }[] = [
   { value: 'newest', label: 'Newest' },
@@ -70,6 +72,23 @@ export default function CatalogueContent({
   const [viewMode, setViewMode] = useState<'GRID' | 'LIST'>('GRID');
   const { containerRef, isFixed } = useFilterSticky(50);
   const dataReady = useProductData();
+
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [showFab, setShowFab] = useState(false);
+  const mainRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const onScroll = () => {
+      if (filtersOpen) return;
+      const mainEl = mainRef.current;
+      const vh = window.innerHeight;
+      const reachedGrid = mainEl ? mainEl.getBoundingClientRect().top <= vh * 0.5 : false;
+      setShowFab(reachedGrid);
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener('scroll', onScroll);
+  }, [filtersOpen]);
 
   const handleCollectionClick = (cat: string) => {
     if (cat === 'ALL') {
@@ -165,181 +184,121 @@ export default function CatalogueContent({
         </div>
       </header>
 
+      {/* Desktop: inline sticky filter bar */}
+      <div className="hidden md:block">
+        <CatalogueFilterBar
+          containerRef={containerRef}
+          isFixed={isFixed}
+          collectionButtons={collectionButtons}
+          occasionButtons={occasionButtons}
+          materialButtons={materialButtons}
+          groupButtons={groupButtons}
+          tagButtons={tagButtons}
+          activeCollections={activeCollections}
+          activeMaterial={activeMaterial}
+          activeGroup={activeGroup}
+          activeOccasions={activeOccasions}
+          activeTag={activeTag}
+          availableOnly={availableOnly}
+          minPrice={minPrice}
+          maxPrice={maxPrice}
+          sort={sort}
+          viewMode={viewMode}
+          hideCategories={hideCategories}
+          productCount={filteredProducts.length}
+          handleCollectionClick={handleCollectionClick}
+          handleOccasionClick={handleOccasionClick}
+          setActiveMaterial={setActiveMaterial}
+          setActiveGroup={setActiveGroup}
+          setActiveTag={setActiveTag}
+          setAvailableOnly={setAvailableOnly}
+          setMinPrice={setMinPrice}
+          setMaxPrice={setMaxPrice}
+          setSort={setSort}
+          setViewMode={setViewMode}
+        />
+      </div>
+
+      {/* Mobile: floating filters button (auto show/hide on scroll) */}
+      {showFab && !filtersOpen && (
+        <button
+          type="button"
+          onClick={() => setFiltersOpen(true)}
+          aria-label="Open filters"
+          className="fixed right-3 top-[84px] z-[60] flex h-12 w-12 items-center justify-center rounded-full border border-bj-gold-rich/60 bg-bj-gold-rich text-bj-bg shadow-lg md:hidden transition-transform duration-300 hover:scale-105"
+        >
+          <FiSliders size={20} />
+        </button>
+      )}
+
+      {/* Mobile: full filters bottom sheet */}
       <div
-        ref={containerRef}
-        className={`w-full bg-bj-bg-elevated/95 backdrop-blur-md pb-4 pt-4 border-b border-bj-border px-4 sm:px-6 md:px-16 lg:px-15 sticky top-[50px] z-[49] ${
-          isFixed ? 'shadow-2xl' : ''
+        className={`fixed inset-0 z-[70] md:hidden transition-opacity duration-300 ${
+          filtersOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
         }`}
       >
-          <div className="flex flex-col gap-3 max-w-[100vw]">
-            {!hideCategories && (
-              <div className="flex overflow-x-auto whitespace-nowrap gap-2 items-center no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0 py-1">
-                {collectionButtons.map((cat) => {
-                  const isSelected = activeCollections.includes(cat);
-                  return (
-                    <button
-                      key={cat}
-                      onClick={() => handleCollectionClick(cat)}
-                      className={`${tenorSans.className} collection-filter inline-block px-3 py-1 text-[8px] hover:-translate-y-[2px] font-small tracking-widest transition-all border rounded-4xl uppercase shrink-0 ${
-                        isSelected
-                           ? 'border-bj-gold-alt text-bj-gold-alt  bg-bj-bg-elevated'
-                          : 'border-bj-border text-bj-text-muted'
-                      }`}
-                    >
-                      {cat === 'ALL' ? 'ALL' : cat}
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-
-            {!hideCategories && occasionButtons.length > 0 && (
-              <div className="flex overflow-x-auto whitespace-nowrap gap-2 items-center no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0 py-1">
-                {occasionButtons.map((occ) => {
-                  const isSelected = activeOccasions.includes(occ);
-                  return (
-                    <button
-                      key={occ}
-                      onClick={() => handleOccasionClick(occ)}
-                      className={`${tenorSans.className} collection-filter inline-block px-3 py-1 text-[8px] hover:-translate-y-[2px] font-small tracking-widest transition-all border rounded-4xl uppercase shrink-0 ${
-                        isSelected
-                          ? 'border-bj-gold-alt text-bj-gold-alt bg-bj-bg-elevated'
-                          : 'border-bj-border text-bj-text-muted'
-                      }`}
-                    >
-                      {occ}
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 w-full">
-              <div className="flex overflow-x-auto whitespace-nowrap gap-4 items-center shrink-0 no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0 text-[11px] font-semibold tracking-widest uppercase w-full sm:w-auto">
-                {materialButtons.map((mat) => (
-                  <button
-                    key={mat}
-                    onClick={() => { setActiveMaterial(mat); setActiveGroup('ALL'); }}
-                    className={`${tenorSans.className} pb-0.5 border-b-2 transition-all ${
-                      activeMaterial === mat
-                        ? 'border-[#cda274] text-bj-gold-alt'
-                        : 'border-transparent text-bj-text-muted'
-                    }`}
-                  >
-                    {mat}
-                  </button>
-                ))}
-              </div>
-
-              {activeMaterial !== 'ALL' && groupButtons.length > 1 && (
-                <div className="flex overflow-x-auto whitespace-nowrap gap-2 items-center no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0 text-[11px] font-semibold tracking-widest uppercase">
-                  {groupButtons.map((grp) => (
-                    <button
-                      key={grp}
-                      onClick={() => setActiveGroup(grp)}
-                      className={`${tenorSans.className} inline-block px-3 py-1 text-[8px] hover:-translate-y-[2px] font-small tracking-widest transition-all border rounded-4xl uppercase shrink-0 ${
-                        activeGroup === grp
-                          ? 'border-bj-gold-alt text-bj-gold-alt bg-bj-bg-elevated'
-                          : 'border-bj-border text-bj-text-muted'
-                      }`}
-                    >
-                      {grp}
-                    </button>
-                  ))}
-                </div>
-              )}
-
-              <div className="flex items-center gap-4 text-[11px] tracking-[0.2em] uppercase text-bj-text-muted">
-                <span className={`${tenorSans.className} pieces-count opacity-60 hidden sm:block`}>
-                  {filteredProducts.length} Pieces
-                </span>
-
-                <div className="flex border border-bj-border">
-                  <button
-                    onClick={() => setViewMode('GRID')}
-                    className={`${tenorSans.className} catalogue-toggle px-3 py-1.5 text-[10px] tracking-[0.15em] transition-all duration-300 uppercase ${
-                      viewMode === 'GRID'
-                        ? 'bg-[#cda274] text-black font-semibold'
-                        : 'bg-transparent text-[#cda274] hover:bg-[#cda274]/10'
-                    }`}
-                  >
-                    Grid
-                  </button>
-                  <button
-                    onClick={() => setViewMode('LIST')}
-                    className={`${tenorSans.className} catalogue-toggle px-3 py-1.5 text-[10px] tracking-[0.15em] transition-all duration-300 uppercase ${
-                      viewMode === 'LIST'
-                        ? 'bg-[#cda274] text-black font-semibold'
-                        : 'bg-transparent text-[#cda274] hover:bg-[#cda274]/10'
-                    }`}
-                  >
-                    List
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-      <div className="px-4 sm:px-6 md:px-16 lg:px-15 py-4 border-b border-bj-border/60">
-        <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
-          {tagButtons.length > 1 && (
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className={`${tenorSans.className} text-[9px] tracking-[0.2em] uppercase text-bj-text-dim`}>Tag</span>
-              {tagButtons.map((t) => (
-                <button
-                  key={t}
-                  onClick={() => setActiveTag(t)}
-                  className={`${tenorSans.className} tag-filter px-2.5 py-1 text-[9px] tracking-widest uppercase border rounded-full transition-all ${
-                    activeTag === t ? 'border-bj-gold-alt text-bj-gold-alt' : 'border-bj-border text-bj-text-muted'
-                  }`}
-                >
-                  {t}
-                </button>
-              ))}
-            </div>
-          )}
-
-          <label className={`${tenorSans.className} stock-only-label flex items-center gap-2 text-[9px] tracking-[0.2em] uppercase text-bj-text-muted cursor-pointer`}>
-            <input type="checkbox" checked={availableOnly} onChange={(e) => setAvailableOnly(e.target.checked)} className="accent-[#cda274]" />
-            In Stock Only
-          </label>
-
-          <div className="flex items-center gap-2">
-            <span className={`${tenorSans.className} text-[9px] tracking-[0.2em] uppercase text-bj-text-dim`}>Price</span>
-            <input
-              type="number"
-              value={minPrice}
-              onChange={(e) => setMinPrice(e.target.value)}
-              placeholder="Min"
-              className={`${tenorSans.className} w-20 bg-transparent border border-bj-border rounded px-2 py-1 text-[10px] text-bj-text-alt focus:outline-none focus:border-[#cda274]`}
-            />
-            <span className="text-bj-text-dim text-[10px]">–</span>
-            <input
-              type="number"
-              value={maxPrice}
-              onChange={(e) => setMaxPrice(e.target.value)}
-              placeholder="Max"
-              className={`${tenorSans.className} w-20 bg-transparent border border-bj-border rounded px-2 py-1 text-[10px] text-bj-text-alt focus:outline-none focus:border-[#cda274]`}
-            />
-          </div>
-
-          <div className="flex items-center gap-2 sm:ml-auto">
-            <span className={`${tenorSans.className} text-[9px] tracking-[0.2em] uppercase text-bj-text-dim`}>Sort</span>
-            <select
-              value={sort}
-              onChange={(e) => setSort(e.target.value as SortOption)}
-              className={`${tenorSans.className} bg-transparent border border-bj-border rounded px-2 py-1 text-[10px] text-bj-text-alt focus:outline-none focus:border-[#cda274] uppercase`}
+        <div className="absolute inset-0 bg-black/60" onClick={() => setFiltersOpen(false)} />
+        <div
+          className={`absolute bottom-0 left-0 right-0 max-h-[85vh] overflow-y-auto rounded-t-2xl bg-bj-bg border-t border-bj-border transition-transform duration-300 ease-in-out ${
+            filtersOpen ? 'translate-y-0' : 'translate-y-full'
+          }`}
+        >
+          <div className="sticky top-0 flex items-center justify-between px-5 h-14 bg-bj-bg border-b border-bj-border">
+            <span className="text-[13px] tracking-[0.2em] uppercase text-bj-text-nav">Filters</span>
+            <button
+              onClick={() => setFiltersOpen(false)}
+              aria-label="Close filters"
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-bj-border text-bj-text-nav transition-colors hover:border-bj-gold-rich hover:text-bj-gold-rich"
             >
-              {SORT_OPTIONS.map((o) => (
-                <option key={o.value} value={o.value} className="bg-bj-bg-elevated normal-case">{o.label}</option>
-              ))}
-            </select>
+              <FiX size={18} />
+            </button>
+          </div>
+
+          <div className="px-4 py-4">
+            <CatalogueFilterBar
+              isFixed={false}
+              collectionButtons={collectionButtons}
+              occasionButtons={occasionButtons}
+              materialButtons={materialButtons}
+              groupButtons={groupButtons}
+              tagButtons={tagButtons}
+              activeCollections={activeCollections}
+              activeMaterial={activeMaterial}
+              activeGroup={activeGroup}
+              activeOccasions={activeOccasions}
+              activeTag={activeTag}
+              availableOnly={availableOnly}
+              minPrice={minPrice}
+              maxPrice={maxPrice}
+              sort={sort}
+              viewMode={viewMode}
+              hideCategories={hideCategories}
+              productCount={filteredProducts.length}
+              handleCollectionClick={handleCollectionClick}
+              handleOccasionClick={handleOccasionClick}
+              setActiveMaterial={setActiveMaterial}
+              setActiveGroup={setActiveGroup}
+              setActiveTag={setActiveTag}
+              setAvailableOnly={setAvailableOnly}
+              setMinPrice={setMinPrice}
+              setMaxPrice={setMaxPrice}
+              setSort={setSort}
+              setViewMode={setViewMode}
+            />
+          </div>
+
+          <div className="sticky bottom-0 px-5 py-3 bg-bj-bg border-t border-bj-border">
+            <button
+              onClick={() => setFiltersOpen(false)}
+              className="w-full h-12 rounded-full bg-bj-gold-rich text-bj-bg text-[12px] tracking-[0.2em] uppercase transition-colors hover:bg-bj-gold-richer"
+            >
+              Show {filteredProducts.length} Pieces
+            </button>
           </div>
         </div>
       </div>
 
-      <main className="px-4 sm:px-6 md:px-16 lg:px-15 pb-32 mt-6">
+      <main ref={mainRef} className="px-4 sm:px-6 md:px-16 lg:px-15 pb-32 mt-6">
         {!dataReady ? (
           <div className={`${tenorSans.className} col-span-full text-center py-20 text-xs tracking-[4px] uppercase text-bj-text-muted`}>
             Loading ...
