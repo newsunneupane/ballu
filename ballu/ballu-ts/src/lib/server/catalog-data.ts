@@ -240,6 +240,50 @@ async function resolveHeroBanners(banners: any[]) {
   return resolved.filter(Boolean);
 }
 
+export const getGroupRateData = unstable_cache(
+  async () => {
+    await connectDB();
+    const groups = await Group.find().populate('material', 'name').sort({ createdAt: -1 }).lean();
+    if (!groups.length) return [];
+
+    const fmt = new Intl.DateTimeFormat('en-IN', {
+      timeZone: 'Asia/Kathmandu',
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+    });
+
+    const rates = await Promise.all(
+      (groups as any[]).map(async (group) => {
+        const groupId = group._id.toString();
+
+        const lastItem = await Item.findOne({ group: group._id })
+          .sort({ updatedAt: -1 })
+          .select('updatedAt')
+          .lean();
+
+        const lastChanged = lastItem ? (lastItem as { updatedAt: Date }).updatedAt : null;
+
+        return toPlain({
+          groupId,
+          name: group.name,
+          materialName: (group.material?.name as { en?: string })?.en || null,
+          rateNpr: typeof group.rateNpr === 'number' ? group.rateNpr : null,
+          lastItemChangedAt: lastChanged ? new Date(lastChanged).toISOString() : null,
+          lastItemChangedLabel: lastChanged ? fmt.format(new Date(lastChanged)) : null,
+        });
+      })
+    );
+
+    return rates;
+  },
+  ['catalog-group-rate'],
+  { revalidate, tags: [CATALOG_TAG, 'catalog-group-rate'] }
+);
+
 export const getRatesData = unstable_cache(
   async () => {
     await connectDB();

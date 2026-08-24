@@ -20,7 +20,7 @@ const nextConfig = {
         headers: [
           {
             key: 'Content-Security-Policy',
-            value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self' https:; frame-ancestors 'none';",
+            value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://elfsightcdn.com https://*.elfsight.com; style-src 'self' 'unsafe-inline' https://elfsightcdn.com https://*.elfsight.com; font-src 'self' data: https://*.elfsight.com; img-src 'self' data: blob: https: https://*.instagram.com https://*.cdninstagram.com; connect-src 'self' https: https://*.elfsight.com; frame-src https://elfsight.com https://*.elfsight.com https://elfsightcdn.com https://www.instagram.com https://*.instagram.com; frame-ancestors 'none';",
           },
           { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' },
           { key: 'X-Frame-Options', value: 'SAMEORIGIN' },

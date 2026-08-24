@@ -1,8 +1,8 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import { Cormorant_Garamond } from 'next/font/google';
-import { brandFeatures } from '@/data/site';
 
 const cormorant = Cormorant_Garamond({
   subsets: ['latin'],
@@ -10,13 +10,23 @@ const cormorant = Cormorant_Garamond({
   style: ['normal', 'italic'],
 });
 
-export default function BrandTrust() {
+type GroupRate = {
+  groupId: string;
+  name: string;
+  materialName: string | null;
+  rateNpr: number | null;
+  lastItemChangedAt: string | null;
+  lastItemChangedLabel: string | null;
+};
+
+export default function BrandTrust({ groupRates }: { groupRates: GroupRate[] | null }) {
   return (
     <div className="brand-section bg-bj-bg-secondary text-bj-text-heading w-full min-h-[60vh] flex flex-col justify-between relative overflow-hidden font-sans border-t border-white/5">
       <style>{`
         [data-theme="light"] .brand-section { border-color: rgba(0,0,0,0.08) !important; }
-        [data-theme="light"] .brand-grid, [data-theme="light"] .brand-grid > div, [data-theme="light"] .brand-grid > div > div { border-color: #cc0000 !important; }
-        [data-theme="light"] .brand-grid h3 { color: #000000 !important; }
+        [data-theme="light"] .brand-grid { border-color: #cc0000 !important; }
+        [data-theme="light"] .brand-grid h3,
+        [data-theme="light"] .brand-grid h4 { color: #000000 !important; }
         [data-theme="light"] .brand-grid p { color: #000000 !important; opacity: 0.7 !important; }
         [data-theme="light"] .brand-orbit { opacity: 0.6; }
         [data-theme="light"] .brand-orbit .bo-black { stroke: #000000 !important; }
@@ -24,7 +34,7 @@ export default function BrandTrust() {
         [data-theme="light"] .brand-orbit .brand-orbit-circle { border-color: #cc0000 !important; }
       `}</style>
       <div className="max-w-7xl w-full  mx-auto px-6 md:px-12 lg:px-16 pt-10 pb-40 flex flex-col items-center text-center relative overflow-hidden">
-      
+       
 
         <p className={`${cormorant.className} italic text-[clamp(1.5rem,4vw,2.5rem)] font-light tracking-wide max-w-4xl text-bj-text-body leading-relaxed mb-4 relative z-10`}>
           30+ Years of Trust. Jewellery for Generations.
@@ -37,7 +47,7 @@ export default function BrandTrust() {
         <OrbitalDecoration />
       </div>
 
-      <FeatureGrid />
+      <FeatureGrid groupRates={groupRates} />
     </div>
   );
 }
@@ -70,29 +80,84 @@ function OrbitalDecoration() {
   );
 }
 
-function FeatureGrid() {
+function groupByMaterial(rates: GroupRate[]) {
+  const order: string[] = [];
+  const map = new Map<string, GroupRate[]>();
+  for (const r of rates) {
+    const key = r.materialName || 'Other';
+    if (!map.has(key)) {
+      map.set(key, []);
+      order.push(key);
+    }
+    map.get(key)!.push(r);
+  }
+  return order.map((materialName) => ({ materialName, groups: map.get(materialName)! }));
+}
+
+function FeatureGrid({ groupRates }: { groupRates: GroupRate[] | null }) {
+  const grouped = groupRates && groupRates.length ? groupByMaterial(groupRates) : [];
+
   return (
-    <div className="brand-grid w-full border-t border-white/10 border-b border-white/5 relative z-10 bg-bj-bg-secondary">
-      <div className="max-w-7xl w-full mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-        {brandFeatures.map((item, idx) => (
-          <div
-            key={idx}
-            className={`
-              flex flex-col items-center justify-center text-center p-12 md:p-16 min-h-[220px]
-              border-b border-white/10 sm:border-b-0
-              ${idx !== 3 ? 'lg:border-r lg:border-white/10' : ''}
-              ${idx % 2 === 0 ? 'sm:border-r sm:border-white/10' : ''}
-              hover:bg-white/[0.01] transition-colors duration-300 group
-            `}
-          >
-            <h3 className={`${cormorant.className} italic text-3xl md:text-4xl font-light text-bj-gold mb-3 group-hover:translate-y-[-2px] transition-transform duration-300`}>
-              {item.title}
-            </h3>
-            <p className="text-[10px] tracking-[0.25em] text-bj-text-body opacity-60 uppercase font-sans">
-              {item.description}
-            </p>
+    <div className="brand-grid w-full border-t border-white/10  relative z-10 bg-bj-bg-secondary">
+      <div className="max-w-7xl w-full mx-auto px-6 md:px-12 lg:px-16 py-10 md:py-14 grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,3fr)] gap-10 lg:gap-16 items-center">
+        <div className="order-1">
+          <div className="flex items-center gap-3 mb-6">
+            <span className="h-px w-8 bg-bj-gold/60" />
+            <span className="text-[10px] tracking-[0.4em] text-bj-gold uppercase opacity-80">
+              Today&apos;s Rates
+            </span>
           </div>
-        ))}
+          {grouped.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-8">
+              {grouped.map(({ materialName, groups }) => (
+                <div key={materialName}>
+                  <h4 className="text-[11px] tracking-[0.3em] uppercase text-bj-text-body opacity-60 mb-3 font-sans">
+                    {materialName}
+                  </h4>
+                  <ul className="space-y-2">
+                    {groups.map((g) => (
+                      <li
+                        key={g.groupId}
+                        className="flex items-baseline justify-between gap-4 border-b border-white/5 pb-2"
+                      >
+                        <span className={`${cormorant.className} italic text-lg md:text-xl font-light text-bj-text-heading`}>
+                          {g.name}
+                        </span>
+                        <span className={`${cormorant.className} italic text-lg md:text-xl font-light text-bj-gold whitespace-nowrap`}>
+                          {g.rateNpr != null ? `₨ ${g.rateNpr.toLocaleString('en-IN')}/G` : '₨ —/G'}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-[10px] tracking-[0.25em] text-bj-text-body opacity-60 uppercase font-sans">
+              Rates unavailable
+            </p>
+          )}
+        </div>
+
+        <Link
+          href="/personalize"
+          className="group/pz order-2 relative block overflow-hidden rounded-sm border border-white/10 hover:border-bj-gold/40 transition-colors duration-500"
+          aria-label="Personalize your jewellery"
+        >
+          <div className="w-full overflow-hidden">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/personalize.jpg"
+              alt="Personalize your jewellery"
+              className="block w-full h-auto object-contain transition-transform duration-700 group-hover/pz:scale-[1.02]"
+            />
+          </div>
+          <div className="pointer-events-none absolute inset-0 flex items-end bg-gradient-to-t from-black/60 via-black/0 to-black/0 p-6">
+            <span className={`${cormorant.className} italic text-2xl md:text-3xl font-light text-white`}>
+              Personalize
+            </span>
+          </div>
+        </Link>
       </div>
     </div>
   );

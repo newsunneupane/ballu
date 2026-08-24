@@ -7,10 +7,10 @@ export const dynamic = 'force-dynamic';
 export default function CataloguePage() {
   return (
     <>
+      <InstagramFeed />
       <Suspense>
         <CatalogueContent />
       </Suspense>
-      <InstagramFeed />
     </>
   );
 }

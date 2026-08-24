@@ -27,7 +27,7 @@ export default function InstagramFeed() {
   }, []);
 
   return (
-    <section className="mt-24 lg:mt-32">
+    <section className="mx-auto w-full max-w-[1400px] px-4 sm:px-6 md:px-16 lg:px-15 pt-10 lg:pt-14">
       <div className="mb-8 flex items-end justify-between">
         <div>
           <p className="text-[11px] tracking-[0.3em] uppercase text-bj-text-muted">Social</p>
