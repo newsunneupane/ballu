@@ -42,6 +42,11 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', updateOffset);
   }, []);
 
+  useEffect(() => {
+    document.body.classList.toggle('bj-menu-open', isOpen);
+    return () => document.body.classList.remove('bj-menu-open');
+  }, [isOpen]);
+
   return (
     <div className={`${cormorant.className} bg-bj-bg-ticker text-[#dbb86b] w-full fixed z-50`} style={{ top: tickerOffset }}>
       <div

@@ -814,3 +814,7 @@ body {
 [data-theme="light"] .bj-mobile-menu .text-bj-text-nav {
   color: #2c231a;
 }
+
+body.bj-menu-open .bj-filter-fab {
+  display: none !important;
+}

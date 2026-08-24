@@ -225,7 +225,7 @@ export default function CatalogueContent({
           type="button"
           onClick={() => setFiltersOpen(true)}
           aria-label="Open filters"
-          className="fixed right-3 top-[84px] z-[60] flex h-12 w-12 items-center justify-center rounded-full border border-bj-gold-rich/60 bg-bj-gold-rich text-bj-bg shadow-lg md:hidden transition-transform duration-300 hover:scale-105"
+          className="bj-filter-fab fixed right-3 top-[84px] z-[60] flex h-12 w-12 items-center justify-center rounded-full border border-bj-gold-rich/60 bg-bj-gold-rich text-bj-bg shadow-lg md:hidden transition-transform duration-300 hover:scale-105"
         >
           <FiSliders size={20} />
         </button>
