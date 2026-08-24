@@ -29,7 +29,7 @@ export const metadata = {
 export const revalidate = 300;
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const [{ items, collections, materials, groups }, dehydratedState] = await Promise.all([
+  const [{ items, collections, materials, groups, occasions }, dehydratedState] = await Promise.all([
     loadCatalogData(),
     prefetchCatalogData(),
   ]);
@@ -59,7 +59,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body className="min-h-screen" style={{ background: 'var(--bj-bg)', color: 'var(--bj-text-body)' }}>
         <QueryProvider>
           <HydrationBoundary state={dehydratedState}>
-            <CatalogStoreHydration items={items} collections={collections} materials={materials} groups={groups}>
+            <CatalogStoreHydration items={items} collections={collections} materials={materials} groups={groups} occasions={occasions}>
               <ThemeProvider>
                 <GoldTicker />
                 <header className="w-full">

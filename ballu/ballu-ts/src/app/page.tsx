@@ -10,9 +10,9 @@ const Home = () => {
     <>
       <OnboardingWizard />
       <HeroSection />
+      <BrandTrust />
       <CollectionsRow />
       <RecommendedRow />
-      <BrandTrust />
     </>
   )
 }

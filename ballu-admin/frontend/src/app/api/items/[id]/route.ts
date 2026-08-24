@@ -16,7 +16,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
     if (authResult) return authResult;
     const { id } = await params;
     await connectDB();
-    const item = await Item.findById(id).populate('collections', 'name').populate('material', 'name').populate('group', 'name').lean();
+    const item = await Item.findById(id).populate('collections', 'name').populate('material', 'name').populate('group', 'name').populate('occasion', 'name').lean();
     if (!item) return NextResponse.json({ error: 'Item not found' }, { status: 404, headers: { 'Cache-Control': 'no-store' } });
 
     try {
@@ -95,6 +95,11 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       return badRequest('Invalid number for manualPriceNpr');
     }
 
+    let resolvedOccasion: unknown[] = [];
+    if (Array.isArray(body.occasion)) {
+      resolvedOccasion = body.occasion.map((o: unknown) => String(o)).filter((o: string) => o && isObjectId(o));
+    }
+
     const group = await Group.findById(body.group).lean();
     if (!group) {
       return badRequest('Group not found');
@@ -169,7 +174,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       }
     }
 
-    const item = await Item.findByIdAndUpdate(id, { ...body, material, purity, manualPriceNpr: body.manualPriceNpr != null ? Number(body.manualPriceNpr) : undefined }, { new: true, runValidators: true }).populate(['collections', 'material', 'group']);
+    const item = await Item.findByIdAndUpdate(id, { ...body, occasion: resolvedOccasion, material, purity, manualPriceNpr: body.manualPriceNpr != null ? Number(body.manualPriceNpr) : undefined }, { new: true, runValidators: true }).populate(['collections', 'material', 'group', 'occasion']);
     if (!item) return NextResponse.json({ error: 'Item not found' }, { status: 404, headers: { 'Cache-Control': 'no-store' } });
     revalidateCatalog();
     return NextResponse.json(item, {

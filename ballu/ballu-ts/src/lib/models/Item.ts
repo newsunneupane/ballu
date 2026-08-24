@@ -2,6 +2,7 @@ import mongoose, { Schema, Types } from 'mongoose';
 
 export interface IItem {
   collections: Types.ObjectId[];
+  occasion: Types.ObjectId[];
   material: Types.ObjectId;
   group?: Types.ObjectId;
   name: { en: string; np: string };
@@ -27,6 +28,7 @@ export interface IItem {
 const ItemSchema = new Schema<IItem>(
   {
     collections: { type: [{ type: Schema.Types.ObjectId, ref: 'Collection' }], required: true, validate: [(v: unknown[]) => Array.isArray(v) && v.length > 0, 'At least one collection is required'] },
+    occasion: { type: [{ type: Schema.Types.ObjectId, ref: 'Occasion' }] },
     material: { type: Schema.Types.ObjectId, ref: 'Material', required: true },
     group: { type: Schema.Types.ObjectId, ref: 'Group' },
     name: { en: { type: String, required: true }, np: { type: String, required: true } },
@@ -53,5 +55,9 @@ const ItemSchema = new Schema<IItem>(
   },
   { timestamps: true }
 );
+
+if (process.env.NODE_ENV !== 'production' && mongoose.models.Item) {
+  delete mongoose.models.Item;
+}
 
 export default mongoose.models.Item || mongoose.model<IItem>('Item', ItemSchema);

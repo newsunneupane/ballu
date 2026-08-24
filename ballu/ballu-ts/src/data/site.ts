@@ -12,7 +12,7 @@ export const siteConfig: SiteConfig = {
   address: 'मुख्य बजार · काँकडभिट्टा · झापा',
   hours: 'Mon–Sat 10–7 · Sun 11–5',
   social: {
-    instagram: '#',
+    instagram: 'https://www.instagram.com/balujewellerykakarvitta/',
     facebook: '#',
     whatsapp: 'https://wa.me/+9779842000000',
   },

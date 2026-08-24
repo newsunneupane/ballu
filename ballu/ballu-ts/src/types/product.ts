@@ -14,6 +14,7 @@ export interface Product {
   collection: string;
   collections: string[];
   type: string;
+  occasions: string[];
   material: string;
   title: string;
   subTitle: string;
@@ -38,6 +39,7 @@ export type SortOption = 'newest' | 'price-asc' | 'price-desc' | 'most-viewed';
 
 export interface ProductFilters {
   collections: string[];
+  occasions?: string[];
   material: string;
   purity?: string;
   tag: string;

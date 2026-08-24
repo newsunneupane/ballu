@@ -6,6 +6,7 @@ let productStore: Product[] = [];
 let collectionStore: any[] = [];
 let materialStore: any[] = [];
 let groupStore: any[] = [];
+let occasionStore: any[] = [];
 let seeded = false;
 
 export function isProductStoreSeeded(): boolean {
@@ -47,6 +48,7 @@ function transformApiItem(item: any): Product {
     showPrice: item.showPrice ?? true,
     estimatedMakingDays: item.estimatedMakingDays,
     viewCount: item.viewCount,
+    occasions: (item.occasion || []).map((o: any) => (o?.name?.en || '').trim().toUpperCase()).filter(Boolean),
     images: item.images,
     pricing: pricing
       ? {
@@ -116,12 +118,26 @@ async function loadGroupsFromApi(): Promise<void> {
   groupStore = [];
 }
 
+async function loadOccasionsFromApi(): Promise<void> {
+  try {
+    const res = await fetch('/api/occasions');
+    if (res.ok) {
+      occasionStore = await res.json();
+      return;
+    }
+  } catch {
+    /* ignore */
+  }
+  occasionStore = [];
+}
+
 export const productService = {
-  seed(data: { items: any[]; collections: any[]; materials: any[]; groups: any[] }): void {
+  seed(data: { items: any[]; collections: any[]; materials: any[]; groups: any[]; occasions?: any[] }): void {
     if (data.items) productStore = data.items.map(transformApiItem);
     if (data.collections) collectionStore = data.collections;
     if (data.materials) materialStore = data.materials;
     if (data.groups) groupStore = data.groups;
+    if (data.occasions) occasionStore = data.occasions;
     seeded = true;
   },
 
@@ -131,7 +147,7 @@ export const productService = {
 
   async ensureLoaded(): Promise<void> {
     if (seeded) return;
-    await Promise.all([loadFromApi(), loadCollectionsFromApi(), loadMaterialsFromApi(), loadGroupsFromApi()]);
+    await Promise.all([loadFromApi(), loadCollectionsFromApi(), loadMaterialsFromApi(), loadGroupsFromApi(), loadOccasionsFromApi()]);
     seeded = true;
   },
 
@@ -141,6 +157,10 @@ export const productService = {
 
   getCollectionsList(): any[] {
     return [...collectionStore];
+  },
+
+  getOccasionsList(): any[] {
+    return [...occasionStore];
   },
 
   getMaterialsList(): any[] {
@@ -189,9 +209,10 @@ export const productService = {
         (product.purity || '').toUpperCase() === filters.purity;
       const matchesTag = !filters.tag || filters.tag === 'ALL' || product.tag === filters.tag;
       const matchesAvailability = !filters.availableOnly || product.isAvailable;
+      const matchesOccasion = !filters.occasions || filters.occasions.length === 0 || filters.occasions.includes('ALL') || (product.occasions || []).some((occ: string) => filters.occasions!.includes(occ));
       const matchesMinPrice = filters.minPrice == null || (product.priceNpr != null && product.priceNpr >= filters.minPrice);
       const matchesMaxPrice = filters.maxPrice == null || (product.priceNpr != null && product.priceNpr <= filters.maxPrice);
-      return matchesCollection && matchesMaterial && matchesPurity && matchesTag && matchesAvailability && matchesMinPrice && matchesMaxPrice;
+      return matchesCollection && matchesMaterial && matchesPurity && matchesTag && matchesAvailability && matchesOccasion && matchesMinPrice && matchesMaxPrice;
     });
 
     switch (filters.sort) {
@@ -271,7 +292,7 @@ export const productService = {
 
     const catLookup: Record<string, any> = {};
     for (const c of collectionStore) {
-      const key = c.name?.en?.toUpperCase() || '';
+      const key = c.name?.en?.trim().toUpperCase() || '';
       catLookup[key] = c;
     }
 
@@ -391,6 +412,7 @@ export const productService = {
     collectionStore = [];
     materialStore = [];
     groupStore = [];
+    occasionStore = [];
     seeded = false;
   },
 };

@@ -24,14 +24,14 @@ export default function BrandTrust() {
         [data-theme="light"] .brand-orbit .brand-orbit-circle { border-color: #cc0000 !important; }
       `}</style>
       <div className="max-w-7xl w-full  mx-auto px-6 md:px-12 lg:px-16 pt-10 pb-40 flex flex-col items-center text-center relative overflow-hidden">
-        <div className="text-bj-gold tracking-widest mb-6 opacity-80 relative z-10">☆</div>
+      
 
         <p className={`${cormorant.className} italic text-[clamp(1.5rem,4vw,2.5rem)] font-light tracking-wide max-w-4xl text-bj-text-body leading-relaxed mb-4 relative z-10`}>
-          &ldquo;Every piece, named for the bench that made it.&rdquo;
+          30+ Years of Trust. Jewellery for Generations.
         </p>
 
         <span className="text-[10px] tracking-[0.4em]  text-bj-gold uppercase opacity-70 relative z-10">
-          — Ballu Suvedi, Master Karigar
+          Authentic Gold Jewellery . Transparent Pricing . Trusted Service
         </span>
 
         <OrbitalDecoration />

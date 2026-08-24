@@ -19,6 +19,7 @@ import {
   LogOut,
   Menu,
   X,
+  Sparkles,
 } from 'lucide-react';
 
 const navItems = [
@@ -26,6 +27,7 @@ const navItems = [
   { href: '/materials', label: 'Materials', icon: Gem },
   { href: '/groups', label: 'Groups', icon: Layers },
   { href: '/collections', label: 'Collections', icon: Tag },
+  { href: '/occasions', label: 'Occasions', icon: Sparkles },
   { href: '/items', label: 'Items', icon: Package },
   { href: '/custom-requests', label: 'Custom Requests', icon: MessageSquare, badgeKey: 'pendingRequests' as const },
   { href: '/item-inquiries', label: 'Item Inquiries', icon: PhoneCall, badgeKey: 'pendingInquiries' as const },

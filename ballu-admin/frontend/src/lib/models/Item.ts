@@ -4,6 +4,7 @@ export interface IItem {
   collections: Types.ObjectId[];
   material: Types.ObjectId;
   group: Types.ObjectId;
+  occasion?: Types.ObjectId[];
   name: { en: string; np: string };
   description?: string;
   tag?: string;
@@ -30,6 +31,7 @@ const ItemSchema = new Schema<IItem>(
     collections: { type: [{ type: Schema.Types.ObjectId, ref: 'Collection' }], required: true, validate: [(v: unknown[]) => Array.isArray(v) && v.length > 0, 'At least one collection is required'] },
     material: { type: Schema.Types.ObjectId, ref: 'Material', required: true },
     group: { type: Schema.Types.ObjectId, ref: 'Group', required: true },
+    occasion: { type: [{ type: Schema.Types.ObjectId, ref: 'Occasion' }] },
     name: { en: { type: String, required: true }, np: { type: String, required: true } },
     description: { type: String },
     tag: { type: String, enum: ['new-arrival', 'best-seller', 'limited-edition', 'sale', 'bestseller', 'trending'] },
@@ -55,5 +57,9 @@ const ItemSchema = new Schema<IItem>(
   },
   { timestamps: true }
 );
+
+if (process.env.NODE_ENV !== 'production' && mongoose.models.Item) {
+  delete mongoose.models.Item;
+}
 
 export default mongoose.models.Item || mongoose.model<IItem>('Item', ItemSchema);

@@ -4,6 +4,7 @@ import mongoose from 'mongoose';
 import './models/Material';
 import './models/Group';
 import './models/Collection';
+import './models/Occasion';
 import './models/Item';
 import './models/CustomRequest';
 import './models/StoreSettings';

@@ -28,6 +28,7 @@ export async function GET(req: NextRequest) {
       .populate('collections', 'name')
       .populate('material', 'name')
       .populate('group', 'name')
+      .populate('occasion', 'name')
       .sort({ createdAt: -1 })
       .lean();
 
@@ -109,6 +110,11 @@ export async function POST(req: NextRequest) {
       return badRequest('Invalid number for manualPriceNpr');
     }
 
+    let resolvedOccasion: unknown[] = [];
+    if (Array.isArray(body.occasion)) {
+      resolvedOccasion = body.occasion.map((o: unknown) => String(o)).filter((o: string) => o && isObjectId(o));
+    }
+
     const group = await Group.findById(body.group).lean();
     if (!group) {
       return badRequest('Group not found');
@@ -186,8 +192,8 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    const item = await Item.create({ ...body, material, purity, manualPriceNpr: body.manualPriceNpr != null ? Number(body.manualPriceNpr) : undefined });
-    const populated = await item.populate(['collections', 'material', 'group']);
+    const item = await Item.create({ ...body, occasion: resolvedOccasion, material, purity, manualPriceNpr: body.manualPriceNpr != null ? Number(body.manualPriceNpr) : undefined });
+    const populated = await item.populate(['collections', 'material', 'group', 'occasion']);
     revalidateCatalog();
     return NextResponse.json(populated, { status: 201, headers: { 'Cache-Control': 'no-store' } });
   } catch (err) {

@@ -8,6 +8,7 @@ interface CatalogStoreHydrationProps {
   collections: unknown[];
   materials: unknown[];
   groups: unknown[];
+  occasions: unknown[];
   children: ReactNode;
 }
 
@@ -16,6 +17,7 @@ export default function CatalogStoreHydration({
   collections,
   materials,
   groups,
+  occasions,
   children,
 }: CatalogStoreHydrationProps) {
   useMemo(() => {
@@ -24,8 +26,9 @@ export default function CatalogStoreHydration({
       collections: (collections || []) as any[],
       materials: (materials || []) as any[],
       groups: (groups || []) as any[],
+      occasions: (occasions || []) as any[],
     });
-  }, [items, collections, materials, groups]);
+  }, [items, collections, materials, groups, occasions]);
 
   return <>{children}</>;
 }

@@ -11,6 +11,7 @@ const RESOURCE_NAMES: Record<string, string> = {
   materials: 'Material',
   groups: 'Group',
   collections: 'Collection',
+  occasions: 'Occasion',
   items: 'Item',
   'custom-requests': 'Custom request',
   'item-inquiries': 'Inquiry',
@@ -92,6 +93,13 @@ export const api = {
     create: (data: any) => request<any>('/collections', { method: 'POST', body: JSON.stringify(data) }),
     update: (id: string, data: any) => request<any>(`/collections/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
     delete: (id: string) => request<any>(`/collections/${id}`, { method: 'DELETE' }),
+  },
+  occasions: {
+    list: () => request<any[]>('/occasions'),
+    get: (id: string) => request<any>(`/occasions/${id}`),
+    create: (data: any) => request<any>('/occasions', { method: 'POST', body: JSON.stringify(data) }),
+    update: (id: string, data: any) => request<any>(`/occasions/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+    delete: (id: string) => request<any>(`/occasions/${id}`, { method: 'DELETE' }),
   },
   items: {
     list: (params?: Record<string, string>) => {

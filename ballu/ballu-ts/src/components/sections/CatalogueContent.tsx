@@ -52,12 +52,16 @@ export default function CatalogueContent({
   const urlCollection = searchParams.get('collection')?.toUpperCase();
   const urlMaterial = searchParams.get('material')?.toUpperCase();
   const urlGroup = searchParams.get('group')?.toUpperCase();
+  const urlOccasion = searchParams.get('occasion')?.toUpperCase();
 
   const [activeCollections, setActiveCollections] = useState<string[]>(
     urlCollection ? [urlCollection] : defaultCollection ? [defaultCollection] : ['ALL']
   );
   const [activeMaterial, setActiveMaterial] = useState(urlMaterial || 'ALL');
   const [activeGroup, setActiveGroup] = useState(urlGroup || 'ALL');
+  const [activeOccasions, setActiveOccasions] = useState<string[]>(
+    urlOccasion ? [urlOccasion] : []
+  );
   const [activeTag, setActiveTag] = useState('ALL');
   const [availableOnly, setAvailableOnly] = useState(false);
   const [minPrice, setMinPrice] = useState('');
@@ -85,12 +89,28 @@ export default function CatalogueContent({
     setActiveCollections(updated);
   };
 
+  const handleOccasionClick = (occ: string) => {
+    if (activeOccasions.includes(occ)) {
+      setActiveOccasions(activeOccasions.filter((o) => o !== occ));
+    } else {
+      setActiveOccasions([...activeOccasions, occ]);
+    }
+  };
+
   const collectionButtons = useMemo(() => {
     const dbCollections = productService.getCollectionsList();
     if (dbCollections.length > 0) {
       return ['ALL', ...dbCollections.map((c: any) => c.name?.en?.toUpperCase() || '')];
     }
     return [...HARDCODED_CATEGORIES];
+  }, [dataReady]);
+
+  const occasionButtons = useMemo(() => {
+    const dbOccasions = productService.getOccasionsList();
+    if (dbOccasions.length > 0) {
+      return dbOccasions.map((o: any) => (o?.name?.en || '').trim().toUpperCase()).filter(Boolean);
+    }
+    return [];
   }, [dataReady]);
 
   const materialButtons = useMemo(() => {
@@ -116,6 +136,7 @@ export default function CatalogueContent({
 
   const filteredProducts = productService.getFiltered({
     collections: activeCollections,
+    occasions: activeOccasions,
     material: activeMaterial,
     purity: activeGroup,
     tag: activeTag,
@@ -166,6 +187,27 @@ export default function CatalogueContent({
                       }`}
                     >
                       {cat === 'ALL' ? 'ALL' : cat}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+
+            {!hideCategories && occasionButtons.length > 0 && (
+              <div className="flex overflow-x-auto whitespace-nowrap gap-2 items-center no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0 py-1">
+                {occasionButtons.map((occ) => {
+                  const isSelected = activeOccasions.includes(occ);
+                  return (
+                    <button
+                      key={occ}
+                      onClick={() => handleOccasionClick(occ)}
+                      className={`${tenorSans.className} collection-filter inline-block px-3 py-1 text-[8px] hover:-translate-y-[2px] font-small tracking-widest transition-all border rounded-4xl uppercase shrink-0 ${
+                        isSelected
+                          ? 'border-bj-gold-alt text-bj-gold-alt bg-bj-bg-elevated'
+                          : 'border-bj-border text-bj-text-muted'
+                      }`}
+                    >
+                      {occ}
                     </button>
                   );
                 })}

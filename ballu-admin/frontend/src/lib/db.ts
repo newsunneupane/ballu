@@ -9,6 +9,7 @@ import './models/Item';
 import './models/Group';
 import './models/CustomRequest';
 import './models/Collection';
+import './models/Occasion';
 
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/ballu';
 

@@ -5,9 +5,12 @@ import Collection from '@/lib/models/Collection';
 import Material from '@/lib/models/Material';
 import Group from '@/lib/models/Group';
 import StoreSettings from '@/lib/models/StoreSettings';
+import Occasion from '@/lib/models/Occasion';
 import { calculateFinalPrice } from '@/lib/utils/priceCalculator';
 
-export const CATALOG_REVALIDATE_SECONDS = 300;
+export const CATALOG_REVALIDATE_SECONDS = process.env.REVALIDATE_SECONDS
+  ? Math.max(1, parseInt(process.env.REVALIDATE_SECONDS, 10) || 300)
+  : 300;
 
 export const CATALOG_TAG = 'catalog';
 export const STORE_SETTINGS_TAG = 'store-settings';
@@ -36,9 +39,10 @@ export const getItemsData = unstable_cache(
   async () => {
     await connectDB();
     const items = await Item.find()
-      .populate('collections', 'name')
+      .populate({ path: 'collection', model: 'Collection', select: 'name', strictPopulate: false })
       .populate('material', 'name')
       .populate('group', 'name')
+      .populate('occasion', 'name')
       .sort({ createdAt: -1 })
       .lean();
 
@@ -76,9 +80,10 @@ export const getItemByIdData = unstable_cache(
   async (id: string) => {
     await connectDB();
     const item = await Item.findById(id)
-      .populate('collections', 'name')
+      .populate({ path: 'collection', model: 'Collection', select: 'name', strictPopulate: false })
       .populate('material', 'name')
       .populate('group', 'name')
+      .populate('occasion', 'name')
       .lean();
     if (!item) return null;
     normalizeCollections(item as unknown as Record<string, unknown>);
@@ -122,6 +127,16 @@ export const getMaterialsData = unstable_cache(
   },
   ['catalog-materials'],
   { revalidate, tags: [CATALOG_TAG, 'catalog-materials'] }
+);
+
+export const getOccasionsData = unstable_cache(
+  async () => {
+    await connectDB();
+    const docs = await Occasion.find().sort({ createdAt: -1 }).lean();
+    return toPlain(docs);
+  },
+  ['catalog-occasions'],
+  { revalidate, tags: [CATALOG_TAG, 'catalog-occasions'] }
 );
 
 export const getGroupsData = unstable_cache(
@@ -245,13 +260,14 @@ export const getRatesData = unstable_cache(
 );
 
 export async function loadCatalogData() {
-  const [items, collections, materials, groups, storeSettings, rates] = await Promise.all([
+  const [items, collections, materials, groups, occasions, storeSettings, rates] = await Promise.all([
     getItemsData(),
     getCollectionsData(),
     getMaterialsData(),
     getGroupsData(),
+    getOccasionsData(),
     getStoreSettingsData(),
     getRatesData(),
   ]);
-  return { items, collections, materials, groups, storeSettings, rates };
+  return { items, collections, materials, groups, occasions, storeSettings, rates };
 }

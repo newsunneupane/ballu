@@ -15,8 +15,9 @@ const initialForm = {
   nameEn: '', nameNp: '', description: '', tag: '', group: '',
   collections: [] as string[], weightValue: '', weightUnit: 'g' as WeightUnit,
   wastagePercent: '', makingCharges: '', accessoriesCharge: '', boutiqueDeduction: '', diamondValue: '',
-  caratWeight: '', stonesDetails: '', karigarName: '', images: [] as string[],
+  caratWeight: '', stonesDetails: '', karigarName: '',   images: [] as string[],
   isAvailable: true, showPrice: true, makingDaysMin: '', makingDaysMax: '', manualPrice: '',
+  occasion: [] as string[],
 };
 
 export default function ItemsPage() {
@@ -62,6 +63,10 @@ export default function ItemsPage() {
   const { data: collections = [] } = useQuery({
     queryKey: ['collections'],
     queryFn: api.collections.list,
+  });
+  const { data: occasions = [] } = useQuery({
+    queryKey: ['occasions'],
+    queryFn: api.occasions.list,
   });
 
   const invalidateItems = () => queryClient.invalidateQueries({ queryKey: ['items'] });
@@ -142,6 +147,7 @@ export default function ItemsPage() {
       makingDaysMin: item.estimatedMakingDays?.min != null ? String(item.estimatedMakingDays.min) : '',
       makingDaysMax: item.estimatedMakingDays?.max != null ? String(item.estimatedMakingDays.max) : '',
       manualPrice: item.manualPriceNpr != null ? String(item.manualPriceNpr) : '',
+      occasion: (item.occasion || []).map((o: any) => o?._id || o).filter(Boolean) as string[],
     });
     setShowForm(true);
   };
@@ -222,6 +228,7 @@ export default function ItemsPage() {
       tag: form.tag || undefined,
       group: form.group,
       collections: form.collections,
+      occasion: form.occasion,
       weightGrams: weightGramsValue,
       wastagePercent: Number(form.wastagePercent),
       makingCharges: Number(form.makingCharges),
@@ -481,7 +488,26 @@ export default function ItemsPage() {
                     options={collections.map((c: any) => ({ value: c._id, label: c.name.en }))}
                     placeholder="Select collections"
                 />
-                <p className="text-[10px] text-[#6b655b] mt-1.5">An item can belong to multiple collections. The first one is used as its primary collection.</p>
+                  <p className="text-[10px] text-[#6b655b] mt-1.5">An item can belong to multiple collections. The first one is used as its primary collection.</p>
+              </div>
+              <div>
+                <label className="block text-[10px] tracking-[0.2em] uppercase text-[#6b655b] mb-1.5">Occasions</label>
+                  <SearchableSelect
+                    multiple
+                    values={form.occasion}
+                    onValuesChange={(v) => setForm({ ...form, occasion: v })}
+                    options={(() => {
+                      const othersDoc = occasions.find((o: any) => o.name?.en === 'Others');
+                      const normal = occasions
+                        .filter((o: any) => (o.name?.en || '').toLowerCase() !== 'others')
+                        .map((o: any) => ({ value: o._id, label: o.name.en }));
+                      return othersDoc
+                        ? [...normal, { value: othersDoc._id, label: 'Others' }]
+                        : normal;
+                    })()}
+                    placeholder="Select occasions"
+                  />
+                <p className="text-[10px] text-[#6b655b] mt-1.5">An item can be suited to multiple occasions.</p>
               </div>
               <div>
                 <label className="block text-[10px] tracking-[0.2em] uppercase text-[#6b655b] mb-1.5">Group</label>

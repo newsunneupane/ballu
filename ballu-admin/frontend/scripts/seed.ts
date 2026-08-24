@@ -174,6 +174,21 @@ async function seed() {
   }, { timestamps: true });
   const Collection = mongoose.models.Collection || mongoose.model('Collection', collectionSchema);
 
+  const occasionSchema = new mongoose.Schema({
+    name: { en: String, np: String },
+    description: String,
+    image: String,
+  }, { timestamps: true });
+  const Occasion = mongoose.models.Occasion || mongoose.model('Occasion', occasionSchema);
+
+  const existingOthers = await Occasion.findOne({ 'name.en': 'Others' });
+  if (!existingOthers) {
+    await Occasion.create({ name: { en: 'Others', np: 'अन्य' }, description: '', image: '' });
+    created.push('Occasion: Others');
+  } else {
+    created.push('Occasion already exists: Others');
+  }
+
   const collectionData = [
     { en: 'Bridal', np: 'वैवाहिक', desc: 'Bridal jewellery collection' },
     { en: 'Festive', np: 'पर्व', desc: 'Festive season collection' },
