@@ -778,3 +778,39 @@ body {
 [data-theme="light"] .subnav-link:hover::after {
   background-color: #cc0000 !important;
 }
+
+/* Mobile menu — curated light-mode skin (dark mode left untouched) */
+[data-theme="light"] .bj-mobile-menu {
+  background: linear-gradient(180deg, #fcf8ef 0%, #f5eddc 55%, #f1e7d2 100%);
+  color: #2c231a;
+}
+[data-theme="light"] .bj-mobile-menu .mm-header,
+[data-theme="light"] .bj-mobile-menu .mm-footer {
+  background: rgba(255, 255, 255, 0.72);
+  border-color: #e6d8ba;
+}
+[data-theme="light"] .bj-mobile-menu .mm-body {
+  background: transparent;
+}
+[data-theme="light"] .bj-mobile-menu .mm-subpanel {
+  background: rgba(255, 255, 255, 0.55);
+}
+[data-theme="light"] .bj-mobile-menu .border-bj-border {
+  border-color: #e6d8ba;
+}
+[data-theme="light"] .bj-mobile-menu .mm-subbtn {
+  background: rgba(255, 255, 255, 0.6);
+  color: #2c231a;
+}
+[data-theme="light"] .bj-mobile-menu .mm-subbtn:hover {
+  background: rgba(184, 137, 48, 0.1);
+  border-color: rgba(184, 137, 48, 0.5);
+  color: #9a7a30;
+}
+[data-theme="light"] .bj-mobile-menu .mm-muted,
+[data-theme="light"] .bj-mobile-menu .text-bj-text-muted {
+  color: #9b8c6e;
+}
+[data-theme="light"] .bj-mobile-menu .text-bj-text-nav {
+  color: #2c231a;
+}

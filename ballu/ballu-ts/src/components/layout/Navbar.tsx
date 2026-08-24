@@ -183,12 +183,12 @@ function MobileMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
 
   return (
     <div
-      className={`md:hidden fixed inset-0 bg-bj-bg-secondary/98 backdrop-blur-lg transition-all duration-500 ease-in-out overflow-y-auto z-[60] no-scrollbar ${
+      className={`bj-mobile-menu md:hidden fixed inset-0 bg-bj-bg-secondary/98 backdrop-blur-lg transition-all duration-500 ease-in-out overflow-y-auto z-[60] no-scrollbar ${
         isOpen ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible -translate-y-full'
       }`}
     >
       <div className="flex flex-col h-full">
-        <div className="sticky top-0 z-20 flex items-center justify-between px-5 h-16 bg-bj-bg-secondary/95 backdrop-blur border-b border-bj-border shrink-0">
+        <div className="mm-header sticky top-0 z-20 flex items-center justify-between px-5 h-16 bg-bj-bg-secondary/95 backdrop-blur border-b border-bj-border shrink-0">
           <div className="flex items-baseline gap-2">
             <span className="italic text-bj-text-nav text-[20px] leading-none">{SITE.name}</span>
             <span className="text-[10px] tracking-[0.35em] uppercase text-bj-text-muted leading-none">
@@ -204,7 +204,7 @@ function MobileMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto no-scrollbar">
+        <div className="mm-body flex-1 overflow-y-auto no-scrollbar bg-bj-bg">
           <nav className="flex flex-col">
             <div className="flex flex-col gap-3 px-5 py-5">
               {primaryLinks.map((link) => (
@@ -220,7 +220,7 @@ function MobileMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
             </div>
 
             <div className="flex flex-col gap-3 px-5 py-5">
-              <p className="px-1 pb-1 text-[11px] tracking-[0.3em] uppercase text-bj-text-muted">
+              <p className="mm-muted px-1 pb-1 text-[11px] tracking-[0.3em] uppercase text-bj-text-muted">
                 Browse the collection
               </p>
 
@@ -232,7 +232,7 @@ function MobileMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
                       type="button"
                       onClick={() => toggle(item.label)}
                       aria-expanded={open}
-                      className="flex w-full items-center justify-between h-12 rounded-xl border border-bj-border bg-bj-bg-elevated/40 px-5 text-[13px] tracking-[0.2em] uppercase text-bj-text-nav transition-all duration-300 hover:border-bj-gold-rich/60 hover:text-bj-gold-rich"
+                      className="mm-subbtn flex w-full items-center justify-between h-12 rounded-xl border border-bj-border bg-bj-bg-elevated/40 px-5 text-[13px] tracking-[0.2em] uppercase text-bj-text-nav transition-all duration-300 hover:border-bj-gold-rich/60 hover:text-bj-gold-rich"
                     >
                       <span>{item.label}</span>
                       <FiChevronRight
@@ -258,7 +258,7 @@ function MobileMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
           </nav>
         </div>
 
-        <div className="shrink-0 border-t border-bj-border bg-bj-bg-secondary px-5 py-4">
+        <div className="mm-footer shrink-0 border-t border-bj-border bg-bj-bg-secondary px-5 py-4">
           <div className="flex items-center justify-between gap-3">
             <div className="flex flex-col">
               <span className="text-[12px] tracking-[0.15em] text-bj-text-nav">{SITE.fullName}</span>
@@ -287,7 +287,7 @@ function MobileSubPanel({ item, onClose }: { item: SubNavItem; onClose: () => vo
   const data = getPanelData(item);
 
   return (
-    <div className="bg-bj-bg-elevated/30 px-5 pb-6 pt-1">
+    <div className="mm-subpanel bg-bj-bg-elevated/30 px-5 pb-6 pt-1">
       <MobileSection title="Shop by Category">
         {data.collections.length > 0 && (
           <ul>
