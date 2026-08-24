@@ -28,25 +28,7 @@ export default function InstagramFeed() {
 
   return (
     <section className="mx-auto w-full max-w-[1400px] px-4 sm:px-6 md:px-16 lg:px-15 pt-10 lg:pt-14">
-      <div className="mb-8 flex items-end justify-between">
-        <div>
-          <p className="text-[11px] tracking-[0.3em] uppercase text-bj-text-muted">Social</p>
-          <h2 className="mt-2 font-serif-editorial text-2xl font-light text-bj-text-heading md:text-3xl">
-            From our Instagram
-          </h2>
-        </div>
-        {siteConfig.social.instagram && siteConfig.social.instagram !== '#' && (
-          <Link
-            href={siteConfig.social.instagram}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group inline-flex items-center gap-2 whitespace-nowrap text-[12px] tracking-[0.2em] uppercase text-bj-gold-richer transition-colors hover:text-bj-gold-rich"
-          >
-            Follow us
-            <span className="transition-transform duration-300 group-hover:translate-x-1.5">→</span>
-          </Link>
-        )}
-      </div>
+      
 
       <Script
         src="https://elfsightcdn.com/platform.js"

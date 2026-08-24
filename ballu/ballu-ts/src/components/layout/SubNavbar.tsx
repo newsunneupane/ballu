@@ -81,6 +81,7 @@ interface PanelData {
   items: any[];
   priceRanges: PanelLink[];
   occasions: { name: string; nepali?: string; image?: string; href: string }[];
+  baseQuery: string;
 }
 
 function collectionSlugOf(name: string): string {
@@ -165,6 +166,11 @@ function getPanelData(item: SubNavItem): PanelData {
   const collectionName = slug ? slugToName.get(slug) || collectionFromSlug[slug] : undefined;
 
   const all = productService.getAll();
+
+  const baseParams = new URLSearchParams();
+  if (materialParam) baseParams.set('material', materialParam);
+  else if (collectionName) baseParams.set('collection', collectionName);
+  const baseQuery = baseParams.toString();
 
   let ctxProducts = all;
   if (materialParam) {
@@ -270,7 +276,7 @@ function getPanelData(item: SubNavItem): PanelData {
     );
   }
 
-  return { categoryMode, collections, items, priceRanges, occasions };
+  return { categoryMode, collections, items, priceRanges, occasions, baseQuery };
 }
 
 export default function SubNavbar() {
@@ -420,10 +426,10 @@ function MegaPanel({
         <div className="min-w-0 flex-1 overflow-y-auto px-6 py-8 md:px-10">
           {activeOption === 'category' ? (
             data.categoryMode === 'collections' ? (
-              <CollectionCards cards={data.collections} onClose={onClose} />
+              <CollectionCards cards={data.collections} baseQuery={data.baseQuery} onClose={onClose} />
             ) : data.categoryMode === 'mixed' ? (
               <>
-                <CollectionCards cards={data.collections} onClose={onClose} />
+                <CollectionCards cards={data.collections} baseQuery={data.baseQuery} onClose={onClose} />
                 {data.items.length > 0 && (
                   <>
                     <h3 className="mb-4 mt-10 text-[11px] tracking-[0.3em] uppercase text-bj-text-muted">
@@ -471,16 +477,20 @@ function OptionButton({
   );
 }
 
-function CollectionCards({ cards, onClose }: { cards: PanelCollection[]; onClose: () => void }) {
+function CollectionCards({ cards, baseQuery, onClose }: { cards: PanelCollection[]; baseQuery?: string; onClose: () => void }) {
   if (cards.length === 0) {
     return <p className="text-[12px] tracking-wide text-bj-text-muted">No collections available.</p>;
   }
   return (
     <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-      {cards.map((card) => (
+      {cards.map((card) => {
+        const q = new URLSearchParams(baseQuery || '');
+        q.set('collection', card.name.trim().toUpperCase());
+        const href = `/catalogue?${q.toString()}`;
+        return (
         <Link
           key={card.slug}
-          href={`/${card.slug}`}
+          href={href}
           onClick={onClose}
           className="group/col block"
         >
@@ -499,7 +509,8 @@ function CollectionCards({ cards, onClose }: { cards: PanelCollection[]; onClose
             {card.name}
           </p>
         </Link>
-      ))}
+        );
+      })}
     </div>
   );
 }

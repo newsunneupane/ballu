@@ -98,8 +98,8 @@ function FeatureGrid({ groupRates }: { groupRates: GroupRate[] | null }) {
   const grouped = groupRates && groupRates.length ? groupByMaterial(groupRates) : [];
 
   return (
-    <div className="brand-grid w-full border-t border-white/10  relative z-10 bg-bj-bg-secondary">
-      <div className="max-w-7xl w-full mx-auto px-6 md:px-12 lg:px-16 py-10 md:py-14 grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,3fr)] gap-10 lg:gap-16 items-center">
+    <div className="brand-grid w-full   relative z-10 bg-bj-bg-secondary">
+      <div className="max-w-7xl w-full mx-auto px-6 md:px-12 lg:px-16 pb-10 md:pb-14 grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,3fr)] gap-10 lg:gap-16 items-center">
         <div className="order-1">
           <div className="flex items-center gap-3 mb-6">
             <span className="h-px w-8 bg-bj-gold/60" />
