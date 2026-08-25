@@ -11,6 +11,7 @@ import { useStoreSettings, whatsappNumber } from '@/hooks/useStoreSettings';
 import { whatsappBaseUrl } from '@/lib/utils/whatsapp';
 import SearchOverlay from '@/components/layout/SearchOverlay';
 import { useTheme } from '@/components/layout/ThemeProvider';
+import { cloudinaryUrl } from '@/lib/cloudinary';
 import { productService } from '@/services/product-service';
 import { buildNavItems, getPanelData, type SubNavItem } from '@/components/layout/subnav-data';
 
@@ -194,12 +195,17 @@ function MobileMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
     >
       <div className="flex flex-col h-full">
         <div className="mm-header sticky top-0 z-20 flex items-center justify-between px-5 h-16 bg-bj-bg-secondary/95 backdrop-blur border-b border-bj-border shrink-0">
-          <div className="flex items-baseline gap-2">
+          <Link
+            href="/"
+            onClick={onClose}
+            aria-label="Go to homepage"
+            className="flex items-baseline gap-2 cursor-pointer transition-opacity duration-300 hover:opacity-80"
+          >
             <span className="italic text-bj-text-nav text-[20px] leading-none">{SITE.name}</span>
             <span className="text-[10px] tracking-[0.35em] uppercase text-bj-text-muted leading-none">
               {SITE.suffix}
             </span>
-          </div>
+          </Link>
           <button
             onClick={onClose}
             aria-label="Close menu"
@@ -299,35 +305,51 @@ function MobileSubPanel({ item, onClose }: { item: SubNavItem; onClose: () => vo
             {data.collections.map((card) => {
               const q = new URLSearchParams(data.baseQuery);
               q.set('collection', card.name.trim().toUpperCase());
-              return (
-                <MobileLinkRow
-                  key={card.slug}
-                  href={`/catalogue?${q.toString()}`}
-                  label={card.name}
-                  sub={card.nepali}
-                  onClose={onClose}
-                />
-              );
+                return (
+                  <MobileLinkRow
+                    key={card.slug}
+                    href={`/catalogue?${q.toString()}`}
+                    label={card.name}
+                    sub={card.nepali}
+                    image={card.image}
+                    onClose={onClose}
+                  />
+                );
             })}
           </ul>
         )}
         {data.items.length > 0 && (
           <>
             {data.collections.length > 0 && (
-              <p className="mb-1 mt-3 text-[10px] tracking-[0.3em] uppercase text-bj-text-muted">
+              <p className="mb-2 mt-3 text-[10px] tracking-[0.3em] uppercase text-bj-text-muted">
                 More pieces
               </p>
             )}
-            <ul>
+            <div className="grid grid-cols-3 gap-2">
               {data.items.map((p) => (
-                <MobileLinkRow
+                <Link
                   key={p.id}
                   href={`/catalogue/${p.id}`}
-                  label={p.title}
-                  onClose={onClose}
-                />
+                  onClick={onClose}
+                  className="group block"
+                >
+                  <div className="relative aspect-[3/4] w-full overflow-hidden rounded-md border border-bj-border bg-bj-bg-elevated">
+                    {p.images?.[0] ? (
+                      <img
+                        src={cloudinaryUrl(p.images[0], { width: 300, aspect: '3:4' })}
+                        alt={p.title}
+                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 bg-gradient-to-br from-[#423722] to-[#1a140f]" />
+                    )}
+                  </div>
+                  <p className="mt-1.5 truncate text-[11px] tracking-wide text-bj-text-nav">
+                    {p.title}
+                  </p>
+                </Link>
               ))}
-            </ul>
+            </div>
           </>
         )}
       </MobileSection>
@@ -379,11 +401,13 @@ function MobileLinkRow({
   href,
   label,
   sub,
+  image,
   onClose,
 }: {
   href: string;
   label: string;
   sub?: string;
+  image?: string;
   onClose: () => void;
 }) {
   return (
@@ -391,10 +415,19 @@ function MobileLinkRow({
       <Link
         href={href}
         onClick={onClose}
-        className="group flex items-center justify-between rounded-md px-3 py-2.5 transition-colors hover:bg-bj-bg-elevated hover:text-bj-gold-rich"
+        className="group flex items-center gap-3 rounded-md px-3 py-2.5 transition-colors hover:bg-bj-bg-elevated hover:text-bj-gold-rich"
       >
-        <span className="flex flex-col">
-          <span className="text-[13px] tracking-[0.08em] text-bj-text-nav">{label}</span>
+        {image && (
+          <span className="relative h-10 w-10 shrink-0 overflow-hidden rounded border border-bj-border bg-bj-bg-elevated">
+            <img
+              src={cloudinaryUrl(image, { width: 80, aspect: '1:1' })}
+              alt={label}
+              className="h-full w-full object-cover"
+            />
+          </span>
+        )}
+        <span className="flex min-w-0 flex-1 flex-col">
+          <span className="truncate text-[13px] tracking-[0.08em] text-bj-text-nav">{label}</span>
           {sub && <span className="text-[10px] tracking-wide text-bj-text-muted">{sub}</span>}
         </span>
         <span className="text-bj-gold-richer opacity-0 -translate-x-1 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0">

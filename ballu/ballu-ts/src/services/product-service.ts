@@ -211,7 +211,7 @@ export const productService = {
       const matchesAvailability = !filters.availableOnly || product.isAvailable;
       const matchesOccasion = !filters.occasions || filters.occasions.length === 0 || filters.occasions.includes('ALL') || (product.occasions || []).some((occ: string) => filters.occasions!.includes(occ));
       const matchesMinPrice = filters.minPrice == null || (product.priceNpr != null && product.priceNpr >= filters.minPrice);
-      const matchesMaxPrice = filters.maxPrice == null || (product.priceNpr != null && product.priceNpr <= filters.maxPrice);
+      const matchesMaxPrice = filters.maxPrice == null || (product.priceNpr != null && product.priceNpr < filters.maxPrice);
       return matchesCollection && matchesMaterial && matchesPurity && matchesTag && matchesAvailability && matchesOccasion && matchesMinPrice && matchesMaxPrice;
     });
 

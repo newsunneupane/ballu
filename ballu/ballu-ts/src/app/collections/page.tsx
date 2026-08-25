@@ -4,7 +4,7 @@ import React from 'react';
 import { Cormorant_Garamond, Cormorant_SC } from 'next/font/google';
 import { productService } from '@/services/product-service';
 import { useProductData } from '@/hooks/useProductData';
-import OccasionsGrid from '@/components/sections/OccasionsGrid';
+import CollectionsGrid from '@/components/sections/CollectionsGrid';
 
 const cormorant = Cormorant_Garamond({
   subsets: ['latin'],
@@ -18,13 +18,9 @@ const cormorantSC = Cormorant_SC({
   variable: '--font-serif-title',
 });
 
-export default function AllOccasionsPage() {
+export default function AllCollectionsPage() {
   const ready = useProductData();
-  const occasions = productService.getOccasionsList() as {
-    _id: string;
-    name: { en: string; np?: string };
-    image?: string;
-  }[];
+  const collections = productService.getCollectionsCards();
 
   return (
     <div
@@ -33,13 +29,13 @@ export default function AllOccasionsPage() {
       <div className="max-w-7xl mx-auto">
         <div className="mb-10 md:mb-14">
           <p className="text-[11px] tracking-[0.4em] uppercase text-bj-gold/80">
-            Moments
+            Everything
           </p>
           <h1 className="mt-3 font-serif-title text-[clamp(2rem,5vw,3.5rem)] font-light leading-[1.1] text-bj-text-heading">
-            All Occasions
+            All Collections
           </h1>
           <p className="mt-4 max-w-xl text-sm leading-7 text-bj-text-muted">
-            Browse the complete range — every occasion in one place.
+            Browse the complete range — every collection in one place.
           </p>
         </div>
 
@@ -48,7 +44,7 @@ export default function AllOccasionsPage() {
             Loading ...
           </p>
         ) : (
-          <OccasionsGrid occasions={occasions} />
+          <CollectionsGrid collections={collections} />
         )}
       </div>
     </div>

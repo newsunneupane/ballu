@@ -127,11 +127,11 @@ export function collectionsForMaterial(matUpper: string): Set<string> {
 }
 
 export const PRICE_BUCKETS: { label: string; min?: number; max?: number }[] = [
-  { label: 'Under ₹50,000', max: 50000 },
-  { label: '₹50,000 – ₹100,000', min: 50000, max: 100000 },
-  { label: '₹100,000 – ₹250,000', min: 100000, max: 250000 },
-  { label: '₹250,000 – ₹500,000', min: 250000, max: 500000 },
-  { label: 'Above ₹500,000', min: 500000 },
+  { label: 'Under Rs 50,000', max: 50000 },
+  { label: 'Rs 50,000 – Rs 100,000', min: 50000, max: 100000 },
+  { label: 'Rs 100,000 – Rs 250,000', min: 100000, max: 250000 },
+  { label: 'Rs 250,000 – Rs 500,000', min: 250000, max: 500000 },
+  { label: 'Above Rs 500,000', min: 500000 },
 ];
 
 export function getPanelData(item: SubNavItem): PanelData {
@@ -232,7 +232,7 @@ export function getPanelData(item: SubNavItem): PanelData {
     const min = params.get('minPrice') ? Number(params.get('minPrice')) : -Infinity;
     const max = params.get('maxPrice') ? Number(params.get('maxPrice')) : Infinity;
     return ctxProducts.some(
-      (p) => typeof p.priceNpr === 'number' && p.priceNpr >= min && p.priceNpr <= max
+      (p) => typeof p.priceNpr === 'number' && p.priceNpr >= min && p.priceNpr < max
     );
   });
 

@@ -1,4 +1,5 @@
 import React from 'react'
+import Link from 'next/link'
 import HeroSection from '@/components/sections/HeroSection'
 import CollectionsRow from '@/components/sections/CollectionsRow'
 import RecommendedRow from '@/components/sections/RecommendedRow'
@@ -26,6 +27,17 @@ const Home = async () => {
             <h2 className="font-serif-title text-[clamp(1.6rem,4vw,2.6rem)] font-light text-bj-text-heading">Shop by Occasions</h2>
           </div>
           <OccasionsBento occasions={occasions} />
+          <div className="mt-8 flex justify-end">
+            <Link
+              href="/occasions"
+              className="group inline-flex items-center gap-2 text-[12px] tracking-[0.25em] uppercase text-bj-gold transition-colors hover:text-bj-gold-rich"
+            >
+              <span>All Occasions</span>
+              <span className="transition-transform duration-300 group-hover:translate-x-1.5">
+                &rarr;
+              </span>
+            </Link>
+          </div>
         </div>
       </section>
       <RecommendedRow />

@@ -10,8 +10,6 @@ const tenorSans = Tenor_Sans({
 });
 
 export interface CatalogueFilterBarProps {
-  containerRef?: React.RefObject<HTMLDivElement | null>;
-  isFixed: boolean;
   collectionButtons: string[];
   occasionButtons: string[];
   materialButtons: string[];
@@ -29,6 +27,7 @@ export interface CatalogueFilterBarProps {
   viewMode: 'GRID' | 'LIST';
   hideCategories?: boolean;
   productCount?: number;
+  className?: string;
   handleCollectionClick: (cat: string) => void;
   handleOccasionClick: (occ: string) => void;
   setActiveMaterial: (m: string) => void;
@@ -42,8 +41,6 @@ export interface CatalogueFilterBarProps {
 }
 
 export default function CatalogueFilterBar({
-  containerRef,
-  isFixed,
   collectionButtons,
   occasionButtons,
   materialButtons,
@@ -61,6 +58,7 @@ export default function CatalogueFilterBar({
   viewMode,
   hideCategories,
   productCount = 0,
+  className,
   handleCollectionClick,
   handleOccasionClick,
   setActiveMaterial,
@@ -75,10 +73,7 @@ export default function CatalogueFilterBar({
   return (
     <>
       <div
-        ref={containerRef}
-        className={`w-full bg-bj-bg-elevated/95 backdrop-blur-md pb-4 pt-4 border-b border-bj-border px-4 sm:px-6 md:px-16 lg:px-15 sticky top-[50px] z-[49] max-md:static max-md:shadow-none max-md:z-auto ${
-          isFixed ? 'shadow-2xl' : ''
-        }`}
+        className={`w-full bg-bj-bg-elevated/95 backdrop-blur-md pb-4 pt-4 border-b border-bj-border px-4 sm:px-6 md:px-16 lg:px-15 relative ${className ?? ''}`}
       >
         <div className="flex flex-col gap-3 max-w-[100vw]">
           {!hideCategories && (
@@ -193,7 +188,7 @@ export default function CatalogueFilterBar({
         </div>
       </div>
 
-      <div className="px-4 sm:px-6 md:px-16 lg:px-15 py-4 border-b border-bj-border/60">
+      <div className={`px-4 sm:px-6 md:px-16 lg:px-15 py-4 border-b border-bj-border/60 ${className ?? ''}`}>
         <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
           {tagButtons.length > 1 && (
             <div className="flex items-center gap-2 flex-wrap">

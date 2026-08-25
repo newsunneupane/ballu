@@ -8,7 +8,6 @@ import { FiSliders, FiX } from 'react-icons/fi';
 import { productService } from '@/services/product-service';
 import { CATEGORIES as HARDCODED_CATEGORIES } from '@/data/products';
 import { SortOption } from '@/types/product';
-import { useFilterSticky } from '@/hooks/useFilterSticky';
 import { useProductData } from '@/hooks/useProductData';
 import ProductCard from '@/components/shared/ProductCard';
 import CatalogueFilterBar from '@/components/sections/CatalogueFilterBar';
@@ -19,6 +18,18 @@ const SORT_OPTIONS: { value: SortOption; label: string }[] = [
   { value: 'price-asc', label: 'Price: Low to High' },
   { value: 'price-desc', label: 'Price: High to Low' },
 ];
+
+function getPageItems(current: number, total: number): (number | '...')[] {
+  if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+  const items: (number | '...')[] = [1];
+  const start = Math.max(2, current - 1);
+  const end = Math.min(total - 1, current + 1);
+  if (start > 2) items.push('...');
+  for (let i = start; i <= end; i++) items.push(i);
+  if (end < total - 1) items.push('...');
+  items.push(total);
+  return items;
+}
 
 const cormorantSC = Cormorant_SC({
   subsets: ['latin'],
@@ -55,6 +66,8 @@ export default function CatalogueContent({
   const urlMaterial = searchParams.get('material')?.toUpperCase();
   const urlGroup = searchParams.get('group')?.toUpperCase();
   const urlOccasion = searchParams.get('occasion')?.toUpperCase();
+  const urlMinPrice = searchParams.get('minPrice');
+  const urlMaxPrice = searchParams.get('maxPrice');
 
   const [activeCollections, setActiveCollections] = useState<string[]>(
     urlCollection ? [urlCollection] : defaultCollection ? [defaultCollection] : ['ALL']
@@ -66,16 +79,18 @@ export default function CatalogueContent({
   );
   const [activeTag, setActiveTag] = useState('ALL');
   const [availableOnly, setAvailableOnly] = useState(false);
-  const [minPrice, setMinPrice] = useState('');
-  const [maxPrice, setMaxPrice] = useState('');
+  const [minPrice, setMinPrice] = useState(urlMinPrice ?? '');
+  const [maxPrice, setMaxPrice] = useState(urlMaxPrice ?? '');
   const [sort, setSort] = useState<SortOption>('newest');
   const [viewMode, setViewMode] = useState<'GRID' | 'LIST'>('GRID');
-  const { containerRef, isFixed } = useFilterSticky(50);
+  const [page, setPage] = useState(1);
+  const PAGE_SIZE = 16;
   const dataReady = useProductData();
 
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [showFab, setShowFab] = useState(false);
   const mainRef = useRef<HTMLElement>(null);
+  const filterAnchorRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const onScroll = () => {
@@ -165,6 +180,42 @@ export default function CatalogueContent({
     sort,
   });
 
+  const totalPages = Math.max(1, Math.ceil(filteredProducts.length / PAGE_SIZE));
+  const currentPage = Math.min(Math.max(1, page), totalPages);
+  const pageItems = filteredProducts.slice(
+    (currentPage - 1) * PAGE_SIZE,
+    currentPage * PAGE_SIZE
+  );
+
+  useEffect(() => {
+    setPage(1);
+  }, [
+    activeCollections,
+    activeMaterial,
+    activeGroup,
+    activeOccasions,
+    activeTag,
+    availableOnly,
+    minPrice,
+    maxPrice,
+    sort,
+  ]);
+
+  const goToPage = (p: number) => {
+    const target = Math.min(Math.max(1, p), totalPages);
+    setPage(target);
+    requestAnimationFrame(() => {
+      let y = 0;
+      const anchor = filterAnchorRef.current;
+      if (anchor && anchor.offsetParent !== null) {
+        y = anchor.getBoundingClientRect().top + window.scrollY - 25;
+      } else if (mainRef.current) {
+        y = mainRef.current.getBoundingClientRect().top + window.scrollY - 25;
+      }
+      window.scrollTo({ top: y, behavior: 'smooth' });
+    });
+  };
+
   return (
     <div className={`${cormorant.className} min-h-screen bg-bj-bg-elevated text-bj-text-alt antialiased`}>
       <header className="w-full pt-6 relative">
@@ -184,38 +235,37 @@ export default function CatalogueContent({
         </div>
       </header>
 
-      {/* Desktop: inline sticky filter bar */}
-      <div className="hidden md:block">
+      {/* Desktop: inline filter bar */}
+      <div ref={filterAnchorRef}>
         <CatalogueFilterBar
-          containerRef={containerRef}
-          isFixed={isFixed}
+          className="hidden md:block"
           collectionButtons={collectionButtons}
-          occasionButtons={occasionButtons}
-          materialButtons={materialButtons}
-          groupButtons={groupButtons}
-          tagButtons={tagButtons}
-          activeCollections={activeCollections}
-          activeMaterial={activeMaterial}
-          activeGroup={activeGroup}
-          activeOccasions={activeOccasions}
-          activeTag={activeTag}
-          availableOnly={availableOnly}
-          minPrice={minPrice}
-          maxPrice={maxPrice}
-          sort={sort}
-          viewMode={viewMode}
-          hideCategories={hideCategories}
-          productCount={filteredProducts.length}
-          handleCollectionClick={handleCollectionClick}
-          handleOccasionClick={handleOccasionClick}
-          setActiveMaterial={setActiveMaterial}
-          setActiveGroup={setActiveGroup}
-          setActiveTag={setActiveTag}
-          setAvailableOnly={setAvailableOnly}
-          setMinPrice={setMinPrice}
-          setMaxPrice={setMaxPrice}
-          setSort={setSort}
-          setViewMode={setViewMode}
+        occasionButtons={occasionButtons}
+        materialButtons={materialButtons}
+        groupButtons={groupButtons}
+        tagButtons={tagButtons}
+        activeCollections={activeCollections}
+        activeMaterial={activeMaterial}
+        activeGroup={activeGroup}
+        activeOccasions={activeOccasions}
+        activeTag={activeTag}
+        availableOnly={availableOnly}
+        minPrice={minPrice}
+        maxPrice={maxPrice}
+        sort={sort}
+        viewMode={viewMode}
+        hideCategories={hideCategories}
+        productCount={filteredProducts.length}
+        handleCollectionClick={handleCollectionClick}
+        handleOccasionClick={handleOccasionClick}
+        setActiveMaterial={setActiveMaterial}
+        setActiveGroup={setActiveGroup}
+        setActiveTag={setActiveTag}
+        setAvailableOnly={setAvailableOnly}
+        setMinPrice={setMinPrice}
+        setMaxPrice={setMaxPrice}
+        setSort={setSort}
+        setViewMode={setViewMode}
         />
       </div>
 
@@ -256,7 +306,6 @@ export default function CatalogueContent({
 
           <div className="px-4 py-4">
             <CatalogueFilterBar
-              isFixed={false}
               collectionButtons={collectionButtons}
               occasionButtons={occasionButtons}
               materialButtons={materialButtons}
@@ -309,7 +358,7 @@ export default function CatalogueContent({
           </div>
         ) : viewMode === 'GRID' ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {filteredProducts.map((product) => (
+            {pageItems.map((product) => (
               <ProductCard key={product.id} product={product} viewMode="GRID" />
             ))}
           </div>
@@ -326,10 +375,51 @@ export default function CatalogueContent({
               <div />
             </div>
             <div className="divide-y divide-bj-border">
-              {filteredProducts.map((product) => (
+              {pageItems.map((product) => (
                 <ProductCard key={product.id} product={product} viewMode="LIST" />
               ))}
             </div>
+          </div>
+        )}
+
+        {totalPages > 1 && (
+          <div className="mt-12 flex flex-wrap items-center justify-center gap-2">
+            <button
+              type="button"
+              onClick={() => goToPage(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="px-3 py-1.5 text-[11px] tracking-[0.2em] uppercase border border-bj-border text-bj-text-muted transition-colors hover:border-bj-gold-rich hover:text-bj-gold-rich disabled:opacity-30 disabled:cursor-not-allowed"
+            >
+              Prev
+            </button>
+            {getPageItems(currentPage, totalPages).map((it, i) =>
+              it === '...' ? (
+                <span key={`e${i}`} className="px-2 text-bj-text-muted">
+                  …
+                </span>
+              ) : (
+                <button
+                  type="button"
+                  key={it}
+                  onClick={() => goToPage(it)}
+                  className={`px-3 py-1.5 text-[11px] tracking-[0.2em] uppercase border transition-colors ${
+                    it === currentPage
+                      ? 'border-bj-gold-alt text-bj-gold-alt bg-bj-bg-elevated'
+                      : 'border-bj-border text-bj-text-muted hover:border-bj-gold-rich hover:text-bj-gold-rich'
+                  }`}
+                >
+                  {it}
+                </button>
+              )
+            )}
+            <button
+              type="button"
+              onClick={() => goToPage(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className="px-3 py-1.5 text-[11px] tracking-[0.2em] uppercase border border-bj-border text-bj-text-muted transition-colors hover:border-bj-gold-rich hover:text-bj-gold-rich disabled:opacity-30 disabled:cursor-not-allowed"
+            >
+              Next
+            </button>
           </div>
         )}
       </main>

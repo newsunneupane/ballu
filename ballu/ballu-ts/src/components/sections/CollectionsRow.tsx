@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import { Cormorant_Garamond, Cormorant_SC } from 'next/font/google';
 import { productService } from '@/services/product-service';
 import { useProductData } from '@/hooks/useProductData';
@@ -42,6 +43,17 @@ export default function CollectionsRow() {
       <div className="w-full pb-20 overflow-hidden select-none">
         <div className="max-w-7xl w-full mx-auto px-6 md:px-12 lg:px-16">
           <CollectionsBento collections={topCollections} />
+          <div className="mt-8 flex justify-end">
+            <Link
+              href="/collections"
+              className="group inline-flex items-center gap-2 text-[12px] tracking-[0.25em] uppercase text-bj-gold transition-colors hover:text-bj-gold-rich"
+            >
+              <span>All Collections</span>
+              <span className="transition-transform duration-300 group-hover:translate-x-1.5">
+                &rarr;
+              </span>
+            </Link>
+          </div>
         </div>
       </div>
     </div>
