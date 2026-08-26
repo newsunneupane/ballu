@@ -201,6 +201,25 @@ export default function CatalogueContent({
     sort,
   ]);
 
+  useEffect(() => {
+    const urlCollection = searchParams.get('collection')?.toUpperCase();
+    const urlMaterial = searchParams.get('material')?.toUpperCase();
+    const urlGroup = searchParams.get('group')?.toUpperCase();
+    const urlOccasion = searchParams.get('occasion')?.toUpperCase();
+    const urlMinPrice = searchParams.get('minPrice');
+    const urlMaxPrice = searchParams.get('maxPrice');
+
+    setActiveCollections(urlCollection ? [urlCollection] : defaultCollection ? [defaultCollection] : ['ALL']);
+    setActiveMaterial(urlMaterial || 'ALL');
+    setActiveGroup(urlGroup || 'ALL');
+    setActiveOccasions(urlOccasion ? [urlOccasion] : []);
+    setActiveTag('ALL');
+    setAvailableOnly(false);
+    setMinPrice(urlMinPrice ?? '');
+    setMaxPrice(urlMaxPrice ?? '');
+    setSort('newest');
+  }, [searchParams, defaultCollection]);
+
   const goToPage = (p: number) => {
     const target = Math.min(Math.max(1, p), totalPages);
     setPage(target);
