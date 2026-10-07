@@ -50,13 +50,3 @@ export function getAffinity(): { collection?: string; material?: string } {
     material: topKey(affinity.material),
   };
 }
-
-export function hasSeenOnboarding(): boolean {
-  if (typeof window === 'undefined') return true;
-  return sessionStorage.getItem('bj_onboarding_seen') === '1';
-}
-
-export function markOnboardingSeen(): void {
-  if (typeof window === 'undefined') return;
-  sessionStorage.setItem('bj_onboarding_seen', '1');
-}
