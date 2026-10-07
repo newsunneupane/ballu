@@ -27,7 +27,7 @@ export default function InstagramFeed() {
   }, []);
 
   return (
-    <section className="mx-auto w-full max-w-[1400px] px-4 sm:px-6 md:px-16 lg:px-15 pt-10 lg:pt-14">
+    <section className="mx-auto w-full max-w-[1400px] px-4 sm:px-6 md:px-16 lg:px-15 pt-10 lg:pt-14 pb-10 lg:pb-14">
       
 
       <Script

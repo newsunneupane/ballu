@@ -5,6 +5,7 @@ import CollectionsRow from '@/components/sections/CollectionsRow'
 import RecommendedRow from '@/components/sections/RecommendedRow'
 import BrandTrust from '@/components/sections/BrandTrust'
 import OccasionsBento from '@/components/sections/OccasionsBento'
+import InstagramFeed from '@/components/sections/InstagramFeed'
 import { getGroupRateData, getOccasionsData } from '@/lib/server/catalog-data'
 
 const Home = async () => {
@@ -39,6 +40,7 @@ const Home = async () => {
         </div>
       </section>
       <RecommendedRow />
+      <InstagramFeed />
     </>
   )
 }
