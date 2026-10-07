@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Cormorant_Garamond, Cormorant_SC, Noto_Serif_Devanagari } from 'next/font/google';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
-import { ArrowRight, StarIcon } from '@/components/shared/Icons';
+import { ArrowRight, Sparkle, StarIcon } from '@/components/shared/Icons';
 import { AmbientParticles, HeroAnimations } from '@/components/shared/AmbientBackground';
 import { cloudinaryUrl } from '@/lib/cloudinary';
 import { SITE } from '@/lib/constants';
@@ -198,10 +198,38 @@ function HeroSlider({ banners }: { banners: any[] }) {
           {renderDots('m')}
         </div>
 
-        {/* Right 35% — Personalize on top. Mobile: bottom 50%. Bottom half left empty for now (desktop only). */}
-        <div className="flex md:flex-none md:basis-[35%] md:max-w-[35%] flex-col gap-3 md:gap-4 min-h-[38vh] md:h-[60vh] md:min-h-[60vh] w-full shrink-0">
-          <div className="relative w-full h-[38vh] md:h-1/2 md:min-h-0 shrink-0">
-            <PersonalizeCard className="min-h-[38vh] md:min-h-0" />
+        {/* Mobile personalize CTA — modern button replacing the image card on small screens. */}
+        <button
+          onClick={() => router.push('/personalize')}
+          aria-label="Personalize your jewellery"
+          className="group md:hidden relative w-full overflow-hidden rounded-2xl border border-[#c9a96e]/35 bg-[#14100a] px-5 py-4 text-left shadow-[0_10px_40px_-12px_rgba(201,169,110,0.45)] transition-all duration-300 active:scale-[0.98]"
+        >
+          <span className="pointer-events-none absolute inset-0 bg-gradient-to-r from-transparent via-[#c9a96e]/[0.12] to-transparent bg-[length:250%_100%] animate-[pz-sheen_3.5s_ease-in-out_infinite]" />
+          <span className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-[#e9cf8f]/80 to-transparent" />
+          <span className="relative flex items-center gap-4">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#e9cf8f] to-[#9a7b38] text-[#0a0806] shadow-md">
+              <Sparkle size={16} />
+            </span>
+            <span className="flex flex-1 flex-col">
+              <span className="font-sans text-[9px] tracking-[0.35em] uppercase text-[#c9a96e]/80">Make it yours</span>
+              <span className="font-serif-editorial italic text-2xl font-light leading-tight text-[#f3e9d2]">Personalize</span>
+            </span>
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#c9a96e]/40 text-[#e9cf8f] transition-transform duration-300 group-hover:translate-x-1">
+              <ArrowRight size={14} />
+            </span>
+          </span>
+          <style>{`
+            @keyframes pz-sheen {
+              0% { background-position: 150% 0; }
+              60%, 100% { background-position: -50% 0; }
+            }
+          `}</style>
+        </button>
+
+        {/* Right 35% — Personalize image card (desktop only). */}
+        <div className="hidden md:flex md:flex-none md:basis-[35%] md:max-w-[35%] flex-col gap-3 md:gap-4 md:h-[60vh] md:min-h-[60vh] w-full shrink-0">
+          <div className="relative w-full md:h-1/2 md:min-h-0 shrink-0">
+            <PersonalizeCard className="md:min-h-0" />
           </div>
           <div className="hidden md:block flex-1" aria-hidden="true" />
         </div>
