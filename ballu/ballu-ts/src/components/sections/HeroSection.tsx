@@ -10,6 +10,7 @@ import { AmbientParticles, HeroAnimations } from '@/components/shared/AmbientBac
 import { cloudinaryUrl } from '@/lib/cloudinary';
 import { SITE } from '@/lib/constants';
 import { useStoreSettings } from '@/hooks/useStoreSettings';
+import PersonalizeCard from '@/components/sections/PersonalizeCard';
 
 const cormorant = Cormorant_Garamond({
   subsets: ['latin'],
@@ -59,8 +60,8 @@ function StaticHero({ settings }: { settings?: any }) {
       </div>
 
       <div className="grow flex items-start z-10 pt-6">
-        <div className="flex flex-col max-w-4xl lg:pr-380px w-full">
-          <h1 className="text-[80px] font-light leading-[0.8] text-bj-text-heading tracking-tight font-serif-editorial">
+        <div className="flex flex-col max-w-4xl lg:pr-[380px] w-full">
+          <h1 className="text-[clamp(2.75rem,13vw,5rem)] font-light leading-[0.9] break-words text-bj-text-heading tracking-tight font-serif-editorial">
             <span className="block fade-in-up" style={{ animationDelay: '0ms' }}>Heirlooms,</span>
             <span className="block fade-in-up" style={{ animationDelay: '200ms' }}>made for</span>
             <span className="block fade-in-up" style={{ animationDelay: '400ms' }}>a quieter wear.</span>
@@ -150,32 +151,43 @@ function HeroSlider({ banners }: { banners: any[] }) {
 
   return (
     <div
-      className={`${cormorant.variable} ${cormorantSC.variable} ${notoDevanagari.variable} hero-section min-h-[80vh] w-full text-bj-text-heading relative overflow-hidden font-serif-editorial flex flex-col px-0 pb-3 md:pb-4`}
+      className={`${cormorant.variable} ${cormorantSC.variable} ${notoDevanagari.variable} hero-section min-h-[80vh] w-full text-bj-text-heading relative overflow-hidden font-serif-editorial flex flex-col px-6 md:px-10 lg:px-16 2xl:px-24 pb-3 md:pb-4`}
     >
       <HeroAnimations />
       <AmbientParticles />
 
-      <div className="relative z-10 flex-1 overflow-hidden mx-6 md:mx-10 lg:mx-16 2xl:mx-24 mt-2 md:mt-3 rounded-xl md:rounded-2xl">
-        {banners.map((banner, i) => (
-          <div
-            key={i}
-            className={`absolute inset-0 transition-opacity duration-1000 ${i === activeIndex ? 'opacity-100' : 'opacity-0'}`}
-          >
+      <div className="relative z-10 flex flex-1 flex-col md:flex-row gap-3 md:gap-4 mt-2 md:mt-3 items-stretch">
+        {/* Left 65% — hero banner. Mobile: top 50%. */}
+        <div className="relative overflow-hidden rounded-xl md:rounded-2xl flex-1 md:flex-none md:basis-[65%] md:max-w-[65%] min-h-[38vh] md:min-h-[60vh]">
+          {banners.map((banner, i) => (
             <div
-              className="absolute inset-0 bg-cover bg-center"
-              style={{ backgroundImage: `url(${cloudinaryUrl(banner.image, { width: 1920, aspect: '16:9' })})` }}
-            />
+              key={i}
+              className={`absolute inset-0 transition-opacity duration-1000 ${i === activeIndex ? 'opacity-100' : 'opacity-0'}`}
+            >
+              <div
+                className="absolute inset-0 bg-cover bg-center"
+                style={{ backgroundImage: `url(${cloudinaryUrl(banner.image, { width: 1920, aspect: '16:9' })})` }}
+              />
+            </div>
+          ))}
+
+          <div className="absolute bottom-4 right-4 md:bottom-6 md:right-6 z-30">
+            <Button variant="primary" size="sm" magnetic className="hero-btn" icon={<ArrowRight />} onClick={() => navigate(active)}>
+              {active?.type === 'item' ? 'Shop' : 'Explore'}
+            </Button>
           </div>
-        ))}
+        </div>
+
+        {/* Right 35% — Personalize on top. Mobile: bottom 50%. Bottom half left empty for now (desktop only). */}
+        <div className="flex md:flex-none md:basis-[35%] md:max-w-[35%] flex-col gap-3 md:gap-4 min-h-[38vh] md:h-[60vh] md:min-h-[60vh] w-full shrink-0">
+          <div className="relative w-full h-[38vh] md:h-1/2 md:min-h-0 shrink-0">
+            <PersonalizeCard className="min-h-[38vh] md:min-h-0" />
+          </div>
+          <div className="hidden md:block flex-1" aria-hidden="true" />
+        </div>
       </div>
 
-      <div className="absolute bottom-10 md:bottom-12 right-2 md:right-3 z-30">
-        <Button variant="primary" size="sm" magnetic className="hero-btn" icon={<ArrowRight />} onClick={() => navigate(active)}>
-          {active?.type === 'item' ? 'Shop' : 'Explore'}
-        </Button>
-      </div>
-
-      <div className="relative z-20 flex items-center justify-center gap-2 pt-2">
+      <div className="relative z-20 flex items-center justify-center md:justify-start md:w-[65%] gap-2 pt-2">
         {banners.map((_, i) => (
           <button
             key={i}

@@ -56,7 +56,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           }}
         />
       </head>
-      <body className="min-h-screen" style={{ background: 'var(--bj-bg)', color: 'var(--bj-text-body)' }}>
+      <body className="min-h-screen max-w-full overflow-x-clip" style={{ background: 'var(--bj-bg)', color: 'var(--bj-text-body)' }}>
         <QueryProvider>
           <HydrationBoundary state={dehydratedState}>
             <CatalogStoreHydration items={items} collections={collections} materials={materials} groups={groups} occasions={occasions}>
@@ -65,7 +65,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 <header className="w-full">
                   <Navbar />
                 </header>
-                <main className="relative pt-[50px] md:pt-[68px]">
+                <main className="relative max-w-full overflow-x-clip pt-[50px] md:pt-[68px]">
                   <SubNavbar />
                   {children}
                 </main>

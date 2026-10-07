@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import Link from 'next/link';
 import { Cormorant_Garamond } from 'next/font/google';
 
 const cormorant = Cormorant_Garamond({
@@ -65,7 +64,7 @@ export default function BrandTrust({ groupRates }: { groupRates: GroupRate[] | n
 
 function OrbitalDecoration() {
   return (
-        <div className="brand-orbit absolute left-1/2 -translate-x-1/2 translate-y-[270px] md:left-auto md:right-[15%] md:translate-x-0 bottom-0 w-[420px] h-[420px] pointer-events-none opacity-30 select-none z-0">
+        <div className="brand-orbit absolute left-1/2 -translate-x-1/2 translate-y-[270px] md:left-auto md:right-[15%] md:translate-x-0 bottom-0 w-[min(420px,90vw)] h-[min(420px,90vw)] pointer-events-none opacity-30 select-none z-0">
       <div className="absolute inset-0 w-full h-full flex items-center justify-center animate-[spin_45s_linear_infinite]">
         <div className="absolute inset-0 w-full h-full">
           <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
@@ -128,7 +127,7 @@ function FeatureGrid({ groupRates }: { groupRates: GroupRate[] | null }) {
 
   return (
     <div className="brand-grid w-full   relative z-10 bg-bj-bg-secondary">
-      <div className="max-w-7xl w-full mx-auto px-6 md:px-12 lg:px-16 pb-10 md:pb-14 grid grid-cols-1 lg:grid-cols-[2fr_3fr] gap-10 lg:gap-16 items-center">
+      <div className="max-w-3xl w-full mx-auto px-6 md:px-12 lg:px-16 pb-10 md:pb-14 grid grid-cols-1 gap-10 items-center">
         <div className="order-1">
           <div className="brand-rates-card rounded-2xl border border-bj-border bg-bj-bg-elevated p-6 md:p-8">
             <div className="flex items-center gap-3 mb-6">
@@ -182,26 +181,6 @@ function FeatureGrid({ groupRates }: { groupRates: GroupRate[] | null }) {
             </div>
           </div>
         </div>
-
-        <Link
-          href="/personalize"
-          className="group/pz order-2 relative block overflow-hidden rounded-2xl border border-white/10 hover:border-bj-gold/40 transition-colors duration-500"
-          aria-label="Personalize your jewellery"
-        >
-          <div className="w-full overflow-hidden">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/personalize.jpg"
-              alt="Personalize your jewellery"
-              className="block w-full h-auto object-contain transition-transform duration-700 group-hover/pz:scale-[1.02]"
-            />
-          </div>
-          <div className="pointer-events-none absolute inset-0 flex items-end bg-gradient-to-t from-black/60 via-black/0 to-black/0 p-6">
-            <span className={`${cormorant.className} italic text-2xl md:text-3xl font-light text-white`}>
-              Personalize
-            </span>
-          </div>
-        </Link>
       </div>
     </div>
   );

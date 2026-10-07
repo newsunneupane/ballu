@@ -401,7 +401,15 @@
 html,
 body {
   min-height: 100%;
+  overflow-x: hidden; /* fallback for browsers without overflow: clip support */
   overflow-x: clip;
+  max-width: 100%;
+}
+
+main {
+  overflow-x: hidden; /* fallback */
+  overflow-x: clip;
+  max-width: 100%;
 }
 
 body {

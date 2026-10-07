@@ -90,7 +90,7 @@ export default function GoldTicker() {
       <span
         ref={measureRef}
         aria-hidden
-        className={`${cormorant.className} pointer-events-none invisible absolute -z-10 whitespace-nowrap text-[11px] tracking-[4px] uppercase [font-variant-numeric:lining-nums]`}
+        className={`${cormorant.className} pointer-events-none invisible fixed left-0 top-0 -z-10 w-max max-w-none whitespace-nowrap text-[11px] tracking-[4px] uppercase [font-variant-numeric:lining-nums]`}
       >
         {oneCopy}
       </span>
