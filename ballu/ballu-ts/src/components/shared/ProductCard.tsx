@@ -29,11 +29,18 @@ interface ProductCardProps {
 export default function ProductCard({ product, viewMode = 'GRID' }: ProductCardProps) {
   const { format } = useCurrency();
   const { data: settings } = useStoreSettings();
+  const variantPrices = (product.variants || []).map((v) => v.priceNpr).filter((n): n is number => n != null);
+  const hasRange = variantPrices.length > 1 && Math.min(...variantPrices) !== Math.max(...variantPrices);
   const priceDisplay = !product.showPrice
     ? 'Price on Request'
+    : hasRange
+    ? `From ${format(Math.min(...variantPrices))}`
     : product.priceNpr != null
     ? format(product.priceNpr)
     : '—';
+  const weightDisplay = product.variants && product.variants.length > 1
+    ? `${Math.min(...product.variants.map((v) => v.weightGrams))}–${Math.max(...product.variants.map((v) => v.weightGrams))}g · ${product.variants.length} sizes`
+    : product.weight;
 
   const openWhatsapp = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -72,12 +79,12 @@ export default function ProductCard({ product, viewMode = 'GRID' }: ProductCardP
             )}
           </div>
           <div className="text-[10px] sm:text-xs font-light text-bj-text-muted mt-1 opacity-80 truncate">{product.subTitle}</div>
-          <div className="sm:hidden text-[10px] text-bj-text-dim tracking-wide mt-1">{product.material} • {product.karat} • {product.weight.toLowerCase()}{product.caratWeight ? ` • ${product.caratWeight}ct` : ''}</div>
+          <div className="sm:hidden text-[10px] text-bj-text-dim tracking-wide mt-1">{product.material} • {product.karat} • {weightDisplay.toLowerCase()}{product.caratWeight ? ` • ${product.caratWeight}ct` : ''}{hasRange ? ` • ${product.variants!.length} sizes` : ''}</div>
         </div>
         <div className="text-sm font-thin text-bj-text-gold opacity-80 hidden sm:block">{product.type || product.collection}</div>
         <div className="text-sm font-thin text-bj-text-gold opacity-80 hidden sm:block">{product.material}</div>
         <div className="text-sm font-thin text-bj-text-gold opacity-80 hidden sm:block">{product.karat}</div>
-        <div className="text-sm font-light text-bj-text-gold opacity-80 hidden sm:block">{product.weight.toLowerCase()}</div>
+        <div className="text-sm font-light text-bj-text-gold opacity-80 hidden sm:block">{weightDisplay.toLowerCase()}</div>
         <div className="text-base sm:text-[20px] text-bj-gold-alt font-medium tracking-wide">{priceDisplay}</div>
         <div className="flex items-center justify-end gap-3">
           <button
@@ -142,7 +149,7 @@ export default function ProductCard({ product, viewMode = 'GRID' }: ProductCardP
         <h3 className="text-base font-normal text-bj-text-gold mb-1">{product.title}</h3>
         <p className="text-xs text-bj-text-muted mb-4 opacity-80">{product.subTitle}</p>
         <div className="flex justify-between items-baseline pt-3 border-t border-bj-border">
-          <span className="text-[10px] text-bj-text-dim tracking-wide">{product.material} • {product.karat} • {product.weight}{product.caratWeight ? ` • ${product.caratWeight}ct` : ''}</span>
+          <span className="text-[10px] text-bj-text-dim tracking-wide">{product.material} • {product.karat} • {weightDisplay}{product.caratWeight ? ` • ${product.caratWeight}ct` : ''}</span>
           <span className="text-sm text-bj-text-gold [font-variant-numeric:lining-nums]">{priceDisplay}</span>
         </div>
       </div>

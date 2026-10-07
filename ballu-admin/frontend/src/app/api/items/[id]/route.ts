@@ -3,7 +3,8 @@ import { connectDB } from '@/lib/db';
 import Item from '@/lib/models/Item';
 import Collection from '@/lib/models/Collection';
 import Group from '@/lib/models/Group';
-import { calculateFinalPrice } from '@/lib/utils/priceCalculator';
+import { calculateFinalPrice, calculateVariantPrices } from '@/lib/utils/priceCalculator';
+import { withFallbackVariants, normalizeVariants, validateVariants } from '@/lib/utils/variants';
 import { requireAuth } from '@/lib/auth/middleware';
 import { errorResponse, badRequest, isObjectId } from '@/lib/api-utils';
 import { revalidateCatalog } from '@/lib/revalidateCatalog';
@@ -21,12 +22,14 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
     if (!item) return NextResponse.json({ error: 'Item not found' }, { status: 404, headers: { 'Cache-Control': 'no-store' } });
 
     try {
+      const variants = withFallbackVariants(item.weightGrams, (item as { variants?: unknown }).variants);
       if (item.manualPriceNpr != null) {
-        return NextResponse.json({ ...item, finalPrice: Number(item.manualPriceNpr) }, {
+        const p = Number(item.manualPriceNpr);
+        return NextResponse.json({ ...item, variants, finalPrice: p, variantPrices: variants.map(() => p) }, {
           headers: { 'Cache-Control': 'no-store' },
         });
       }
-      const finalPrice = await calculateFinalPrice({
+      const { base, variants: priced } = await calculateVariantPrices({
         materialId: item.material._id.toString(),
         groupId: item.group ? (item.group as { _id: string })._id.toString() : undefined,
         weightGrams: item.weightGrams,
@@ -35,12 +38,13 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
         accessoriesCharge: item.accessoriesCharge,
         boutiqueDeduction: item.boutiqueDeduction,
         diamondValue: item.diamondValue,
+        variants,
       });
-      return NextResponse.json({ ...item, finalPrice }, {
+      return NextResponse.json({ ...item, variants, finalPrice: base, variantPrices: priced.map((v) => v.price) }, {
         headers: { 'Cache-Control': 'no-store' },
       });
     } catch {
-      return NextResponse.json({ ...item, finalPrice: null }, {
+      return NextResponse.json({ ...item, variants: withFallbackVariants(item.weightGrams, (item as { variants?: unknown }).variants), finalPrice: null, variantPrices: [] }, {
         headers: { 'Cache-Control': 'no-store' },
       });
     }
@@ -77,7 +81,18 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       return badRequest('Invalid group');
     }
     if (body.weightGrams == null || !Number.isFinite(Number(body.weightGrams)) || Number(body.weightGrams) <= 0) {
-      return badRequest('Valid weight is required');
+      if (!Array.isArray(body.variants) || body.variants.length === 0) {
+        return badRequest('Valid weight is required');
+      }
+    }
+    const variantsError = validateVariants(body.variants);
+    if (variantsError) return badRequest(variantsError);
+    const variants = normalizeVariants(body.weightGrams, body.variants);
+    if (variants.length > 0) {
+      body.variants = variants;
+      body.weightGrams = variants[0].weightGrams;
+    } else {
+      body.variants = undefined;
     }
 
     const numericFields: { name: string; value: unknown }[] = [
@@ -125,51 +140,63 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
         ],
       });
       if (existing.length > 0) {
-        let incomingPrice: number | null = null;
+        let incomingPrices: number[] = [];
         try {
-          incomingPrice =
-            body.manualPriceNpr != null
-              ? Number(body.manualPriceNpr)
-              : await calculateFinalPrice({
-                  materialId: material,
-                  groupId: body.group,
-                  weightGrams: Number(body.weightGrams),
-                  wastagePercent: Number(body.wastagePercent) || 0,
-                  makingCharges: Number(body.makingCharges) || 0,
-                  accessoriesCharge: Number(body.accessoriesCharge) || 0,
-                  boutiqueDeduction: Number(body.boutiqueDeduction) || 0,
-                  diamondValue: Number(body.diamondValue) || 0,
-                });
+          if (body.manualPriceNpr != null) {
+            incomingPrices = [Number(body.manualPriceNpr)];
+          } else {
+            const priced = await calculateVariantPrices({
+              materialId: material,
+              groupId: body.group,
+              weightGrams: Number(body.weightGrams),
+              wastagePercent: Number(body.wastagePercent) || 0,
+              makingCharges: Number(body.makingCharges) || 0,
+              accessoriesCharge: Number(body.accessoriesCharge) || 0,
+              boutiqueDeduction: Number(body.boutiqueDeduction) || 0,
+              diamondValue: Number(body.diamondValue) || 0,
+              variants: variants.length > 0 ? variants : undefined,
+            });
+            incomingPrices = priced.variants.map((v) => v.price);
+          }
         } catch {
-          incomingPrice = null;
+          incomingPrices = [];
         }
 
-        if (incomingPrice != null) {
+        if (incomingPrices.length > 0) {
           let priceDuplicate = false;
           for (const ex of existing) {
-            let exPrice: number | null = null;
-            if (ex.manualPriceNpr != null) {
-              exPrice = Number(ex.manualPriceNpr);
-            } else {
-              try {
-                exPrice = await calculateFinalPrice({
-                  materialId: ex.material.toString(),
-                  groupId: ex.group ? ex.group.toString() : undefined,
-                  weightGrams: ex.weightGrams,
-                  wastagePercent: ex.wastagePercent || 0,
-                  makingCharges: ex.makingCharges || 0,
-                  accessoriesCharge: ex.accessoriesCharge || 0,
-                  boutiqueDeduction: ex.boutiqueDeduction || 0,
-                  diamondValue: ex.diamondValue || 0,
-                });
-              } catch {
-                continue;
+            const exVariants = withFallbackVariants(
+              (ex as { weightGrams?: unknown }).weightGrams,
+              (ex as { variants?: unknown }).variants
+            );
+            for (const exV of exVariants) {
+              let exPrice: number | null = null;
+              if (ex.manualPriceNpr != null) {
+                exPrice = Number(ex.manualPriceNpr);
+              } else if ((exV as { manualPriceNpr?: number }).manualPriceNpr != null) {
+                exPrice = Number((exV as { manualPriceNpr?: number }).manualPriceNpr);
+              } else {
+                try {
+                  exPrice = await calculateFinalPrice({
+                    materialId: ex.material.toString(),
+                    groupId: ex.group ? ex.group.toString() : undefined,
+                    weightGrams: exV.weightGrams,
+                    wastagePercent: ex.wastagePercent || 0,
+                    makingCharges: ex.makingCharges || 0,
+                    accessoriesCharge: ex.accessoriesCharge || 0,
+                    boutiqueDeduction: ex.boutiqueDeduction || 0,
+                    diamondValue: ex.diamondValue || 0,
+                  });
+                } catch {
+                  continue;
+                }
+              }
+              if (exPrice != null && incomingPrices.some((p) => Math.round(p) === Math.round(exPrice as number))) {
+                priceDuplicate = true;
+                break;
               }
             }
-            if (exPrice != null && Math.round(exPrice) === Math.round(incomingPrice)) {
-              priceDuplicate = true;
-              break;
-            }
+            if (priceDuplicate) break;
           }
           if (priceDuplicate && !body.allowDuplicate) {
             return NextResponse.json({ error: 'An item with this name and price already exists in this collection & material', duplicate: true }, { status: 409, headers: { 'Cache-Control': 'no-store' } });

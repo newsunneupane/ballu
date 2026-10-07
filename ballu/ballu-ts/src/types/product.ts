@@ -8,6 +8,15 @@ export interface Pricing {
   ratePerGramNpr: number;
 }
 
+export interface ProductVariant {
+  label: string;
+  weightGrams: number;
+  weight: string;
+  priceNpr: number | null;
+  isAvailable: boolean;
+  pricing?: Pricing;
+}
+
 export interface Product {
   id: string | number;
   tag: string | null;
@@ -30,6 +39,7 @@ export interface Product {
   estimatedMakingDays?: { min?: number; max?: number };
   viewCount?: number;
   pricing?: Pricing;
+  variants?: ProductVariant[];
   images?: string[];
   _apiItem?: any;
 }

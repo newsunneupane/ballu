@@ -1,5 +1,12 @@
 import mongoose, { Schema, Types } from 'mongoose';
 
+export interface IItemVariant {
+  label: string;
+  weightGrams: number;
+  manualPriceNpr?: number;
+  isAvailable?: boolean;
+}
+
 export interface IItem {
   collections: Types.ObjectId[];
   material: Types.ObjectId;
@@ -22,8 +29,19 @@ export interface IItem {
   showPrice: boolean;
   estimatedMakingDays?: { min?: number; max?: number };
   manualPriceNpr?: number;
+  variants?: IItemVariant[];
   viewCount: number;
 }
+
+const VariantSchema = new Schema<IItemVariant>(
+  {
+    label: { type: String, required: true, trim: true, maxlength: 24 },
+    weightGrams: { type: Number, required: true, min: 0 },
+    manualPriceNpr: { type: Number },
+    isAvailable: { type: Boolean, default: true },
+  },
+  { _id: false }
+);
 
 const ItemSchema = new Schema<IItem>(
   {
@@ -53,6 +71,7 @@ const ItemSchema = new Schema<IItem>(
       default: undefined,
     },
     manualPriceNpr: { type: Number },
+    variants: { type: [VariantSchema], default: undefined },
     viewCount: { type: Number, default: 0 },
   },
   { timestamps: true }

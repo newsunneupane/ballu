@@ -39,9 +39,17 @@ export default function ProductDetail() {
   const { data: settings } = useStoreSettings();
   const [product, setProduct] = useState(productService.getById(id) || productService.getById(Number(id)));
   const [activeIndex, setActiveIndex] = useState(0);
+  const [variantIdx, setVariantIdx] = useState(0);
   const [paused, setPaused] = useState(false);
 
   const images = product?.images?.length ? product.images : [];
+  const variants = product?.variants && product.variants.length > 0 ? product.variants : [];
+  const hasVariants = variants.length > 1;
+  const activeVariant = variants[variantIdx] || variants[0] || null;
+  const displayedPrice = activeVariant?.priceNpr ?? product?.priceNpr;
+  const displayedWeight = activeVariant?.weight ?? product?.weight;
+  const displayedPricing = activeVariant?.pricing ?? product?.pricing;
+  const isUnavailable = product ? (!product.isAvailable || (activeVariant ? !activeVariant.isAvailable : false)) : false;
 
   useEffect(() => {
     if (dataReady) {
@@ -51,6 +59,7 @@ export default function ProductDetail() {
 
   useEffect(() => {
     setActiveIndex(0);
+    setVariantIdx(0);
   }, [id]);
 
   useEffect(() => {
@@ -184,7 +193,7 @@ export default function ProductDetail() {
           <div className="flex flex-col justify-center py-4">
             <div className={`${tenorSans.className} text-bj-gold-alt text-[9px] tracking-[0.3em] uppercase mb-5 flex items-center gap-3`}>
               <span>CATALOGUE · {product.tag || "COLLECTION"}</span>
-              {!product.isAvailable && (
+              {isUnavailable && (
                 <span className="text-red-400 border border-red-400/30 rounded px-2 py-0.5">Unavailable - Need to Order</span>
               )}
             </div>
@@ -197,13 +206,37 @@ export default function ProductDetail() {
               {product.subTitle}
             </p>
 
+            {hasVariants && (
+              <div className="mb-6">
+                <div className={`${tenorSans.className} text-[9px] tracking-[0.3em] uppercase text-bj-text-muted mb-3`}>
+                  Select Weight · {variants.length} sizes
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {variants.map((v, i) => {
+                    const selected = i === variantIdx;
+                    const soldOut = !v.isAvailable;
+                    return (
+                      <button
+                        key={`${v.label}-${i}`}
+                        onClick={() => setVariantIdx(i)}
+                        className={`px-4 py-2 border text-[12px] tracking-wider transition-colors cursor-pointer ${selected ? 'border-bj-gold-alt bg-bj-gold-alt/10 text-bj-gold-alt' : 'border-bj-border text-bj-text-description hover:border-bj-gold-alt/60 hover:text-bj-gold-alt'} ${soldOut && !selected ? 'opacity-50 line-through' : ''}`}
+                        aria-pressed={selected}
+                      >
+                        {v.label}{soldOut ? ' · sold out' : ''}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
             <div className="flex items-baseline gap-4 mb-8">
               <span className={`${cormorant.className} text-4xl lg:text-[40px] text-bj-gold-alt tracking-wide`}>
-                {product.showPrice ? (product.priceNpr != null ? format(product.priceNpr) : '—') : 'Price on Request'}
+                {product.showPrice ? (displayedPrice != null ? format(displayedPrice) : '—') : 'Price on Request'}
               </span>
               {product.showPrice && (
                 <span className={`${tenorSans.className} text-[9px] tracking-[0.2em] text-bj-text-muted uppercase`}>
-                  Incl. Making
+                  Incl. Making{activeVariant ? ` · ${activeVariant.label}` : ''}
                 </span>
               )}
             </div>
@@ -225,39 +258,39 @@ export default function ProductDetail() {
 
             <div className="w-full h-px bg-bj-border mb-8" />
 
-            {product.showPrice && product.pricing && (
+            {product.showPrice && displayedPricing && (
               <>
                 <div className="mb-10">
                   <h3 className={`${tenorSans.className} text-[9px] tracking-[0.3em] uppercase text-bj-text-muted mb-6`}>
-                    Transparent Pricing
+                    Transparent Pricing{activeVariant ? ` · ${activeVariant.label}` : ''}
                   </h3>
 
                   <div className={`${tenorSans.className} flex flex-col gap-3 text-[12px] text-bj-text-description mb-5`}>
                     <div className="flex justify-between">
-                      <span>{materialLabel(product.material)} value ({product.purity} - {product.weight} @ {format(product.pricing.ratePerGramNpr)}/g)</span>
-                      <span className={`${cormorant.className} text-[15px] italic text-bj-text-alt`}>{format(product.pricing.goldValueNpr)}</span>
+                      <span>{materialLabel(product.material)} value ({product.purity} - {displayedWeight} @ {format(displayedPricing.ratePerGramNpr)}/g)</span>
+                      <span className={`${cormorant.className} text-[15px] italic text-bj-text-alt`}>{format(displayedPricing.goldValueNpr)}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Making charges (incl.)</span>
-                      <span className={`${cormorant.className} text-[15px] italic text-bj-text-alt`}>{format(product.pricing.makingNpr + product.pricing.wastageNpr)}</span>
+                      <span className={`${cormorant.className} text-[15px] italic text-bj-text-alt`}>{format(displayedPricing.makingNpr + displayedPricing.wastageNpr)}</span>
                     </div>
-                    {product.pricing.accessoriesNpr > 0 && (
+                    {displayedPricing.accessoriesNpr > 0 && (
                       <div className="flex justify-between">
                         <span>Accessories charge</span>
-                        <span className={`${cormorant.className} text-[15px] italic text-bj-text-alt`}>{format(product.pricing.accessoriesNpr)}</span>
+                        <span className={`${cormorant.className} text-[15px] italic text-bj-text-alt`}>{format(displayedPricing.accessoriesNpr)}</span>
                       </div>
                     )}
-                    {product.pricing.discountNpr > 0 && (
+                    {displayedPricing.discountNpr > 0 && (
                       <div className="flex justify-between">
                         <span>Less: boutique deduction</span>
-                        <span className={`${cormorant.className} text-[15px] italic text-bj-text-alt`}>− {format(product.pricing.discountNpr)}</span>
+                        <span className={`${cormorant.className} text-[15px] italic text-bj-text-alt`}>− {format(displayedPricing.discountNpr)}</span>
                       </div>
                     )}
                   </div>
 
                   <div className="flex justify-between pt-5 border-t border-bj-border">
                     <span className={`${tenorSans.className} text-[12px] text-bj-gold-alt`}>Total</span>
-                    <span className={`${cormorant.className} text-xl text-bj-gold-alt`}>{product.priceNpr != null ? format(product.priceNpr) : '—'}</span>
+                    <span className={`${cormorant.className} text-xl text-bj-gold-alt`}>{displayedPrice != null ? format(displayedPrice) : '—'}</span>
                   </div>
                 </div>
 
@@ -272,7 +305,7 @@ export default function ProductDetail() {
               </div>
               <div>
                 <div className={`${tenorSans.className} text-[8px] tracking-[0.25em] uppercase text-bj-text-muted mb-2`}>Weight</div>
-                <div className={`${cormorant.className} text-[17px] text-bj-text-alt`}>{product.weight}</div>
+                <div className={`${cormorant.className} text-[17px] text-bj-text-alt`}>{displayedWeight}</div>
               </div>
               {product.caratWeight ? (
                 <div>
@@ -288,7 +321,7 @@ export default function ProductDetail() {
 
             <div>
               <a
-                href={buildWhatsappLink(product, product.showPrice && product.priceNpr != null ? format(product.priceNpr) : null, whatsappNumber(settings))}
+                href={buildWhatsappLink(product, product.showPrice && displayedPrice != null ? format(displayedPrice) : null, whatsappNumber(settings), activeVariant?.label ?? null)}
                 target="_blank"
                 rel="noopener noreferrer"
               >

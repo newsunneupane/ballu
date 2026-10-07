@@ -11,13 +11,40 @@ import { Plus, Pencil, Trash2, X, Upload, ImagePlus, Loader2, Search } from 'luc
 
 type WeightUnit = 'g' | 'tola';
 
+interface VariantRow {
+  weightValue: string;
+  weightUnit: WeightUnit;
+  label: string;
+  labelTouched: boolean;
+  manualPrice: string;
+  isAvailable: boolean;
+}
+
+const emptyVariant = (): VariantRow => ({
+  weightValue: '', weightUnit: 'g', label: '', labelTouched: false, manualPrice: '', isAvailable: true,
+});
+
 const initialForm = {
   nameEn: '', nameNp: '', description: '', tag: '', group: '',
-  collections: [] as string[], weightValue: '', weightUnit: 'g' as WeightUnit,
+  collections: [] as string[],
+  variants: [emptyVariant()] as VariantRow[],
   wastagePercent: '', makingCharges: '', accessoriesCharge: '', boutiqueDeduction: '', diamondValue: '',
   caratWeight: '', stonesDetails: '',   images: [] as string[],
   isAvailable: true, showPrice: true, makingDaysMin: '', makingDaysMax: '', manualPrice: '',
   occasion: [] as string[],
+};
+
+const variantGrams = (v: VariantRow): number => {
+  const n = Number(v.weightValue) || 0;
+  return v.weightUnit === 'tola' ? tolaToGrams(n) : n;
+};
+
+const variantDisplayLabel = (v: VariantRow): string => {
+  if (v.label.trim()) return v.label.trim();
+  if (!v.weightValue) return '';
+  const grams = variantGrams(v);
+  if (!(grams > 0)) return '';
+  return v.weightUnit === 'tola' ? `${Number(v.weightValue)} tola` : `${Number(v.weightValue)}g`;
 };
 
 export default function ItemsPage() {
@@ -131,13 +158,23 @@ export default function ItemsPage() {
 
   const openEdit = (item: any) => {
     setEditing(item);
+    const storedVariants: any[] = Array.isArray(item.variants) && item.variants.length > 0
+      ? item.variants
+      : [{ label: `${item.weightGrams}g`, weightGrams: item.weightGrams, manualPriceNpr: undefined, isAvailable: true }];
     setForm({
       nameEn: item.name.en, nameNp: item.name.np, description: item.description || '',
       tag: item.tag || '', group: item.group?._id || '',
       collections: (item.collections?.length
         ? item.collections.map((c: any) => c?._id || c).filter(Boolean)
         : item.collection ? [item.collection?._id || item.collection].filter(Boolean) : []) as string[],
-      weightValue: String(item.weightGrams), weightUnit: 'g',
+      variants: storedVariants.map((v: any) => ({
+        weightValue: String(v.weightGrams),
+        weightUnit: 'g' as WeightUnit,
+        label: v.label || `${v.weightGrams}g`,
+        labelTouched: true,
+        manualPrice: v.manualPriceNpr != null ? String(v.manualPriceNpr) : '',
+        isAvailable: v.isAvailable !== false,
+      })),
       wastagePercent: String(item.wastagePercent ?? 0),
       makingCharges: String(item.makingCharges), accessoriesCharge: String(item.accessoriesCharge ?? 0),
       boutiqueDeduction: String(item.boutiqueDeduction), diamondValue: String(item.diamondValue),
@@ -152,24 +189,56 @@ export default function ItemsPage() {
     setShowForm(true);
   };
 
-  const setWeightUnit = (unit: WeightUnit) => {
-    const currentGrams = form.weightUnit === 'tola' ? tolaToGrams(Number(form.weightValue) || 0) : Number(form.weightValue) || 0;
-    if (!form.weightValue) {
-      setForm({ ...form, weightUnit: unit });
-      return;
-    }
-    const nextValue = unit === 'tola' ? gramsToTola(currentGrams) : currentGrams;
-    setForm({ ...form, weightUnit: unit, weightValue: String(Math.round(nextValue * 1000) / 1000) });
+  const updateVariant = (index: number, patch: Partial<VariantRow>) => {
+    setForm((prev) => ({
+      ...prev,
+      variants: prev.variants.map((v, i) => (i === index ? { ...v, ...patch } : v)),
+    }));
   };
 
-  const weightGramsValue = form.weightUnit === 'tola' ? tolaToGrams(Number(form.weightValue) || 0) : Number(form.weightValue) || 0;
+  const addVariant = () => {
+    if (form.variants.length >= 12) return;
+    setForm((prev) => ({ ...prev, variants: [...prev.variants, emptyVariant()] }));
+  };
+
+  const removeVariant = (index: number) => {
+    if (form.variants.length <= 1) return;
+    setForm((prev) => ({ ...prev, variants: prev.variants.filter((_, i) => i !== index) }));
+  };
+
+  const setVariantUnit = (index: number, unit: WeightUnit) => {
+    const v = form.variants[index];
+    if (!v) return;
+    if (!v.weightValue) {
+      updateVariant(index, { weightUnit: unit });
+      return;
+    }
+    const currentGrams = variantGrams(v);
+    const nextValue = unit === 'tola' ? gramsToTola(currentGrams) : currentGrams;
+    const patch: Partial<VariantRow> = { weightUnit: unit, weightValue: String(Math.round(nextValue * 1000) / 1000) };
+    if (!v.labelTouched) {
+      patch.label = unit === 'tola' ? `${patch.weightValue} tola` : `${patch.weightValue}g`;
+    }
+    updateVariant(index, patch);
+  };
+
+  const handleVariantWeight = (index: number, value: string) => {
+    const v = form.variants[index];
+    if (!v) return;
+    const patch: Partial<VariantRow> = { weightValue: value };
+    if (!v.labelTouched && value) {
+      patch.label = v.weightUnit === 'tola' ? `${value} tola` : `${value}g`;
+    }
+    updateVariant(index, patch);
+  };
 
   const selectedGroup = groups.find((g: any) => g._id === form.group);
   const selectedMaterial = materials.find((m: any) => m._id === selectedGroup?.material?._id);
   const groupRate = selectedGroup?.rateNpr != null && Number(selectedGroup.rateNpr) > 0 ? Number(selectedGroup.rateNpr) : Number(selectedMaterial?.rateNpr || 0);
 
-  const liveBreakdown = (() => {
-    const weight = weightGramsValue;
+  const priceForGrams = (weight: number, variantManual?: string): number => {
+    if (form.manualPrice) return Number(form.manualPrice) || 0;
+    if (variantManual) return Number(variantManual) || 0;
     const rate = groupRate;
     const goldValue = weight * rate;
     const wastage = goldValue * ((Number(form.wastagePercent) || 0) / 100);
@@ -177,7 +246,21 @@ export default function ItemsPage() {
     const accessories = Number(form.accessoriesCharge) || 0;
     const deduction = Number(form.boutiqueDeduction) || 0;
     const diamond = Number(form.diamondValue) || 0;
-    const total = goldValue + wastage + making + accessories - deduction + diamond;
+    return Math.round(goldValue + wastage + making + accessories - deduction + diamond);
+  };
+
+  const variantTotals = form.variants.map((v) => priceForGrams(variantGrams(v), v.manualPrice));
+
+  const liveBreakdown = (() => {
+    const weight = variantGrams(form.variants[0] || emptyVariant());
+    const rate = groupRate;
+    const goldValue = weight * rate;
+    const wastage = goldValue * ((Number(form.wastagePercent) || 0) / 100);
+    const making = Number(form.makingCharges) || 0;
+    const accessories = Number(form.accessoriesCharge) || 0;
+    const deduction = Number(form.boutiqueDeduction) || 0;
+    const diamond = Number(form.diamondValue) || 0;
+    const total = form.manualPrice ? Number(form.manualPrice) || 0 : priceForGrams(weight, form.variants[0]?.manualPrice);
     return { goldValue, wastage, making, accessories, deduction, diamond, total: Math.round(total) };
   })();
 
@@ -192,15 +275,26 @@ export default function ItemsPage() {
     if (!form.group) errors.push('Group is required');
     if (!form.nameEn.trim()) errors.push('Name (English) is required');
     if (!form.nameNp.trim()) errors.push('Name (Nepali) is required');
-    const incomingPrice = form.manualPrice ? Number(form.manualPrice) : liveBreakdown.total;
+    const gramsList = form.variants.map(variantGrams);
+    if (gramsList.length === 0 || gramsList.some((g) => !(g > 0))) errors.push('Each variant needs a valid weight');
+    const labels = form.variants.map((v) => variantDisplayLabel(v).toLowerCase() || `variant-${form.variants.indexOf(v) + 1}`);
+    if (new Set(labels).size !== labels.length) errors.push('Variant labels must be unique');
+    const incomingPrices = variantTotals;
     const baseKey = stripCountFromName(form.nameEn).toLowerCase();
     const sameName = allItems.filter(
       (it: any) =>
         it._id !== editing?._id &&
         stripCountFromName(it.name?.en || '').toLowerCase() === baseKey
     );
-    const priceDup = sameName.find((it: any) => it.finalPrice != null && Number(it.finalPrice) === incomingPrice);
-    if (!form.weightValue || weightGramsValue <= 0) errors.push('Weight is required');
+    const priceSetOf = (it: any): number[] => {
+      if (Array.isArray(it.variantPrices) && it.variantPrices.length > 0) return it.variantPrices.map(Number);
+      if (it.finalPrice != null) return [Number(it.finalPrice)];
+      return [];
+    };
+    const priceDup = sameName.find((it: any) => {
+      const set = priceSetOf(it);
+      return incomingPrices.some((p) => set.includes(p));
+    });
     if (errors.length > 0) {
       setValidationErrors(errors);
       return;
@@ -209,12 +303,11 @@ export default function ItemsPage() {
     if (priceDup) {
       const unchanged =
         !!editing &&
-        stripCountFromName(editing.name?.en || '').toLowerCase() === baseKey &&
-        editing.finalPrice != null &&
-        Number(editing.finalPrice) === incomingPrice;
+        stripCountFromName(editing.name?.en || '').toLowerCase() === baseKey;
       if (!unchanged) {
+        const dupPrice = incomingPrices.find((p) => priceSetOf(priceDup).includes(p));
         const ok = window.confirm(
-          `"${form.nameEn.trim()}" with price NPR ${incomingPrice.toLocaleString()} already exists. Do you want to repeat this item?`
+          `"${form.nameEn.trim()}" with price NPR ${(dupPrice ?? incomingPrices[0]).toLocaleString()} already exists. Do you want to repeat this item?`
         );
         if (!ok) return;
         allowDuplicate = true;
@@ -229,7 +322,13 @@ export default function ItemsPage() {
       group: form.group,
       collections: form.collections,
       occasion: form.occasion,
-      weightGrams: weightGramsValue,
+      weightGrams: gramsList[0],
+      variants: form.variants.map((v, i) => ({
+        label: variantDisplayLabel(v) || `Variant ${i + 1}`,
+        weightGrams: gramsList[i],
+        ...(v.manualPrice ? { manualPriceNpr: Number(v.manualPrice) } : {}),
+        isAvailable: v.isAvailable,
+      })),
       wastagePercent: Number(form.wastagePercent),
       makingCharges: Number(form.makingCharges),
       accessoriesCharge: Number(form.accessoriesCharge),
@@ -438,9 +537,23 @@ export default function ItemsPage() {
                 </td>
                 <td className="px-4 py-3 text-[#7d776c]">{item.group?.name || '—'}</td>
                 <td className="px-4 py-3 text-[#7d776c]">{item.material?.name?.en || '—'}</td>
-                <td className="px-4 py-3 text-right text-[#26221d] tabular-nums">{item.weightGrams}g</td>
-                <td className="px-4 py-3 text-right text-[#b8860b] tabular-nums font-medium">
-                  {item.showPrice === false ? <span className="text-[#6b655b]">Hidden</span> : item.finalPrice != null ? `Rs ${item.finalPrice.toLocaleString()}` : '—'}
+                <td className="px-4 py-3 text-right text-[#26221d] tabular-nums whitespace-nowrap">
+                  {(() => {
+                    const vs: any[] = Array.isArray(item.variants) && item.variants.length > 0 ? item.variants : [{ label: `${item.weightGrams}g`, weightGrams: item.weightGrams }];
+                    if (vs.length === 1) return `${vs[0].weightGrams}g`;
+                    const grams = vs.map((v) => Number(v.weightGrams)).filter((n) => Number.isFinite(n));
+                    return `${Math.min(...grams)}–${Math.max(...grams)}g (${vs.length})`;
+                  })()}
+                </td>
+                <td className="px-4 py-3 text-right text-[#b8860b] tabular-nums font-medium whitespace-nowrap">
+                  {item.showPrice === false ? <span className="text-[#6b655b]">Hidden</span> : (() => {
+                    const prices: number[] = Array.isArray(item.variantPrices) && item.variantPrices.length > 0
+                      ? item.variantPrices.map(Number)
+                      : item.finalPrice != null ? [Number(item.finalPrice)] : [];
+                    if (prices.length === 0) return '—';
+                    if (prices.length === 1) return `Rs ${prices[0].toLocaleString()}`;
+                    return `Rs ${Math.min(...prices).toLocaleString()}–${Math.max(...prices).toLocaleString()}`;
+                  })()}
                 </td>
                 <td className="px-4 py-3 text-right whitespace-nowrap">
                   <button onClick={() => openEdit(item)} className="text-[#7d776c] hover:text-[#b8860b] transition-colors mr-3"><Pencil size={14} /></button>
@@ -542,22 +655,67 @@ export default function ItemsPage() {
                   clearLabel="None"
                 />
               </div>
-              <div>
-                <label className="block text-[10px] tracking-[0.2em] uppercase text-[#6b655b] mb-1.5">Weight</label>
-                <div className="flex gap-2">
-                  <input type="number" step="0.001" value={form.weightValue} onChange={(e) => setForm({ ...form, weightValue: e.target.value })} className="flex-1 min-w-0 bg-[#faf8f4] border border-[#e5ded2] rounded px-3 py-2 text-sm text-[#26221d] focus:outline-none focus:border-[#b8860b]" />
-                  <div className="flex border border-[#e5ded2] rounded overflow-hidden shrink-0">
-                    <button type="button" onClick={() => setWeightUnit('g')} className={`px-2.5 py-2 text-xs ${form.weightUnit === 'g' ? 'bg-[#b8860b] text-[#ffffff]' : 'text-[#7d776c]'}`}>g</button>
-                    <button type="button" onClick={() => setWeightUnit('tola')} className={`px-2.5 py-2 text-xs ${form.weightUnit === 'tola' ? 'bg-[#b8860b] text-[#ffffff]' : 'text-[#7d776c]'}`}>tola</button>
-                  </div>
+              <div className="md:col-span-2">
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="block text-[10px] tracking-[0.2em] uppercase text-[#6b655b]">Variants · weight wise ({form.variants.length}/12)</label>
+                  <span className="text-[10px] text-[#6b655b]">First row = default weight & price</span>
                 </div>
-                {form.weightValue && (
-                  <p className="text-[10px] text-[#6b655b] mt-1.5">
-                    {form.weightUnit === 'tola'
-                      ? `= ${weightGramsValue.toFixed(3)} g`
-                      : `= ${gramsToTola(weightGramsValue).toFixed(3)} tola`}
-                  </p>
+                <div className="space-y-2.5">
+                  {form.variants.map((v, i) => {
+                    const grams = variantGrams(v);
+                    return (
+                      <div key={i} className="border border-[#e5ded2] rounded-lg p-3 bg-[#faf8f4]/60">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-[10px] tracking-[0.2em] uppercase text-[#6b655b]">
+                            {i === 0 ? '★ Default' : `Variant ${i + 1}`} · <span className="text-[#b8860b] font-semibold">Rs {(variantTotals[i] || 0).toLocaleString()}</span>
+                          </span>
+                          {form.variants.length > 1 && (
+                            <button type="button" onClick={() => removeVariant(i)} className="text-[#7d776c] hover:text-red-600 transition-colors" aria-label={`Remove variant ${i + 1}`}>
+                              <Trash2 size={14} />
+                            </button>
+                          )}
+                        </div>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                          <div className="col-span-1">
+                            <label className="block text-[10px] uppercase tracking-wider text-[#6b655b] mb-1">Weight</label>
+                            <div className="flex gap-1.5">
+                              <input type="number" step="0.001" value={v.weightValue} onChange={(e) => handleVariantWeight(i, e.target.value)} placeholder="e.g. 10" className="flex-1 min-w-0 bg-[#ffffff] border border-[#e5ded2] rounded px-2.5 py-2 text-sm text-[#26221d] focus:outline-none focus:border-[#b8860b]" />
+                              <div className="flex border border-[#e5ded2] rounded overflow-hidden shrink-0 bg-white">
+                                <button type="button" onClick={() => setVariantUnit(i, 'g')} className={`px-2 py-2 text-xs ${v.weightUnit === 'g' ? 'bg-[#b8860b] text-[#ffffff]' : 'text-[#7d776c]'}`}>g</button>
+                                <button type="button" onClick={() => setVariantUnit(i, 'tola')} className={`px-2 py-2 text-xs ${v.weightUnit === 'tola' ? 'bg-[#b8860b] text-[#ffffff]' : 'text-[#7d776c]'}`}>tola</button>
+                              </div>
+                            </div>
+                            {v.weightValue && grams > 0 && (
+                              <p className="text-[10px] text-[#6b655b] mt-1">
+                                {v.weightUnit === 'tola' ? `= ${grams.toFixed(3)} g` : `= ${gramsToTola(grams).toFixed(3)} tola`}
+                              </p>
+                            )}
+                          </div>
+                          <div>
+                            <label className="block text-[10px] uppercase tracking-wider text-[#6b655b] mb-1">Label (pill)</label>
+                            <input value={v.label} onChange={(e) => updateVariant(i, { label: e.target.value, labelTouched: true })} placeholder={variantDisplayLabel(v) || 'e.g. 10g'} className="w-full bg-[#ffffff] border border-[#e5ded2] rounded px-2.5 py-2 text-sm text-[#26221d] focus:outline-none focus:border-[#b8860b]" />
+                          </div>
+                          <div>
+                            <label className="block text-[10px] uppercase tracking-wider text-[#6b655b] mb-1">Manual Rs (opt.)</label>
+                            <input type="number" min="0" value={v.manualPrice} onChange={(e) => updateVariant(i, { manualPrice: e.target.value })} placeholder="Auto" className="w-full bg-[#ffffff] border border-[#e5ded2] rounded px-2.5 py-2 text-sm text-[#26221d] focus:outline-none focus:border-[#b8860b]" />
+                          </div>
+                          <label className="flex items-center gap-2 text-xs text-[#26221d] cursor-pointer pt-5">
+                            <input type="checkbox" checked={v.isAvailable} onChange={(e) => updateVariant(i, { isAvailable: e.target.checked })} className="accent-[#b8860b]" />
+                            In stock
+                          </label>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+                {form.variants.length < 12 ? (
+                  <button type="button" onClick={addVariant} className="mt-2.5 inline-flex items-center gap-1.5 text-xs font-medium text-[#b8860b] border border-dashed border-[#b8860b]/50 rounded-lg px-3 py-2 hover:bg-[#b8860b]/5 transition-colors">
+                    <Plus size={14} /> Add weight variant
+                  </button>
+                ) : (
+                  <p className="text-[10px] text-[#6b655b] mt-2">Maximum of 12 variants reached.</p>
                 )}
+                <p className="text-[10px] text-[#6b655b] mt-1.5">Same design, different weights — e.g. 5g, 10g, 2 tola. Price recalculates from weight automatically.</p>
               </div>
               <div>
                 <label className="block text-[10px] tracking-[0.2em] uppercase text-[#6b655b] mb-1.5">Wastage (%)</label>
@@ -694,13 +852,23 @@ export default function ItemsPage() {
                   <span className="tabular-nums">+ Rs {liveBreakdown.diamond.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between pt-3 border-t border-[#e5ded2] text-[#1f1b16] font-semibold">
-                  <span>Total (NPR)</span>
+                  <span>Total — default variant (NPR)</span>
                   <span className="text-[#b8860b] tabular-nums text-lg">{liveBreakdown.total.toLocaleString()}</span>
                 </div>
+                {form.variants.length > 1 && (
+                  <div className="pt-2 space-y-1 border-t border-[#e5ded2]/60">
+                    {form.variants.map((v, i) => (
+                      <div key={i} className="flex justify-between text-xs text-[#7d776c]">
+                        <span>{variantDisplayLabel(v) || `Variant ${i + 1}`}{i === 0 ? ' (default)' : ''}</span>
+                        <span className="tabular-nums">Rs {(variantTotals[i] || 0).toLocaleString()}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
             <div className="mt-4">
-              <label className="block text-[10px] tracking-[0.2em] uppercase text-[#6b655b] mb-1.5">Manual Price (NPR) — optional override</label>
+              <label className="block text-[10px] tracking-[0.2em] uppercase text-[#6b655b] mb-1.5">Manual Price (NPR) — optional override for ALL variants</label>
               <input
                 type="number"
                 min="0"
@@ -734,7 +902,7 @@ export default function ItemsPage() {
               <h2 className="text-lg font-semibold text-[#1f1b16]">Bulk Upload Items</h2>
               <button onClick={() => setShowBulk(false)} className="text-[#6b655b] hover:text-[#26221d]"><X size={18} /></button>
             </div>
-              <p className="text-xs text-[#6b655b] mb-3">Paste a JSON array of items. Each item needs <span className="text-[#b8860b]">collections</span> (array of IDs), <span className="text-[#b8860b]">group</span> (ID — material is derived from the group), <span className="text-[#b8860b]">name</span> (object with <span className="text-[#b8860b]">en</span>/<span className="text-[#b8860b]">np</span>), and <span className="text-[#b8860b]">weightGrams</span>.</p>
+              <p className="text-xs text-[#6b655b] mb-3">Paste a JSON array of items. Each item needs <span className="text-[#b8860b]">collections</span> (array of IDs), <span className="text-[#b8860b]">group</span> (ID — material is derived from the group), <span className="text-[#b8860b]">name</span> (object with <span className="text-[#b8860b]">en</span>/<span className="text-[#b8860b]">np</span>), and <span className="text-[#b8860b]">weightGrams</span> — or a <span className="text-[#b8860b]">variants</span> array like <span className="font-mono">[{`{label, weightGrams}`}]</span>.</p>
             <textarea
               value={bulkJson}
               onChange={(e) => setBulkJson(e.target.value)}

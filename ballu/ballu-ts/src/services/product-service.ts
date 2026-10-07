@@ -26,6 +26,50 @@ function transformApiItem(item: any): Product {
   const purity = item.group?.name?.en || item.purity || '';
 
   const pricing = item.pricing;
+  const rawVariants: any[] = Array.isArray(item.variants) && item.variants.length > 0
+    ? item.variants
+    : [{ label: `${item.weightGrams}g`, weightGrams: item.weightGrams }];
+
+  const toPricing = (p: any) => {
+    if (!p) return undefined;
+    if (typeof p.finalPrice === 'number') {
+      return {
+        goldValueNpr: p.goldValue ?? p.finalPrice,
+        wastageNpr: p.wastage ?? 0,
+        wastagePercent: p.wastagePercent ?? pricing?.wastagePercent ?? 0,
+        makingNpr: p.making ?? pricing?.making ?? 0,
+        accessoriesNpr: p.accessories ?? pricing?.accessories ?? 0,
+        discountNpr: p.deduction ?? pricing?.deduction ?? 0,
+        ratePerGramNpr: p.ratePerGramNrs ?? pricing?.ratePerGramNrs ?? 0,
+      };
+    }
+    return {
+      goldValueNpr: p.goldValue,
+      wastageNpr: p.wastage,
+      wastagePercent: p.wastagePercent,
+      makingNpr: p.making,
+      accessoriesNpr: p.accessories,
+      discountNpr: p.deduction,
+      ratePerGramNpr: p.ratePerGramNrs,
+    };
+  };
+
+  const variants = rawVariants.map((v: any) => {
+    const vp = v.pricing && typeof v.pricing.finalPrice === 'number'
+      ? v.pricing.finalPrice
+      : v.manualPriceNpr != null
+        ? Math.round(Number(v.manualPriceNpr))
+        : (pricing?.finalPrice ?? null);
+    return {
+      label: v.label || `${v.weightGrams}g`,
+      weightGrams: Number(v.weightGrams),
+      weight: `${v.weightGrams}g`,
+      priceNpr: vp,
+      isAvailable: v.isAvailable !== false,
+      pricing: toPricing(v.pricing),
+    };
+  });
+  const defaultPrice = variants[0]?.priceNpr ?? pricing?.finalPrice ?? null;
 
   return {
     id: item._id,
@@ -38,7 +82,8 @@ function transformApiItem(item: any): Product {
     subTitle: item.name?.np || '',
     karat: purity,
     weight: weightStr,
-    priceNpr: pricing?.finalPrice ?? null,
+    priceNpr: defaultPrice,
+    variants,
     description: item.description,
     purity,
     stones: item.stonesDetails,
@@ -193,6 +238,13 @@ export const productService = {
   },
 
   getFiltered(filters: Partial<ProductFilters>): Product[] {
+    const effPrice = (p: Product): number | null => {
+      if (p.variants && p.variants.length > 0) {
+        const ps = p.variants.map((v) => v.priceNpr).filter((n): n is number => n != null);
+        if (ps.length > 0) return Math.min(...ps);
+      }
+      return p.priceNpr;
+    };
     const filtered = productStore.filter((product) => {
       const matchesCollection =
         !filters.collections ||
@@ -209,16 +261,16 @@ export const productService = {
       const matchesTag = !filters.tag || filters.tag === 'ALL' || product.tag === filters.tag;
       const matchesAvailability = !filters.availableOnly || product.isAvailable;
       const matchesOccasion = !filters.occasions || filters.occasions.length === 0 || filters.occasions.includes('ALL') || (product.occasions || []).some((occ: string) => filters.occasions!.includes(occ));
-      const matchesMinPrice = filters.minPrice == null || (product.priceNpr != null && product.priceNpr >= filters.minPrice);
-      const matchesMaxPrice = filters.maxPrice == null || (product.priceNpr != null && product.priceNpr < filters.maxPrice);
+      const matchesMinPrice = filters.minPrice == null || ((effPrice(product)) != null && (effPrice(product) as number) >= filters.minPrice);
+      const matchesMaxPrice = filters.maxPrice == null || ((effPrice(product)) != null && (effPrice(product) as number) < filters.maxPrice);
       return matchesCollection && matchesMaterial && matchesPurity && matchesTag && matchesAvailability && matchesOccasion && matchesMinPrice && matchesMaxPrice;
     });
 
     switch (filters.sort) {
       case 'price-asc':
-        return [...filtered].sort((a, b) => (a.priceNpr ?? Infinity) - (b.priceNpr ?? Infinity));
+        return [...filtered].sort((a, b) => (effPrice(a) ?? Infinity) - (effPrice(b) ?? Infinity));
       case 'price-desc':
-        return [...filtered].sort((a, b) => (b.priceNpr ?? -Infinity) - (a.priceNpr ?? -Infinity));
+        return [...filtered].sort((a, b) => (effPrice(b) ?? -Infinity) - (effPrice(a) ?? -Infinity));
       case 'most-viewed':
         return [...filtered].sort((a, b) => (b.viewCount ?? 0) - (a.viewCount ?? 0));
       default:

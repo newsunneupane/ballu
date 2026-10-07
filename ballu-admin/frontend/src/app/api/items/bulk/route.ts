@@ -6,6 +6,7 @@ import Group from '@/lib/models/Group';
 import { requireAuth } from '@/lib/auth/middleware';
 import { errorResponse } from '@/lib/api-utils';
 import { revalidateCatalog } from '@/lib/revalidateCatalog';
+import { normalizeVariants, validateVariants } from '@/lib/utils/variants';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,6 +16,7 @@ interface BulkItem {
   group?: string;
   name?: { en?: string; np?: string };
   weightGrams?: number;
+  variants?: unknown;
   manualPriceNpr?: number;
   [key: string]: unknown;
 }
@@ -42,6 +44,15 @@ export async function POST(req: NextRequest) {
       if (!group) {
         return NextResponse.json({ error: 'Each item requires a valid group' }, { status: 400, headers: { 'Cache-Control': 'no-store' } });
       }
+      const variantsError = validateVariants((item as BulkItem).variants);
+      if (variantsError) {
+        return NextResponse.json({ error: `Item "${(item.name?.en || 'unnamed')}": ${variantsError}` }, { status: 400, headers: { 'Cache-Control': 'no-store' } });
+      }
+      const variants = normalizeVariants(item.weightGrams, (item as BulkItem).variants);
+      const weightGrams = variants.length > 0 ? variants[0].weightGrams : Number(item.weightGrams);
+      if (!Number.isFinite(weightGrams) || weightGrams <= 0) {
+        return NextResponse.json({ error: `Item "${(item.name?.en || 'unnamed')}": valid weightGrams or variants required` }, { status: 400, headers: { 'Cache-Control': 'no-store' } });
+      }
       const collections = (
         Array.isArray(item.collections) ? item.collections : item.collection ? [item.collection] : []
       ).map((c) => String(c)).filter((c) => /^[a-f\d]{24}$/i.test(c));
@@ -51,6 +62,8 @@ export async function POST(req: NextRequest) {
       prepared.push({
         ...item,
         collections: [...new Set(collections)],
+        weightGrams,
+        ...(variants.length > 0 ? { variants } : {}),
         material: (group as { material: unknown }).material,
         purity: (group as { name: string }).name,
         manualPriceNpr: item.manualPriceNpr != null ? Number(item.manualPriceNpr) : undefined,

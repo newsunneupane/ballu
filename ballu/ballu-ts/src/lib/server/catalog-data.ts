@@ -7,6 +7,7 @@ import Group from '@/lib/models/Group';
 import StoreSettings from '@/lib/models/StoreSettings';
 import Occasion from '@/lib/models/Occasion';
 import { calculateFinalPrice } from '@/lib/utils/priceCalculator';
+import { withFallbackVariants } from '@/lib/utils/variants';
 
 export const CATALOG_REVALIDATE_SECONDS = process.env.REVALIDATE_SECONDS
   ? Math.max(1, parseInt(process.env.REVALIDATE_SECONDS, 10) || 300)
@@ -128,22 +129,46 @@ export const getItemsData = unstable_cache(
 
     const itemsWithPricing = items.map((item) => {
       const clean = { ...item, name: stripItemCount((item as { name?: { en?: string; np?: string } }).name) };
-      if (!clean.material) return { ...clean, pricing: null };
-      const pricing = computePricingFromRates(
-        {
-          materialId: refId(clean.material),
-          groupId: clean.group ? refId(clean.group) : undefined,
-          weightGrams: clean.weightGrams,
-          wastagePercent: clean.wastagePercent,
-          makingCharges: clean.makingCharges,
-          accessoriesCharge: clean.accessoriesCharge,
-          boutiqueDeduction: clean.boutiqueDeduction,
-          diamondValue: clean.diamondValue,
-        },
-        rateByMaterialId,
-        rateByGroupId
-      );
-      return { ...clean, pricing };
+      if (!clean.material) return { ...clean, pricing: null, variants: withFallbackVariants(clean.weightGrams, (clean as { variants?: unknown }).variants) };
+      const baseParams = {
+        materialId: refId(clean.material),
+        groupId: clean.group ? refId(clean.group) : undefined,
+        wastagePercent: clean.wastagePercent,
+        makingCharges: clean.makingCharges,
+        accessoriesCharge: clean.accessoriesCharge,
+        boutiqueDeduction: clean.boutiqueDeduction,
+        diamondValue: clean.diamondValue,
+      };
+      const variants = withFallbackVariants(clean.weightGrams, (clean as { variants?: unknown }).variants);
+      const pricedVariants = variants.map((v) => {
+        if (v.manualPriceNpr != null) {
+          return { ...v, pricing: null as null, manual: true };
+        }
+        return {
+          ...v,
+          pricing: computePricingFromRates({ ...baseParams, weightGrams: v.weightGrams }, rateByMaterialId, rateByGroupId),
+        };
+      });
+      // Item-level manual override wins for every variant
+      const manualAll = (clean as { manualPriceNpr?: number }).manualPriceNpr;
+      const pricing = manualAll != null
+        ? { finalPrice: Math.round(Number(manualAll)), goldValue: 0, wastage: 0, wastagePercent: clean.wastagePercent, making: clean.makingCharges, accessories: clean.accessoriesCharge, deduction: clean.boutiqueDeduction, ratePerGramNrs: 0 }
+        : computePricingFromRates(
+            { ...baseParams, weightGrams: variants[0]?.weightGrams ?? clean.weightGrams },
+            rateByMaterialId,
+            rateByGroupId
+          );
+      return {
+        ...clean,
+        variants: pricedVariants.map((v) => ({
+          label: v.label,
+          weightGrams: v.weightGrams,
+          manualPriceNpr: (v as { manualPriceNpr?: number }).manualPriceNpr,
+          isAvailable: v.isAvailable,
+          pricing: manualAll != null ? { finalPrice: Math.round(Number(manualAll)) } : v.pricing,
+        })),
+        pricing,
+      };
     });
 
     return toPlain(itemsWithPricing);
@@ -164,21 +189,37 @@ export const getItemByIdData = unstable_cache(
     if (!item) return null;
     normalizeCollections(item as unknown as Record<string, unknown>);
     const clean = { ...item, name: stripItemCount((item as { name?: { en?: string; np?: string } }).name) };
+    const variants = withFallbackVariants(clean.weightGrams, (clean as { variants?: unknown }).variants);
 
     try {
-      const pricing = await calculateFinalPrice({
+      const base = {
         materialId: (clean.material as { _id: string })._id.toString(),
         groupId: clean.group ? (clean.group as { _id: string })._id.toString() : undefined,
-        weightGrams: clean.weightGrams,
         wastagePercent: clean.wastagePercent,
         makingCharges: clean.makingCharges,
         accessoriesCharge: clean.accessoriesCharge,
         boutiqueDeduction: clean.boutiqueDeduction,
         diamondValue: clean.diamondValue,
-      });
-      return toPlain({ ...clean, pricing });
+      };
+      const manualAll = (clean as { manualPriceNpr?: number }).manualPriceNpr;
+      const pricedVariants = await Promise.all(
+        variants.map(async (v) => {
+          if (manualAll != null) return { ...v, pricing: { finalPrice: Math.round(Number(manualAll)) } };
+          if (v.manualPriceNpr != null) return { ...v, pricing: { finalPrice: Math.round(v.manualPriceNpr) } };
+          try {
+            const pricing = await calculateFinalPrice({ ...base, weightGrams: v.weightGrams });
+            return { ...v, pricing };
+          } catch {
+            return { ...v, pricing: null };
+          }
+        })
+      );
+      const pricing = manualAll != null
+        ? { finalPrice: Math.round(Number(manualAll)) }
+        : await calculateFinalPrice({ ...base, weightGrams: variants[0]?.weightGrams ?? clean.weightGrams }).catch(() => null);
+      return toPlain({ ...clean, variants: pricedVariants, pricing });
     } catch {
-      return toPlain({ ...clean, pricing: null });
+      return toPlain({ ...clean, variants, pricing: null });
     }
   },
   ['catalog-item-by-id'],

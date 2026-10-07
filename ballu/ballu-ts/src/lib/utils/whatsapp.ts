@@ -18,11 +18,13 @@ function groupName(product: Product): string {
 export function buildWhatsappLink(
   product: Product,
   priceLabel: string | null,
-  phoneNumber?: string | null
+  phoneNumber?: string | null,
+  variantLabel?: string | null
 ): string {
   const group = groupName(product);
+  const variant = variantLabel ? ` [${variantLabel}]` : '';
   const parts = [
-    `Hi, I'm interested in ${product.title}${group ? ` (${group})` : ''}`,
+    `Hi, I'm interested in ${product.title}${group ? ` (${group})` : ''}${variant}`,
     `(ID: ${product.id})`,
     priceLabel ? `— ${priceLabel}` : '',
     `— ${SITE.fullName}`,
