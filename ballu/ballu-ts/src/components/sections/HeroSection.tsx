@@ -132,6 +132,21 @@ function HeroSlider({ banners }: { banners: any[] }) {
 
   const active = banners[activeIndex] || banners[0];
 
+  const renderDots = (keyPrefix: string) => (
+    <>
+      {banners.map((_, i) => (
+        <button
+          key={`${keyPrefix}-${i}`}
+          onClick={() => setActiveIndex(i)}
+          aria-label={`Go to slide ${i + 1}`}
+          className={`w-2.5 h-2.5 rotate-45 transition-all duration-500 ${
+            i === activeIndex ? 'hero-dot-active scale-125' : 'bg-bj-text-muted/50 hover:bg-bj-text-muted/80'
+          }`}
+        />
+      ))}
+    </>
+  );
+
   const navigate = (banner: any) => {
     if (banner.type === 'item') {
       router.push(`/catalogue/${banner.refId}`);
@@ -178,6 +193,11 @@ function HeroSlider({ banners }: { banners: any[] }) {
           </div>
         </div>
 
+        {/* Mobile-only dots: just below the hero banner, above the personalize card. */}
+        <div className="flex md:hidden items-center justify-center gap-2 pt-1">
+          {renderDots('m')}
+        </div>
+
         {/* Right 35% — Personalize on top. Mobile: bottom 50%. Bottom half left empty for now (desktop only). */}
         <div className="flex md:flex-none md:basis-[35%] md:max-w-[35%] flex-col gap-3 md:gap-4 min-h-[38vh] md:h-[60vh] md:min-h-[60vh] w-full shrink-0">
           <div className="relative w-full h-[38vh] md:h-1/2 md:min-h-0 shrink-0">
@@ -187,17 +207,8 @@ function HeroSlider({ banners }: { banners: any[] }) {
         </div>
       </div>
 
-      <div className="relative z-20 flex items-center justify-center md:justify-start md:w-[65%] gap-2 pt-2">
-        {banners.map((_, i) => (
-          <button
-            key={i}
-            onClick={() => setActiveIndex(i)}
-            aria-label={`Go to slide ${i + 1}`}
-className={`w-2.5 h-2.5 rotate-45 transition-all duration-500 ${
-                i === activeIndex ? 'hero-dot-active scale-125' : 'bg-bj-text-muted/50 hover:bg-bj-text-muted/80'
-              }`}
-          />
-        ))}
+      <div className="relative z-20 hidden md:flex items-center justify-center md:justify-start md:w-[65%] gap-2 pt-2">
+        {renderDots('d')}
       </div>
     </div>
   );
