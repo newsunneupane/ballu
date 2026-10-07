@@ -238,12 +238,8 @@ export default function ProductDetail() {
                       <span className={`${cormorant.className} text-[15px] italic text-bj-text-alt`}>{format(product.pricing.goldValueNpr)}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span>Wastage ({product.pricing.wastagePercent}%)</span>
-                      <span className={`${cormorant.className} text-[15px] italic text-bj-text-alt`}>{format(product.pricing.wastageNpr)}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Making charges</span>
-                      <span className={`${cormorant.className} text-[15px] italic text-bj-text-alt`}>{format(product.pricing.makingNpr)}</span>
+                      <span>Making charges (incl.)</span>
+                      <span className={`${cormorant.className} text-[15px] italic text-bj-text-alt`}>{format(product.pricing.makingNpr + product.pricing.wastageNpr)}</span>
                     </div>
                     {product.pricing.accessoriesNpr > 0 && (
                       <div className="flex justify-between">
@@ -269,7 +265,7 @@ export default function ProductDetail() {
               </>
             )}
 
-            <div className={`grid gap-4 mb-10 ${product.caratWeight ? 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-5' : 'grid-cols-4'}`}>
+            <div className={`grid gap-4 mb-10 ${product.caratWeight ? 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-4' : 'grid-cols-3'}`}>
               <div>
                 <div className={`${tenorSans.className} text-[8px] tracking-[0.25em] uppercase text-bj-text-muted mb-2`}>Purity</div>
                 <div className={`${cormorant.className} text-[17px] text-bj-text-alt`}>{product.purity || product.karat}</div>
@@ -287,10 +283,6 @@ export default function ProductDetail() {
               <div>
                 <div className={`${tenorSans.className} text-[8px] tracking-[0.25em] uppercase text-bj-text-muted mb-2`}>Stones</div>
                 <div className={`${cormorant.className} text-[17px] text-bj-text-alt`}>{product.stones || 'None'}</div>
-              </div>
-              <div>
-                <div className={`${tenorSans.className} text-[8px] tracking-[0.25em] uppercase text-bj-text-muted mb-2`}>Karigar</div>
-                <div className={`${cormorant.className} text-[17px] text-bj-text-alt`}>{product.karigar || '—'}</div>
               </div>
             </div>
 

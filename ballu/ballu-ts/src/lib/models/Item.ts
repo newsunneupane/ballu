@@ -17,7 +17,6 @@ export interface IItem {
   diamondValue: number;
   caratWeight?: number;
   stonesDetails?: string;
-  karigarName?: string;
   images: string[];
   isAvailable: boolean;
   showPrice: boolean;
@@ -35,7 +34,7 @@ const ItemSchema = new Schema<IItem>(
     group: { type: Schema.Types.ObjectId, ref: 'Group' },
     name: { en: { type: String, required: true }, np: { type: String, required: true } },
     description: { type: String },
-    tag: { type: String, enum: ['new-arrival', 'best-seller', 'limited-edition', 'sale', 'bestseller', 'trending'] },
+    tag: { type: String, enum: ['new-arrival', 'best-seller', 'limited-edition', 'sale', 'bestseller', 'trending', 'light-weight'] },
     purity: { type: String },
     weightGrams: { type: Number, required: true },
     wastagePercent: { type: Number, default: 0 },
@@ -45,7 +44,6 @@ const ItemSchema = new Schema<IItem>(
     diamondValue: { type: Number, default: 0 },
     caratWeight: { type: Number },
     stonesDetails: { type: String },
-    karigarName: { type: String },
     images: [{ type: String }],
     isAvailable: { type: Boolean, default: true },
     showPrice: { type: Boolean, default: true },

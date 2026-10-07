@@ -15,7 +15,7 @@ const initialForm = {
   nameEn: '', nameNp: '', description: '', tag: '', group: '',
   collections: [] as string[], weightValue: '', weightUnit: 'g' as WeightUnit,
   wastagePercent: '', makingCharges: '', accessoriesCharge: '', boutiqueDeduction: '', diamondValue: '',
-  caratWeight: '', stonesDetails: '', karigarName: '',   images: [] as string[],
+  caratWeight: '', stonesDetails: '',   images: [] as string[],
   isAvailable: true, showPrice: true, makingDaysMin: '', makingDaysMax: '', manualPrice: '',
   occasion: [] as string[],
 };
@@ -142,7 +142,7 @@ export default function ItemsPage() {
       makingCharges: String(item.makingCharges), accessoriesCharge: String(item.accessoriesCharge ?? 0),
       boutiqueDeduction: String(item.boutiqueDeduction), diamondValue: String(item.diamondValue),
       caratWeight: item.caratWeight != null ? String(item.caratWeight) : '',
-      stonesDetails: item.stonesDetails || '', karigarName: item.karigarName || '', images: item.images || [],
+      stonesDetails: item.stonesDetails || '', images: item.images || [],
       isAvailable: item.isAvailable ?? true, showPrice: item.showPrice ?? true,
       makingDaysMin: item.estimatedMakingDays?.min != null ? String(item.estimatedMakingDays.min) : '',
       makingDaysMax: item.estimatedMakingDays?.max != null ? String(item.estimatedMakingDays.max) : '',
@@ -237,7 +237,6 @@ export default function ItemsPage() {
       diamondValue: Number(form.diamondValue),
       caratWeight: form.caratWeight ? Number(form.caratWeight) : undefined,
       stonesDetails: form.stonesDetails || undefined,
-      karigarName: form.karigarName || undefined,
       images: form.images,
       isAvailable: form.isAvailable,
       showPrice: form.showPrice,
@@ -331,7 +330,7 @@ export default function ItemsPage() {
     }
   };
 
-  const tags = ['new-arrival', 'best-seller', 'limited-edition', 'sale', 'bestseller', 'trending'];
+  const tags = ['new-arrival', 'best-seller', 'limited-edition', 'sale', 'bestseller', 'trending', 'light-weight'];
 
   return (
     <div>
@@ -583,10 +582,6 @@ export default function ItemsPage() {
               <div>
                 <label className="block text-[10px] tracking-[0.2em] uppercase text-[#6b655b] mb-1.5">Carat Weight (ct)</label>
                 <input type="number" step="0.01" value={form.caratWeight} onChange={(e) => setForm({ ...form, caratWeight: e.target.value })} className="w-full bg-[#faf8f4] border border-[#e5ded2] rounded px-3 py-2 text-sm text-[#26221d] focus:outline-none focus:border-[#b8860b]" placeholder="Optional" />
-              </div>
-              <div>
-                <label className="block text-[10px] tracking-[0.2em] uppercase text-[#6b655b] mb-1.5">Karigar Name</label>
-                <input value={form.karigarName} onChange={(e) => setForm({ ...form, karigarName: e.target.value })} className="w-full bg-[#faf8f4] border border-[#e5ded2] rounded px-3 py-2 text-sm text-[#26221d] focus:outline-none focus:border-[#b8860b]" />
               </div>
               <div>
                 <label className="block text-[10px] tracking-[0.2em] uppercase text-[#6b655b] mb-1.5">Stones Details</label>

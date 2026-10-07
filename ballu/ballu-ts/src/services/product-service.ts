@@ -42,7 +42,6 @@ function transformApiItem(item: any): Product {
     description: item.description,
     purity,
     stones: item.stonesDetails,
-    karigar: item.karigarName,
     caratWeight: item.caratWeight,
     isAvailable: item.isAvailable ?? true,
     showPrice: item.showPrice ?? true,
@@ -260,7 +259,6 @@ export const productService = {
         p.collections.some((c) => c.toLowerCase().includes(keyword)) ||
         p.material.toLowerCase().includes(keyword) ||
         (p.purity && p.purity.toLowerCase().includes(keyword)) ||
-        (p.karigar && p.karigar.toLowerCase().includes(keyword)) ||
         (p.stones && p.stones.toLowerCase().includes(keyword)) ||
         (p.tag && p.tag.toLowerCase().includes(keyword))
       )

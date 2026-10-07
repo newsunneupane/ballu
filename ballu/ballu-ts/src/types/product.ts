@@ -24,7 +24,6 @@ export interface Product {
   description?: string;
   purity?: string;
   stones?: string;
-  karigar?: string;
   caratWeight?: number;
   isAvailable: boolean;
   showPrice: boolean;

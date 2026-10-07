@@ -58,8 +58,7 @@ const ITEM_NAMES = [
 ];
 
 const PURITIES = ['18K', '22K', '24K', '925', '950', '999'];
-const TAGS = ['new-arrival', 'best-seller', 'limited-edition', 'sale', 'bestseller', 'trending'];
-const KARIGARS = ['Rajesh Shakya', 'Prakash Maharjan', 'Suman Tamrakar', 'Bikram Shrestha', 'Anil Nakarmi', 'Deepak Prajapati', 'Mohan Singh', 'Kumar Thapa'];
+const TAGS = ['new-arrival', 'best-seller', 'limited-edition', 'sale', 'bestseller', 'trending', 'light-weight'];
 
 function rand(min: number, max: number): number {
   return Math.round((Math.random() * (max - min) + min) * 100) / 100;
@@ -222,7 +221,6 @@ async function seed() {
     diamondValue: { type: Number, default: 0 },
     caratWeight: Number,
     stonesDetails: String,
-    karigarName: String,
     images: { type: [String], default: [] },
     isAvailable: { type: Boolean, default: true },
     showPrice: { type: Boolean, default: true },
@@ -263,7 +261,6 @@ async function seed() {
       diamondValue,
       caratWeight,
       stonesDetails: diamondValue > 0 ? `${caratWeight}ct ${pick(['Round', 'Princess', 'Cushion', 'Emerald', 'Oval'])} cut diamond` : undefined,
-      karigarName: pick(KARIGARS),
       images: [],
       isAvailable: Math.random() > 0.1,
       showPrice: Math.random() > 0.05,
