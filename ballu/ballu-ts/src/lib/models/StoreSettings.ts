@@ -51,6 +51,15 @@ const HeroBannerSchema = new Schema<IHeroBanner>(
   { _id: false }
 );
 
+const PieceOfTheWeekSchema = new Schema(
+  {
+    material: { type: Schema.Types.ObjectId, ref: 'Material' },
+    collection: { type: Schema.Types.ObjectId, ref: 'Collection' },
+    item: { type: Schema.Types.ObjectId, ref: 'Item' },
+  },
+  { _id: false, suppressReservedKeysWarning: true }
+);
+
 const StoreSettingsSchema = new Schema<IStoreSettings>(
   {
     contactEmail: { type: String, default: '' },
@@ -58,11 +67,7 @@ const StoreSettingsSchema = new Schema<IStoreSettings>(
     timings: { type: [TimingSlotSchema], default: [] },
     tickerItems: [{ type: String }],
     pieceOfTheWeek: {
-      type: {
-        material: { type: Schema.Types.ObjectId, ref: 'Material' },
-        collection: { type: Schema.Types.ObjectId, ref: 'Collection' },
-        item: { type: Schema.Types.ObjectId, ref: 'Item' },
-      },
+      type: PieceOfTheWeekSchema,
       default: undefined,
     },
     heroBanners: { type: [HeroBannerSchema], default: [] },

@@ -169,7 +169,7 @@ export async function POST(req: NextRequest) {
       const caratWeight = diamondValue > 0 ? Math.round(rand(0.3, 3) * 100) / 100 : undefined;
 
       return {
-        collection: collectionIds[catKey],
+        collections: [collectionIds[catKey]],
         material: materialIds[matKey],
         group: pick(materialGroups[matKey]),
         name,

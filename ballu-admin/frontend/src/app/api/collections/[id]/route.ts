@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import Collection from '@/lib/models/Collection';
+import Item from '@/lib/models/Item';
 import { requireAuth } from '@/lib/auth/middleware';
 import { errorResponse } from '@/lib/api-utils';
 import { revalidateCatalog } from '@/lib/revalidateCatalog';
@@ -61,10 +62,39 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     if (authError) return authError;
     const { id } = await params;
     await connectDB();
-    const collection = await Collection.findByIdAndDelete(id);
-    if (!collection) return NextResponse.json({ error: 'Collection not found' }, { status: 404, headers: { 'Cache-Control': 'no-store' } });
+    const target = await Collection.findById(id);
+    if (!target) return NextResponse.json({ error: 'Collection not found' }, { status: 404, headers: { 'Cache-Control': 'no-store' } });
+
+    if (/^others$/i.test((target as { name?: { en?: string } }).name?.en || '')) {
+      return NextResponse.json({ error: 'The Others collection is the fallback for items and cannot be deleted.' }, { status: 409, headers: { 'Cache-Control': 'no-store' } });
+    }
+
+    // Unlink the deleted collection from every item first, so no item is
+    // ever left orphaned. Items that end up with no collections at all are
+    // moved to a fallback Others collection (created only if actually
+    // needed — the schema requires every item to have at least one).
+    const usingCount = await Item.countDocuments({ collections: id });
+    let movedToFallback = 0;
+    if (usingCount > 0) {
+      await Item.updateMany({ collections: id }, { $pull: { collections: id } });
+      const emptiedCount = await Item.countDocuments({ collections: { $size: 0 } });
+      if (emptiedCount > 0) {
+        let fallback = await Collection.findOne({ 'name.en': { $regex: /^others$/i } });
+        if (!fallback) {
+          fallback = await Collection.create({ name: { en: 'Others', np: 'अन्य' }, description: 'Other jewellery designs' });
+        }
+        const moved = await Item.updateMany({ collections: { $size: 0 } }, { $addToSet: { collections: fallback._id } });
+        movedToFallback = moved.modifiedCount;
+      }
+    }
+
+    await Collection.findByIdAndDelete(id);
     revalidateCatalog();
-    return NextResponse.json({ message: 'Collection deleted' }, {
+    return NextResponse.json({
+      message: usingCount > 0 ? `Collection deleted. ${usingCount} item(s) unlinked${movedToFallback > 0 ? `, ${movedToFallback} moved to Others` : ''}.` : 'Collection deleted.',
+      moved: usingCount,
+      movedToFallback,
+    }, {
       headers: { 'Cache-Control': 'no-store' },
     });
   } catch (err) {

@@ -35,40 +35,116 @@ function toPlain<T>(value: T): T {
   return JSON.parse(JSON.stringify(value)) as T;
 }
 
+function refId(ref: unknown): string {
+  if (!ref || typeof ref !== 'object') return String(ref ?? '');
+  const maybe = ref as { _id?: unknown };
+  return String(maybe._id ?? ref);
+}
+
+/**
+ * Pure equivalent of calculateFinalPrice that reads rates from pre-fetched
+ * maps instead of issuing per-item findById queries.
+ */
+function computePricingFromRates(
+  params: {
+    materialId: string;
+    groupId?: string;
+    weightGrams: number;
+    wastagePercent: number;
+    makingCharges: number;
+    accessoriesCharge: number;
+    boutiqueDeduction: number;
+    diamondValue: number;
+  },
+  rateByMaterialId: Map<string, number>,
+  rateByGroupId: Map<string, number>
+): {
+  finalPrice: number;
+  goldValue: number;
+  wastage: number;
+  wastagePercent: number;
+  making: number;
+  accessories: number;
+  deduction: number;
+  ratePerGramNrs: number;
+} | null {
+  const materialRate = rateByMaterialId.get(params.materialId);
+  if (materialRate === undefined) return null;
+
+  let ratePerGramNrs = materialRate;
+  if (params.groupId) {
+    const groupRate = rateByGroupId.get(params.groupId);
+    if (groupRate !== undefined && groupRate > 0) {
+      ratePerGramNrs = groupRate;
+    }
+  }
+
+  if (ratePerGramNrs <= 0) return null;
+
+  const goldValue = params.weightGrams * ratePerGramNrs;
+  const wastage = goldValue * (params.wastagePercent / 100);
+  const finalPrice =
+    goldValue + wastage + params.makingCharges + params.accessoriesCharge - params.boutiqueDeduction + params.diamondValue;
+
+  return {
+    finalPrice: Math.round(finalPrice),
+    goldValue: Math.round(goldValue),
+    wastage: Math.round(wastage),
+    wastagePercent: params.wastagePercent,
+    making: params.makingCharges,
+    accessories: params.accessoriesCharge,
+    deduction: params.boutiqueDeduction,
+    ratePerGramNrs,
+  };
+}
+
 export const getItemsData = unstable_cache(
   async () => {
     await connectDB();
     const items = await Item.find()
-      .populate({ path: 'collection', model: 'Collection', select: 'name', strictPopulate: false })
+      .populate({ path: 'collections', model: 'Collection', select: 'name', strictPopulate: false })
       .populate('material', 'name')
       .populate('group', 'name')
       .populate('occasion', 'name')
       .sort({ createdAt: -1 })
       .lean();
 
+    // Batch-fetch all rates in 2 queries. The previous per-item findById
+    // calls (N+1) built an await chain thousands of nodes deep, which
+    // overflows React's dev-time async traversal (visitAsyncNode) with
+    // "RangeError: Maximum call stack size exceeded" on `next dev`.
+    const [materials, groups] = await Promise.all([
+      Material.find().select('rateNpr').lean(),
+      Group.find().select('rateNpr').lean(),
+    ]);
+    const rateByMaterialId = new Map<string, number>(
+      materials.map((m) => [String(m._id), Number(m.rateNpr) || 0])
+    );
+    const rateByGroupId = new Map<string, number>(
+      groups.map((g) => [String(g._id), Number((g as { rateNpr?: number }).rateNpr) || 0])
+    );
+
     items.forEach((item) => normalizeCollections(item as unknown as Record<string, unknown>));
 
-    const itemsWithPricing = await Promise.all(
-      items.map(async (item) => {
-        const clean = { ...item, name: stripItemCount((item as { name?: { en?: string; np?: string } }).name) };
-        if (!clean.material) return { ...clean, pricing: null };
-        try {
-          const pricing = await calculateFinalPrice({
-            materialId: (clean.material as { _id: string })._id.toString(),
-            groupId: clean.group ? (clean.group as { _id: string })._id.toString() : undefined,
-            weightGrams: clean.weightGrams,
-            wastagePercent: clean.wastagePercent,
-            makingCharges: clean.makingCharges,
-            accessoriesCharge: clean.accessoriesCharge,
-            boutiqueDeduction: clean.boutiqueDeduction,
-            diamondValue: clean.diamondValue,
-          });
-          return { ...clean, pricing };
-        } catch {
-          return { ...clean, pricing: null };
-        }
-      })
-    );
+    const itemsWithPricing = items.map((item) => {
+      const clean = { ...item, name: stripItemCount((item as { name?: { en?: string; np?: string } }).name) };
+      if (!clean.material) return { ...clean, pricing: null };
+      const pricing = computePricingFromRates(
+        {
+          materialId: refId(clean.material),
+          groupId: clean.group ? refId(clean.group) : undefined,
+          weightGrams: clean.weightGrams,
+          wastagePercent: clean.wastagePercent,
+          makingCharges: clean.makingCharges,
+          accessoriesCharge: clean.accessoriesCharge,
+          boutiqueDeduction: clean.boutiqueDeduction,
+          diamondValue: clean.diamondValue,
+        },
+        rateByMaterialId,
+        rateByGroupId
+      );
+      return { ...clean, pricing };
+    });
 
     return toPlain(itemsWithPricing);
   },
@@ -80,7 +156,7 @@ export const getItemByIdData = unstable_cache(
   async (id: string) => {
     await connectDB();
     const item = await Item.findById(id)
-      .populate({ path: 'collection', model: 'Collection', select: 'name', strictPopulate: false })
+      .populate({ path: 'collections', model: 'Collection', select: 'name', strictPopulate: false })
       .populate('material', 'name')
       .populate('group', 'name')
       .populate('occasion', 'name')

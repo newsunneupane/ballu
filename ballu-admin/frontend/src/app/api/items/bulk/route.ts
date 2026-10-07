@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import Item from '@/lib/models/Item';
+import Collection from '@/lib/models/Collection';
 import Group from '@/lib/models/Group';
 import { requireAuth } from '@/lib/auth/middleware';
 import { errorResponse } from '@/lib/api-utils';
@@ -54,6 +55,11 @@ export async function POST(req: NextRequest) {
         purity: (group as { name: string }).name,
         manualPriceNpr: item.manualPriceNpr != null ? Number(item.manualPriceNpr) : undefined,
       });
+    }
+
+    const allCollectionIds = [...new Set(prepared.flatMap((i) => i.collections ?? []))];
+    if ((await Collection.countDocuments({ _id: { $in: allCollectionIds } })) !== allCollectionIds.length) {
+      return NextResponse.json({ error: 'One or more collections do not exist' }, { status: 400, headers: { 'Cache-Control': 'no-store' } });
     }
 
     const conditions = prepared

@@ -78,12 +78,16 @@ export default function CollectionsPage() {
   };
 
   const [deleteError, setDeleteError] = useState('');
+  const [notice, setNotice] = useState('');
 
-  const remove = async (id: string) => {
-    if (!confirm('Delete this collection?')) return;
+  const remove = async (c: any) => {
+    const n = c.itemCount || 0;
+    if (!confirm(n > 0 ? `Delete "${c.name.en}"? ${n} item(s) use it — they will stay under their other collections, and any left with none will move to Others.` : `Delete "${c.name.en}"?`)) return;
     try {
       setDeleteError('');
-      await api.collections.delete(id);
+      setNotice('');
+      const res = await api.collections.delete(c._id);
+      if (res?.message) setNotice(res.message);
       invalidate();
     } catch (err: any) {
       setDeleteError(err.message);
@@ -104,10 +108,11 @@ export default function CollectionsPage() {
           <thead>
             <tr className="border-b border-[#e5ded2] text-[#6b655b] text-[10px] tracking-[0.2em] uppercase">
               <th className="text-left px-5 py-3 font-medium">Image</th>
-              <th className="text-left px-5 py-3 font-medium">English</th>
-              <th className="text-left px-5 py-3 font-medium">Nepali</th>
-              <th className="text-left px-5 py-3 font-medium">Description</th>
-              <th className="text-right px-5 py-3 font-medium">Actions</th>
+                <th className="text-left px-5 py-3 font-medium">English</th>
+                <th className="text-left px-5 py-3 font-medium">Nepali</th>
+                <th className="text-left px-5 py-3 font-medium">Description</th>
+                <th className="text-left px-5 py-3 font-medium">Items</th>
+                <th className="text-right px-5 py-3 font-medium">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -123,17 +128,21 @@ export default function CollectionsPage() {
                 <td className="px-5 py-3 text-[#26221d]">{c.name.en}</td>
                 <td className="px-5 py-3 text-[#26221d]">{c.name.np}</td>
                 <td className="px-5 py-3 text-[#7d776c] text-xs">{c.description || '—'}</td>
+                <td className="px-5 py-3 text-[#26221d]">{c.itemCount ?? '—'}</td>
                 <td className="px-5 py-3 text-right">
                   <button onClick={() => openEdit(c)} className="text-[#7d776c] hover:text-[#b8860b] transition-colors mr-3"><Pencil size={14} /></button>
-                  <button onClick={() => remove(c._id)} className="text-[#7d776c] hover:text-red-600 transition-colors"><Trash2 size={14} /></button>
+                  <button onClick={() => remove(c)} className="text-[#7d776c] hover:text-red-600 transition-colors"><Trash2 size={14} /></button>
                 </td>
               </tr>
             ))}
             {collections.length === 0 && (
-              <tr><td colSpan={5} className="px-5 py-8 text-center text-[#6b655b]">No collections yet</td></tr>
+              <tr><td colSpan={6} className="px-5 py-8 text-center text-[#6b655b]">No collections yet</td></tr>
+            )}
+            {notice && (
+              <tr><td colSpan={6} className="px-5 py-3 text-center text-green-700 text-sm bg-green-50">{notice}</td></tr>
             )}
             {deleteError && (
-              <tr><td colSpan={5} className="px-5 py-3 text-center text-red-600 text-sm bg-red-50">{deleteError}</td></tr>
+              <tr><td colSpan={6} className="px-5 py-3 text-center text-red-600 text-sm bg-red-50">{deleteError}</td></tr>
             )}
           </tbody>
         </table>

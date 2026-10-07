@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import Collection from '@/lib/models/Collection';
+import Item from '@/lib/models/Item';
 import { requireAuth } from '@/lib/auth/middleware';
 import { errorResponse } from '@/lib/api-utils';
 import { revalidateCatalog } from '@/lib/revalidateCatalog';
@@ -12,8 +13,13 @@ export async function GET(req: NextRequest) {
     const authResult = requireAuth(req);
     if (authResult) return authResult;
     await connectDB();
-    const collections = await Collection.find().sort({ createdAt: -1 });
-    return NextResponse.json(collections, {
+    const collections = await Collection.find().sort({ createdAt: -1 }).lean();
+    const counts = await Item.aggregate([
+      { $unwind: '$collections' },
+      { $group: { _id: '$collections', count: { $sum: 1 } } },
+    ]);
+    const countById = new Map<string, number>(counts.map((c: { _id: unknown; count: number }) => [String(c._id), c.count]));
+    return NextResponse.json(collections.map((c) => ({ ...c, itemCount: countById.get(String(c._id)) ?? 0 })), {
       headers: { 'Cache-Control': 'no-store' },
     });
   } catch (err) {

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import Item from '@/lib/models/Item';
+import Collection from '@/lib/models/Collection';
 import Group from '@/lib/models/Group';
 import { calculateFinalPrice } from '@/lib/utils/priceCalculator';
 import { requireAuth } from '@/lib/auth/middleware';
@@ -62,6 +63,9 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     body.collections = [...new Set(body.collections.map((c: unknown) => String(c)))];
     if (body.collections.some((c: string) => !isObjectId(c))) {
       return badRequest('Invalid collection');
+    }
+    if ((await Collection.countDocuments({ _id: { $in: body.collections } })) !== body.collections.length) {
+      return badRequest('One or more collections do not exist');
     }
     if (!body.name?.en || !body.name?.np) {
       return badRequest('Name (English & Nepali) is required');
