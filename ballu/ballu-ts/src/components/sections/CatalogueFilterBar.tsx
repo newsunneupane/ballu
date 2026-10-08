@@ -164,25 +164,24 @@ export default function CatalogueFilterBar({
         .ff-bar .ff-chip {
           display: inline-flex;
           align-items: center;
-          gap: 0.45rem;
-          min-height: 30px;
-          padding: 0.32rem 0.9rem;
-          font-size: 10px;
-          letter-spacing: 0.18em;
+          gap: 0.4rem;
+          min-height: 26px;
+          padding: 0.25rem 0.75rem;
+          font-size: 9px;
+          letter-spacing: 0.15em;
           text-transform: uppercase;
           white-space: nowrap;
           flex-shrink: 0;
           border-radius: 999px;
-          border: 1px solid rgba(255,255,255,0.1);
-          background: rgba(255,255,255,0.03);
-          color: var(--bj-text-muted);
+          border: 1px solid rgba(201,169,110,0.55);
+          background: rgba(201,169,110,0.06);
+          color: #e9cf8f;
           cursor: pointer;
           transition: transform 0.25s ease, border-color 0.25s ease, color 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
         }
         .ff-bar .ff-chip:hover {
           transform: translateY(-2px);
-          border-color: rgba(201,169,110,0.55);
-          color: #e9cf8f;
+          border-color: rgba(233,207,143,0.85);
         }
         .ff-bar .ff-chip:focus-visible {
           outline: 2px solid #c9a96e;
@@ -201,8 +200,8 @@ export default function CatalogueFilterBar({
           transform: translateY(-2px);
         }
         .ff-bar .ff-dot {
-          width: 5px;
-          height: 5px;
+          width: 4px;
+          height: 4px;
           border-radius: 999px;
           background: currentColor;
           flex-shrink: 0;
@@ -221,21 +220,27 @@ export default function CatalogueFilterBar({
           border-color: #cda274;
           box-shadow: 0 0 0 3px rgba(201,169,110,0.18);
         }
+        @keyframes ff-apply-pulse {
+          0% { box-shadow: 0 8px 24px -8px rgba(201,169,110,0.6), inset 0 1px 0 rgba(255,255,255,0.5), 0 0 0 0 rgba(154,123,56,0.55); }
+          70% { box-shadow: 0 8px 24px -8px rgba(201,169,110,0.6), inset 0 1px 0 rgba(255,255,255,0.5), 0 0 0 9px rgba(154,123,56,0); }
+          100% { box-shadow: 0 8px 24px -8px rgba(201,169,110,0.6), inset 0 1px 0 rgba(255,255,255,0.5), 0 0 0 0 rgba(154,123,56,0); }
+        }
         .ff-bar .ff-apply {
-          padding: 0.35rem 1rem;
-          font-size: 10px;
+          min-height: 38px;
+          padding: 0.5rem 1.5rem;
+          font-size: 11px;
           letter-spacing: 0.15em;
           text-transform: uppercase;
           border-radius: 999px;
           font-weight: 700;
           color: #1a130a;
           background: linear-gradient(135deg, #e9cf8f, #c9a96e 55%, #9a7b38);
-          box-shadow: 0 8px 24px -8px rgba(201,169,110,0.6), inset 0 1px 0 rgba(255,255,255,0.5);
+          border: 1px solid transparent;
+          animation: ff-apply-pulse 2s ease-out infinite;
           transition: transform 0.25s ease, box-shadow 0.25s ease, opacity 0.25s ease;
         }
         .ff-bar .ff-apply:hover:not(:disabled) {
           transform: translateY(-1px);
-          box-shadow: 0 10px 28px -8px rgba(201,169,110,0.7), inset 0 1px 0 rgba(255,255,255,0.5);
         }
         .ff-bar .ff-apply:disabled {
           background: transparent;
@@ -246,8 +251,9 @@ export default function CatalogueFilterBar({
           opacity: 0.6;
         }
         .ff-bar .ff-clear {
-          padding: 0.35rem 1rem;
-          font-size: 10px;
+          min-height: 38px;
+          padding: 0.5rem 1.5rem;
+          font-size: 11px;
           letter-spacing: 0.15em;
           text-transform: uppercase;
           border-radius: 999px;
@@ -274,13 +280,12 @@ export default function CatalogueFilterBar({
         }
         [data-theme="light"] .ff-bar .ff-chip {
           background: #ffffff;
-          border-color: rgba(104,66,9,0.28);
-          color: #4a3d24;
+          border-color: #8a6a30;
+          color: #684209;
           font-weight: 600;
         }
         [data-theme="light"] .ff-bar .ff-chip:hover {
-          border-color: #8a6a30;
-          color: #684209;
+          border-color: #684209;
           transform: translateY(-2px);
         }
         [data-theme="light"] .ff-bar .ff-chip-on {
@@ -301,16 +306,26 @@ export default function CatalogueFilterBar({
           border-color: #cc0000;
           box-shadow: 0 0 0 3px rgba(204,0,0,0.12);
         }
+        @keyframes ff-apply-pulse-light {
+          0% { box-shadow: 0 8px 24px -8px rgba(204,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.35), 0 0 0 0 rgba(204,0,0,0.4); }
+          70% { box-shadow: 0 8px 24px -8px rgba(204,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.35), 0 0 0 9px rgba(204,0,0,0); }
+          100% { box-shadow: 0 8px 24px -8px rgba(204,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.35), 0 0 0 0 rgba(204,0,0,0); }
+        }
         [data-theme="light"] .ff-bar .ff-apply:not(:disabled) {
           background: linear-gradient(135deg, #d42a2a, #a80000);
+          border: 1px solid #8a6a30;
           color: #ffffff;
-          box-shadow: 0 8px 24px -8px rgba(204,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.35);
+          text-shadow: none;
+          animation: ff-apply-pulse-light 2s ease-out infinite;
         }
         [data-theme="light"] .ff-bar .ff-clear:hover {
           border-color: #cc0000;
           color: #a80000;
         }
         @media (prefers-reduced-motion: reduce) {
+          .ff-bar .ff-apply:not(:disabled) {
+            animation: none;
+          }
           .ff-bar .ff-chip, .ff-bar .ff-apply, .ff-bar .ff-clear {
             transition: none;
           }

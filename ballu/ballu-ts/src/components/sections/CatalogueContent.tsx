@@ -355,14 +355,18 @@ export default function CatalogueContent({
             <Link href="/" className="hover:text-bj-gold-richer transition-colors">Home</Link>
             {breadcrumb ? ` · ${breadcrumb.split(' · ').slice(1).join(' · ')}` : ' · Catalogue'}
           </div>
-          <div className="flex flex-col space-y-1 max-w-4xl">
-            <h1 className="antialiased catalogue-title text-[42px] sm:text-[75px] md:text-[90px] font-light leading-[1.1] text-bj-text-heading tracking-tight">
-              <span className="block">{title || 'The Drawer.'}</span>
-            </h1>
-          </div>
-          <p className="italic pb-5 font-nepali-serif tracking-wide text-bj-text-body opacity-85">
-            {subtitle || 'दराज — सबै गहना'}
-          </p>
+          {title ? (
+            <div className="flex flex-col space-y-1 max-w-4xl">
+              <h1 className="antialiased catalogue-title text-[42px] sm:text-[75px] md:text-[90px] font-light leading-[1.1] text-bj-text-heading tracking-tight">
+                <span className="block">{title}</span>
+              </h1>
+            </div>
+          ) : null}
+          {subtitle ? (
+            <p className="italic pb-5 font-nepali-serif tracking-wide text-bj-text-body opacity-85">
+              {subtitle}
+            </p>
+          ) : null}
         </div>
       </header>
 
