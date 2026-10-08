@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 export type GroupRate = {
   groupId: string;
@@ -55,6 +55,28 @@ export default function RatesCard({
     : null;
 
   const compact = variant === 'compact';
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [canScroll, setCanScroll] = useState(false);
+  const [atBottom, setAtBottom] = useState(false);
+
+  const checkScroll = () => {
+    const el = scrollRef.current;
+    if (!el) return;
+    setCanScroll(el.scrollHeight - el.clientHeight > 4);
+    setAtBottom(el.scrollTop + el.clientHeight >= el.scrollHeight - 8);
+  };
+
+  useEffect(() => {
+    checkScroll();
+    // Re-check after fonts settle; heights can shift once webfonts load.
+    const t = setTimeout(checkScroll, 600);
+    window.addEventListener('resize', checkScroll);
+    return () => {
+      clearTimeout(t);
+      window.removeEventListener('resize', checkScroll);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [groupRates]);
 
   return (
     <>
@@ -145,6 +167,43 @@ export default function RatesCard({
           border-color: rgba(104,66,9,0.18) !important;
         }
 
+        /* Scrollable rates list: thin always-visible gold scrollbar (site hides all others). */
+        .brand-rates-card .rt-scroll {
+          overscroll-behavior: contain;
+          scrollbar-width: thin;
+          scrollbar-color: #c9a96e transparent;
+        }
+        .brand-rates-card .rt-scroll::-webkit-scrollbar {
+          display: block !important;
+          width: 6px;
+        }
+        .brand-rates-card .rt-scroll::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .brand-rates-card .rt-scroll::-webkit-scrollbar-thumb {
+          background: linear-gradient(180deg, #e9cf8f, #9a7b38);
+          border-radius: 999px;
+        }
+        .brand-rates-card .rt-scroll::-webkit-scrollbar-thumb:hover {
+          background: #e9cf8f;
+        }
+        [data-theme="light"] .brand-rates-card .rt-scroll {
+          scrollbar-color: #8a6a30 transparent;
+        }
+        [data-theme="light"] .brand-rates-card .rt-scroll::-webkit-scrollbar-thumb {
+          background: linear-gradient(180deg, #8a6a30, #684209);
+        }
+        [data-theme="light"] .brand-rates-card .rt-scroll-hint {
+          color: #8a6a30 !important;
+        }
+        @keyframes rt-scroll-nudge {
+          0%, 100% { transform: translateY(0); opacity: 0.85; }
+          50% { transform: translateY(3px); opacity: 1; }
+        }
+        .brand-rates-card .rt-scroll-hint {
+          animation: rt-scroll-nudge 1.8s ease-in-out infinite;
+        }
+
 
       `}</style>
     <div
@@ -157,9 +216,18 @@ export default function RatesCard({
         <span className="text-[10px] tracking-[0.4em] text-bj-gold uppercase opacity-80">
           Today&apos;s Rates
         </span>
+        {canScroll && !atBottom && (
+          <span className="rt-scroll-hint ml-auto hidden md:inline-block font-sans text-[9px] tracking-[0.3em] uppercase text-[#c9a96e]">
+            scroll ↓
+          </span>
+        )}
       </div>
 
-      <div className={compact ? 'md:flex-1 md:min-h-0 md:overflow-y-auto md:pr-1' : ''}>
+      <div
+        ref={scrollRef}
+        onScroll={checkScroll}
+        className={`rt-scroll ${compact ? 'md:flex-1 md:min-h-0 md:overflow-y-auto md:pr-1' : ''}`}
+      >
         {grouped.length > 0 ? (
           <div className={compact ? 'grid grid-cols-1 gap-y-5' : 'grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-7'}>
             {grouped.map(({ materialName, groups }) => (
