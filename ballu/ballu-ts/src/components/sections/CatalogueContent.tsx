@@ -81,6 +81,18 @@ export default function CatalogueContent({
   const [availableOnly, setAvailableOnly] = useState(false);
   const [minPrice, setMinPrice] = useState(urlMinPrice ?? '');
   const [maxPrice, setMaxPrice] = useState(urlMaxPrice ?? '');
+  // Applied snapshot: the grid only reflects these. Controls above edit the
+  // draft; Apply commits it, Clear resets both.
+  const [applied, setApplied] = useState({
+    collections: urlCollection ? [urlCollection] : defaultCollection ? [defaultCollection] : ['ALL'],
+    material: urlMaterial || 'ALL',
+    group: urlGroup || 'ALL',
+    occasions: urlOccasion ? [urlOccasion] : [] as string[],
+    tag: 'ALL',
+    availableOnly: false,
+    minPrice: urlMinPrice ?? '',
+    maxPrice: urlMaxPrice ?? '',
+  });
   const [sort, setSort] = useState<SortOption>('newest');
   const [viewMode, setViewMode] = useState<'GRID' | 'LIST'>('GRID');
   const [page, setPage] = useState(1);
@@ -134,7 +146,10 @@ export default function CatalogueContent({
   const collectionButtons = useMemo(() => {
     const dbCollections = productService.getCollectionsList();
     if (dbCollections.length > 0) {
-      return ['ALL', ...dbCollections.map((c: any) => c.name?.en?.toUpperCase() || '')];
+      const names = dbCollections
+        .map((c: any) => (c.name?.en || '').trim().toUpperCase())
+        .filter(Boolean);
+      return ['ALL', ...Array.from(new Set(names))];
     }
     return [...HARDCODED_CATEGORIES];
   }, [dataReady]);
@@ -142,7 +157,8 @@ export default function CatalogueContent({
   const occasionButtons = useMemo(() => {
     const dbOccasions = productService.getOccasionsList();
     if (dbOccasions.length > 0) {
-      return dbOccasions.map((o: any) => (o?.name?.en || '').trim().toUpperCase()).filter(Boolean);
+      const names = dbOccasions.map((o: any) => (o?.name?.en || '').trim().toUpperCase()).filter(Boolean);
+      return Array.from(new Set(names));
     }
     return [];
   }, [dataReady]);
@@ -150,7 +166,8 @@ export default function CatalogueContent({
   const materialButtons = useMemo(() => {
     const dbMaterials = productService.getMaterialsList();
     if (dbMaterials.length > 0) {
-      return ['ALL', ...dbMaterials.map((m: any) => m.name?.en?.toUpperCase() || '')];
+      const names = dbMaterials.map((m: any) => (m.name?.en || '').trim().toUpperCase()).filter(Boolean);
+      return ['ALL', ...Array.from(new Set(names))];
     }
     return ['ALL', 'GOLD', 'SILVER'];
   }, [dataReady]);
@@ -159,7 +176,8 @@ export default function CatalogueContent({
     if (activeMaterial === 'ALL') return ['ALL'];
     const groups = productService.getGroupsForMaterial(activeMaterial);
     if (groups.length === 0) return ['ALL'];
-    return ['ALL', ...groups.map((g: any) => g.name?.toUpperCase() || '')];
+    const names = groups.map((g: any) => (typeof g.name === 'string' ? g.name : g.name?.en || '').trim().toUpperCase()).filter(Boolean);
+    return ['ALL', ...Array.from(new Set(names))];
   }, [dataReady, activeMaterial]);
 
   const tagButtons = useMemo(() => {
@@ -168,17 +186,58 @@ export default function CatalogueContent({
     return ['ALL', ...Array.from(tags)];
   }, [dataReady]);
 
-  const filteredProducts = productService.getFiltered({
+  const toFiniteNumber = (v: string): number | undefined => {
+    if (!v) return undefined;
+    const n = Number(v);
+    return Number.isFinite(n) ? n : undefined;
+  };
+
+  const runFilters = (f: typeof applied) =>
+    productService.getFiltered({
+      collections: f.collections,
+      occasions: f.occasions,
+      material: f.material,
+      purity: f.group,
+      tag: f.tag,
+      availableOnly: f.availableOnly,
+      minPrice: toFiniteNumber(f.minPrice),
+      maxPrice: toFiniteNumber(f.maxPrice),
+      sort,
+    });
+
+  // Grid reflects the applied snapshot; the draft preview count feeds Apply labels.
+  const filteredProducts = runFilters(applied);
+  const draftCount = runFilters({
     collections: activeCollections,
     occasions: activeOccasions,
     material: activeMaterial,
-    purity: activeGroup,
+    group: activeGroup,
     tag: activeTag,
     availableOnly,
-    minPrice: minPrice ? Number(minPrice) : undefined,
-    maxPrice: maxPrice ? Number(maxPrice) : undefined,
-    sort,
-  });
+    minPrice,
+    maxPrice,
+  }).length;
+  const hasChanges =
+    JSON.stringify({
+      collections: activeCollections,
+      occasions: activeOccasions,
+      material: activeMaterial,
+      group: activeGroup,
+      tag: activeTag,
+      availableOnly,
+      minPrice,
+      maxPrice,
+    }) !==
+    JSON.stringify({
+      collections: applied.collections,
+      occasions: applied.occasions,
+      material: applied.material,
+      group: applied.group,
+      tag: applied.tag,
+      availableOnly: applied.availableOnly,
+      minPrice: applied.minPrice,
+      maxPrice: applied.maxPrice,
+    });
 
   const totalPages = Math.max(1, Math.ceil(filteredProducts.length / PAGE_SIZE));
   const currentPage = Math.min(Math.max(1, page), totalPages);
@@ -189,17 +248,7 @@ export default function CatalogueContent({
 
   useEffect(() => {
     setPage(1);
-  }, [
-    activeCollections,
-    activeMaterial,
-    activeGroup,
-    activeOccasions,
-    activeTag,
-    availableOnly,
-    minPrice,
-    maxPrice,
-    sort,
-  ]);
+  }, [applied, sort]);
 
   useEffect(() => {
     const urlCollection = searchParams.get('collection')?.toUpperCase();
@@ -209,16 +258,79 @@ export default function CatalogueContent({
     const urlMinPrice = searchParams.get('minPrice');
     const urlMaxPrice = searchParams.get('maxPrice');
 
-    setActiveCollections(urlCollection ? [urlCollection] : defaultCollection ? [defaultCollection] : ['ALL']);
-    setActiveMaterial(urlMaterial || 'ALL');
-    setActiveGroup(urlGroup || 'ALL');
-    setActiveOccasions(urlOccasion ? [urlOccasion] : []);
-    setActiveTag('ALL');
-    setAvailableOnly(false);
-    setMinPrice(urlMinPrice ?? '');
-    setMaxPrice(urlMaxPrice ?? '');
+    const next = {
+      collections: urlCollection ? [urlCollection] : defaultCollection ? [defaultCollection] : ['ALL'],
+      material: urlMaterial || 'ALL',
+      group: urlGroup || 'ALL',
+      occasions: urlOccasion ? [urlOccasion] : [] as string[],
+      tag: 'ALL',
+      availableOnly: false,
+      minPrice: urlMinPrice ?? '',
+      maxPrice: urlMaxPrice ?? '',
+    };
+    setActiveCollections(next.collections);
+    setActiveMaterial(next.material);
+    setActiveGroup(next.group);
+    setActiveOccasions(next.occasions);
+    setActiveTag(next.tag);
+    setAvailableOnly(next.availableOnly);
+    setMinPrice(next.minPrice);
+    setMaxPrice(next.maxPrice);
+    setApplied(next);
     setSort('newest');
   }, [searchParams, defaultCollection]);
+
+  const scrollToResults = () => {
+    requestAnimationFrame(() => {
+      const anchor = filterAnchorRef.current;
+      const y =
+        anchor && anchor.offsetParent !== null
+          ? anchor.getBoundingClientRect().top + window.scrollY - 25
+          : mainRef.current
+            ? mainRef.current.getBoundingClientRect().top + window.scrollY - 25
+            : 0;
+      window.scrollTo({ top: y, behavior: 'smooth' });
+    });
+  };
+
+  const applyFilters = () => {
+    setApplied({
+      collections: activeCollections,
+      occasions: activeOccasions,
+      material: activeMaterial,
+      group: activeGroup,
+      tag: activeTag,
+      availableOnly,
+      minPrice,
+      maxPrice,
+    });
+    setPage(1);
+    setFiltersOpen(false);
+    scrollToResults();
+  };
+
+  const clearFilters = () => {
+    const reset = {
+      collections: ['ALL'],
+      material: 'ALL',
+      group: 'ALL',
+      occasions: [] as string[],
+      tag: 'ALL',
+      availableOnly: false,
+      minPrice: '',
+      maxPrice: '',
+    };
+    setActiveCollections(reset.collections);
+    setActiveMaterial(reset.material);
+    setActiveGroup(reset.group);
+    setActiveOccasions(reset.occasions);
+    setActiveTag(reset.tag);
+    setAvailableOnly(reset.availableOnly);
+    setMinPrice(reset.minPrice);
+    setMaxPrice(reset.maxPrice);
+    setApplied(reset);
+    setPage(1);
+  };
 
   const goToPage = (p: number) => {
     const target = Math.min(Math.max(1, p), totalPages);
@@ -285,6 +397,10 @@ export default function CatalogueContent({
         setMaxPrice={setMaxPrice}
         setSort={setSort}
         setViewMode={setViewMode}
+        onApply={applyFilters}
+        onClear={clearFilters}
+        hasChanges={hasChanges}
+        showActions
         />
       </div>
 
@@ -355,12 +471,18 @@ export default function CatalogueContent({
             />
           </div>
 
-          <div className="sticky bottom-0 px-5 py-3 bg-bj-bg border-t border-bj-border">
+          <div className="sticky bottom-0 px-5 py-3 bg-bj-bg border-t border-bj-border flex gap-3">
             <button
-              onClick={() => setFiltersOpen(false)}
-              className="w-full h-12 rounded-full bg-bj-gold-rich text-bj-bg text-[12px] tracking-[0.2em] uppercase transition-colors hover:bg-bj-gold-richer"
+              onClick={clearFilters}
+              className="h-12 px-5 rounded-full border border-bj-border text-bj-text-muted text-[12px] tracking-[0.2em] uppercase transition-colors hover:border-bj-gold-rich hover:text-bj-gold-rich shrink-0"
             >
-              Show {filteredProducts.length} Pieces
+              Clear
+            </button>
+            <button
+              onClick={applyFilters}
+              className="flex-1 h-12 rounded-full bg-bj-gold-rich text-bj-bg text-[12px] tracking-[0.2em] uppercase transition-colors hover:bg-bj-gold-richer"
+            >
+              Show {draftCount} Pieces
             </button>
           </div>
         </div>

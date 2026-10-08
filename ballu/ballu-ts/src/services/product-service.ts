@@ -21,9 +21,11 @@ function transformApiItem(item: any): Product {
     rawCols.map((c) => (c?.name?.en || '').trim().toUpperCase()).filter(Boolean)
   )];
   const catEn = colNames[0] || 'OTHERS';
-  const matEn = item.material?.name?.en?.toUpperCase() || 'GOLD';
+  const matEn = (item.material?.name?.en || '').trim().toUpperCase() || 'GOLD';
   const weightStr = `${item.weightGrams}g`;
-  const purity = item.group?.name?.en || item.purity || '';
+  // Group.name is a plain string (not { en, np }), so read it directly first.
+  const groupName = typeof item.group?.name === 'string' ? item.group.name : item.group?.name?.en;
+  const purity = (groupName || item.purity || '').trim();
 
   const pricing = item.pricing;
   const rawVariants: any[] = Array.isArray(item.variants) && item.variants.length > 0
@@ -238,6 +240,8 @@ export const productService = {
   },
 
   getFiltered(filters: Partial<ProductFilters>): Product[] {
+    const norm = (v: unknown) => String(v ?? '').trim().toUpperCase();
+    const normList = (list?: string[]) => (list || []).map(norm).filter(Boolean);
     const effPrice = (p: Product): number | null => {
       if (p.variants && p.variants.length > 0) {
         const ps = p.variants.map((v) => v.priceNpr).filter((n): n is number => n != null);
@@ -245,24 +249,34 @@ export const productService = {
       }
       return p.priceNpr;
     };
+    // Sanitize bounds: non-finite values are treated as unset.
+    const min = typeof filters.minPrice === 'number' && Number.isFinite(filters.minPrice) ? filters.minPrice : undefined;
+    const max = typeof filters.maxPrice === 'number' && Number.isFinite(filters.maxPrice) ? filters.maxPrice : undefined;
+    const collections = normList(filters.collections);
+    const occasions = normList(filters.occasions);
+    const material = norm(filters.material);
+    const purity = norm(filters.purity);
+    const tag = String(filters.tag ?? '').trim();
     const filtered = productStore.filter((product) => {
       const matchesCollection =
-        !filters.collections ||
-        filters.collections.includes('ALL') ||
-        filters.collections.some((c) => product.collections.includes(c));
+        collections.length === 0 ||
+        collections.includes('ALL') ||
+        collections.some((c) => product.collections.includes(c));
       const matchesMaterial =
-        !filters.material ||
-        filters.material === 'ALL' ||
-        product.material === filters.material;
+        !material ||
+        material === 'ALL' ||
+        product.material === material;
       const matchesPurity =
-        !filters.purity ||
-        filters.purity === 'ALL' ||
-        (product.purity || '').toUpperCase() === filters.purity;
-      const matchesTag = !filters.tag || filters.tag === 'ALL' || product.tag === filters.tag;
+        !purity ||
+        purity === 'ALL' ||
+        (product.purity || '').trim().toUpperCase() === purity;
+      const matchesTag = !tag || tag === 'ALL' || product.tag === tag;
       const matchesAvailability = !filters.availableOnly || product.isAvailable;
-      const matchesOccasion = !filters.occasions || filters.occasions.length === 0 || filters.occasions.includes('ALL') || (product.occasions || []).some((occ: string) => filters.occasions!.includes(occ));
-      const matchesMinPrice = filters.minPrice == null || ((effPrice(product)) != null && (effPrice(product) as number) >= filters.minPrice);
-      const matchesMaxPrice = filters.maxPrice == null || ((effPrice(product)) != null && (effPrice(product) as number) < filters.maxPrice);
+      const matchesOccasion = occasions.length === 0 || occasions.includes('ALL') || (product.occasions || []).some((occ: string) => occasions.includes(norm(occ)));
+      // Pieces with unknown price stay visible under a range instead of vanishing.
+      const price = effPrice(product);
+      const matchesMinPrice = min == null || price == null || price >= min;
+      const matchesMaxPrice = max == null || price == null || price <= max;
       return matchesCollection && matchesMaterial && matchesPurity && matchesTag && matchesAvailability && matchesOccasion && matchesMinPrice && matchesMaxPrice;
     });
 
