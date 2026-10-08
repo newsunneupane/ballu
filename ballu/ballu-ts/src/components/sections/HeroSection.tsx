@@ -11,6 +11,7 @@ import { cloudinaryUrl } from '@/lib/cloudinary';
 import { SITE } from '@/lib/constants';
 import { useStoreSettings } from '@/hooks/useStoreSettings';
 import PersonalizeCard from '@/components/sections/PersonalizeCard';
+import RatesCard, { type GroupRate } from '@/components/sections/RatesCard';
 
 const cormorant = Cormorant_Garamond({
   subsets: ['latin'],
@@ -30,12 +31,12 @@ const notoDevanagari = Noto_Serif_Devanagari({
   variable: '--font-nepali-serif',
 });
 
-export default function HeroSection() {
+export default function HeroSection({ groupRates = null }: { groupRates?: GroupRate[] | null }) {
   const { data: settings } = useStoreSettings();
   const banners = settings?.heroBanners?.length ? settings.heroBanners : null;
 
   if (banners && banners.length > 0) {
-    return <HeroSlider banners={banners} />;
+    return <HeroSlider banners={banners} groupRates={groupRates} />;
   }
 
   return <StaticHero settings={settings} />;
@@ -118,9 +119,10 @@ function StaticHero({ settings }: { settings?: any }) {
   );
 }
 
-function HeroSlider({ banners }: { banners: any[] }) {
+function HeroSlider({ banners, groupRates = null }: { banners: any[]; groupRates?: GroupRate[] | null }) {
   const router = useRouter();
   const [activeIndex, setActiveIndex] = useState(0);
+  const [ratesOpen, setRatesOpen] = useState(false);
 
   useEffect(() => {
     if (banners.length <= 1) return;
@@ -226,12 +228,43 @@ function HeroSlider({ banners }: { banners: any[] }) {
           `}</style>
         </button>
 
-        {/* Right 35% — Personalize image card (desktop only). */}
-        <div className="hidden md:flex md:flex-none md:basis-[35%] md:max-w-[35%] flex-col gap-3 md:gap-4 md:h-[60vh] md:min-h-[60vh] w-full shrink-0">
-          <div className="relative w-full md:h-1/2 md:min-h-0 shrink-0">
+        {/* Mobile collapsible rates — directly below the personalize button. */}
+        <div className="md:hidden w-full overflow-hidden rounded-2xl border border-[#c9a96e]/35 bg-[#14100a]">
+          <button
+            onClick={() => setRatesOpen((v) => !v)}
+            aria-expanded={ratesOpen}
+            aria-label="Toggle today's rates"
+            className="flex w-full items-center gap-3 px-5 py-4 text-left"
+          >
+            <span className="h-px w-8 bg-bj-gold/60" />
+            <span className="flex-1 font-sans text-[10px] tracking-[0.4em] uppercase text-[#c9a96e]/80">
+              Today&apos;s Rates
+            </span>
+            <span
+              className={`inline-block text-[#e9cf8f] transition-transform duration-300 ${ratesOpen ? 'rotate-180' : ''}`}
+            >
+              ↓
+            </span>
+          </button>
+          <div
+            className={`grid transition-all duration-300 ease-out ${ratesOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}
+          >
+            <div className="min-h-0 overflow-hidden">
+              <div className="px-3 pb-3">
+                <RatesCard groupRates={groupRates} variant="compact" className="w-full h-auto border-white/10 bg-white/[0.03]" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Right 35% — Personalize image card + rates card (desktop only). */}
+        <div className="hidden md:flex md:flex-none md:basis-[35%] md:max-w-[35%] flex-col gap-3 md:gap-4 md:h-[60vh] md:min-h-[60vh] w-full shrink-0 min-h-0">
+          <div className="relative w-full h-[42%] shrink-0 min-h-0">
             <PersonalizeCard className="md:min-h-0" />
           </div>
-          <div className="hidden md:block flex-1" aria-hidden="true" />
+          <div className="flex-1 min-h-0 flex">
+            <RatesCard groupRates={groupRates} variant="compact" className="w-full h-full overflow-hidden" />
+          </div>
         </div>
       </div>
 

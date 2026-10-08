@@ -17,16 +17,15 @@ const Home = async () => {
 
   return (
     <>
-      <HeroSection />
-      <BrandTrust groupRates={groupRate} />
+      <HeroSection groupRates={groupRate} />
       <CollectionsRow />
-      <section className="bg-bj-bg-secondary text-bj-text-heading px-6 md:px-12 lg:px-16 py-16 md:py-20">
+      <section className="bg-bj-bg-secondary text-bj-text-heading px-6 md:px-12 lg:px-16 py-6 md:py-8">
         <div className="max-w-7xl mx-auto">
-          <div className="mb-8">
+          <div className="mb-4">
             <h2 className="font-serif-title text-[clamp(1.6rem,4vw,2.6rem)] font-light text-bj-text-heading">Shop by Occasions</h2>
           </div>
           <OccasionsBento occasions={occasions} />
-          <div className="mt-8 flex justify-end">
+          <div className="mt-4 flex justify-end">
             <Link
               href="/occasions"
               className="group inline-flex items-center gap-2 text-[12px] tracking-[0.25em] uppercase text-bj-gold transition-colors hover:text-bj-gold-rich"
@@ -40,6 +39,7 @@ const Home = async () => {
         </div>
       </section>
       <RecommendedRow />
+      <BrandTrust />
       <InstagramFeed />
     </>
   )

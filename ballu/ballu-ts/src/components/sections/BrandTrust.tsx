@@ -9,42 +9,18 @@ const cormorant = Cormorant_Garamond({
   style: ['normal', 'italic'],
 });
 
-type GroupRate = {
-  groupId: string;
-  name: string;
-  materialName: string | null;
-  rateNpr: number | null;
-  lastItemChangedAt: string | null;
-  lastItemChangedLabel: string | null;
-};
-
-export default function BrandTrust({ groupRates }: { groupRates: GroupRate[] | null }) {
+export default function BrandTrust() {
   return (
-    <div className="brand-section bg-bj-bg-secondary text-bj-text-heading w-full min-h-[60vh] flex flex-col justify-between relative overflow-hidden font-sans border-t border-white/5">
+    <div className="brand-section bg-bj-bg-secondary text-bj-text-heading w-full flex flex-col justify-between relative overflow-hidden font-sans border-t border-white/5">
       <style>{`
         [data-theme="light"] .brand-section { border-color: rgba(0,0,0,0.08) !important; }
-        [data-theme="light"] .brand-grid { border-color: #cc0000 !important; }
-        [data-theme="light"] .brand-grid h3,
-        [data-theme="light"] .brand-grid h4 { color: #000000 !important; }
-        [data-theme="light"] .brand-grid p { color: #000000 !important; opacity: 0.7 !important; }
         [data-theme="light"] .brand-orbit { opacity: 0.6; }
         [data-theme="dark"] .brand-orbit { opacity: 0.5 !important; }
         [data-theme="light"] .brand-orbit .bo-black { stroke: #000000 !important; }
         [data-theme="light"] .brand-orbit .bo-darkgold { stroke: #cc0000 !important; }
         [data-theme="light"] .brand-orbit .brand-orbit-circle { border-color: #cc0000 !important; }
-        [data-theme="light"] .brand-rates-card {
-          background: #F4F0EA !important;
-          border-color: rgba(0,0,0,0.08) !important;
-        }
-        [data-theme="light"] .brand-rates-card .rt-material { color: #1C1C1C !important; opacity: 0.55; }
-        [data-theme="light"] .brand-rates-card .rt-name { color: #1C1C1C !important; }
-        [data-theme="light"] .brand-rates-card .rt-value { color: #9A7B38 !important; }
-        [data-theme="light"] .brand-rates-card .rt-empty { color: #6b655b !important; }
-        [data-theme="light"] .brand-rates-card .rt-updated { color: #6b655b !important; opacity: 0.75; }
-        [data-theme="light"] .brand-rates-card .rt-row { border-color: rgba(0,0,0,0.08) !important; }
       `}</style>
       <div className="max-w-7xl w-full  mx-auto px-6 md:px-12 lg:px-16 pt-6 pb-40 flex flex-col items-center text-center relative overflow-hidden">
-       
 
         <p className={`${cormorant.className} italic text-[clamp(1.5rem,4vw,2.5rem)] font-light tracking-wide max-w-4xl text-bj-text-body leading-relaxed mb-4 relative z-10`}>
           30+ Years of Trust. Jewellery for Generations.
@@ -56,8 +32,6 @@ export default function BrandTrust({ groupRates }: { groupRates: GroupRate[] | n
 
         <OrbitalDecoration />
       </div>
-
-      <FeatureGrid groupRates={groupRates} />
     </div>
   );
 }
@@ -84,102 +58,6 @@ function OrbitalDecoration() {
           <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
             <circle className="bo-black" cx="50" cy="50" r="48" fill="none" stroke="#e9cf8f" strokeWidth="0.5" strokeDasharray="1.5 3.5" strokeLinecap="round" />
           </svg>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function groupByMaterial(rates: GroupRate[]) {
-  const order: string[] = [];
-  const map = new Map<string, GroupRate[]>();
-  for (const r of rates) {
-    const key = r.materialName || 'Other';
-    if (!map.has(key)) {
-      map.set(key, []);
-      order.push(key);
-    }
-    map.get(key)!.push(r);
-  }
-  return order.map((materialName) => ({ materialName, groups: map.get(materialName)! }));
-}
-
-function FeatureGrid({ groupRates }: { groupRates: GroupRate[] | null }) {
-  const grouped = groupRates && groupRates.length ? groupByMaterial(groupRates) : [];
-
-  let lastUpdated: string | null = null;
-  for (const g of groupRates || []) {
-    if (g.lastItemChangedAt) {
-      const t = new Date(g.lastItemChangedAt).getTime();
-      if (!isNaN(t) && (lastUpdated === null || t > new Date(lastUpdated).getTime())) {
-        lastUpdated = g.lastItemChangedAt;
-      }
-    }
-  }
-  const updatedLabel = lastUpdated
-    ? new Date(lastUpdated).toLocaleString('en-US', {
-        month: 'short',
-        day: 'numeric',
-        hour: 'numeric',
-        minute: '2-digit',
-      })
-    : null;
-
-  return (
-    <div className="brand-grid w-full   relative z-10 bg-bj-bg-secondary">
-      <div className="max-w-3xl w-full mx-auto px-6 md:px-12 lg:px-16 pb-6 grid grid-cols-1 gap-10 items-center">
-        <div className="order-1">
-          <div className="brand-rates-card rounded-2xl border border-bj-border bg-bj-bg-elevated p-6 md:p-8">
-            <div className="flex items-center gap-3 mb-6">
-              <span className="h-px w-8 bg-bj-gold/60" />
-              <span className="text-[10px] tracking-[0.4em] text-bj-gold uppercase opacity-80">
-                Today&apos;s Rates
-              </span>
-            </div>
-
-            {grouped.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-7">
-                {grouped.map(({ materialName, groups }) => (
-                  <div key={materialName}>
-                    <h4 className="rt-material text-[11px] tracking-[0.3em] uppercase text-bj-text-body opacity-60 mb-3 font-sans">
-                      {materialName}
-                    </h4>
-                    <ul className="space-y-1.5">
-                      {groups.map((g) => (
-                        <li
-                          key={g.groupId}
-                          className="rt-row grid grid-cols-[1fr_auto] items-baseline gap-x-4 border-b border-white/5 pb-2"
-                        >
-                          <span className="rt-name text-[14px] tracking-[0.01em] text-bj-text-heading font-sans">
-                            {g.name}
-                          </span>
-                          {g.rateNpr != null ? (
-                            <span className="rt-value text-[14px] font-medium font-sans text-[#9A7B38] whitespace-nowrap">
-                              ₨ {g.rateNpr.toLocaleString('en-IN')} / g
-                            </span>
-                          ) : (
-                            <span className="rt-empty text-[11px] tracking-[0.18em] uppercase text-bj-text-muted whitespace-nowrap">
-                              Contact for quote
-                            </span>
-                          )}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-[10px] tracking-[0.25em] text-bj-text-body opacity-60 uppercase font-sans">
-                Rates unavailable
-              </p>
-            )}
-
-            <div className="mt-6 pt-4 border-t border-white/5">
-              <span className="rt-updated text-[11px] tracking-[0.04em] text-bj-text-muted">
-                {updatedLabel ? `Updated: ${updatedLabel}` : 'Rates updated daily'}
-              </span>
-            </div>
-          </div>
         </div>
       </div>
     </div>
