@@ -168,14 +168,14 @@ function HeroSlider({ banners, groupRates = null }: { banners: any[]; groupRates
 
   return (
     <div
-      className={`${cormorant.variable} ${cormorantSC.variable} ${notoDevanagari.variable} hero-section min-h-[80vh] w-full text-bj-text-heading relative overflow-hidden font-serif-editorial flex flex-col px-6 md:px-10 lg:px-16 2xl:px-24 pb-0`}
+      className={`${cormorant.variable} ${cormorantSC.variable} ${notoDevanagari.variable} hero-section min-h-0 md:min-h-[80vh] w-full text-bj-text-heading relative overflow-hidden font-serif-editorial flex flex-col px-6 md:px-10 lg:px-16 2xl:px-24 pb-0`}
     >
       <HeroAnimations />
       <AmbientParticles />
 
-      <div className="relative z-10 flex flex-1 flex-col md:flex-row gap-3 md:gap-4 mt-2 md:mt-3 items-stretch">
+      <div className="relative z-10 flex md:flex-1 flex-col md:flex-row gap-2 md:gap-4 mt-1 md:mt-3 items-stretch">
         {/* Left 65% — hero banner. Mobile: top 50%. */}
-        <div className="relative overflow-hidden rounded-xl md:rounded-2xl flex-1 md:flex-none md:basis-[65%] md:max-w-[65%] min-h-[38vh] md:min-h-[60vh]">
+        <div className="relative overflow-hidden rounded-xl md:rounded-2xl flex-none shrink-0 md:flex-none md:basis-[65%] md:max-w-[65%] min-h-[38vh] md:min-h-[60vh]">
           {banners.map((banner, i) => (
             <div
               key={i}
@@ -188,48 +188,27 @@ function HeroSlider({ banners, groupRates = null }: { banners: any[]; groupRates
             </div>
           ))}
 
-          <div className="absolute bottom-4 right-4 md:bottom-6 md:right-6 z-30">
+          <div className="absolute bottom-4 right-4 md:hidden z-30">
             <Button variant="primary" size="sm" magnetic className="hero-btn" icon={<ArrowRight />} onClick={() => navigate(active)}>
               {active?.type === 'item' ? 'Shop' : 'Explore'}
             </Button>
           </div>
         </div>
 
+        {/* Desktop-only banner button — pure overlay straddling the banner's right edge. */}
+        <div className="hidden md:block absolute bottom-6 right-[calc(35%+1rem)] translate-x-[95%] z-30">
+          <Button variant="primary" size="sm" magnetic className="hero-btn" icon={<ArrowRight />} onClick={() => navigate(active)}>
+            {active?.type === 'item' ? 'Shop' : 'Explore'}
+          </Button>
+        </div>
+
         {/* Mobile-only dots: just below the hero banner, above the personalize card. */}
-        <div className="flex md:hidden items-center justify-center gap-2 pt-1">
+        <div className="flex md:hidden shrink-0 flex-none items-center justify-center gap-2 pt-1">
           {renderDots('m')}
         </div>
 
-        {/* Mobile personalize CTA — modern button replacing the image card on small screens. */}
-        <button
-          onClick={() => router.push('/personalize')}
-          aria-label="Personalize your jewellery"
-          className="group md:hidden relative w-full overflow-hidden rounded-2xl border border-[#c9a96e]/35 bg-[#14100a] px-5 py-4 text-left shadow-[0_10px_40px_-12px_rgba(201,169,110,0.45)] transition-all duration-300 active:scale-[0.98]"
-        >
-          <span className="pointer-events-none absolute inset-0 bg-gradient-to-r from-transparent via-[#c9a96e]/[0.12] to-transparent bg-[length:250%_100%] animate-[pz-sheen_3.5s_ease-in-out_infinite]" />
-          <span className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-[#e9cf8f]/80 to-transparent" />
-          <span className="relative flex items-center gap-4">
-            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#e9cf8f] to-[#9a7b38] text-[#0a0806] shadow-md">
-              <Sparkle size={16} />
-            </span>
-            <span className="flex flex-1 flex-col">
-              <span className="font-sans text-[9px] tracking-[0.35em] uppercase text-[#c9a96e]/80">Make it yours</span>
-              <span className="font-serif-editorial italic text-2xl font-light leading-tight text-[#f3e9d2]">Personalize</span>
-            </span>
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#c9a96e]/40 text-[#e9cf8f] transition-transform duration-300 group-hover:translate-x-1">
-              <ArrowRight size={14} />
-            </span>
-          </span>
-          <style>{`
-            @keyframes pz-sheen {
-              0% { background-position: 150% 0; }
-              60%, 100% { background-position: -50% 0; }
-            }
-          `}</style>
-        </button>
-
-        {/* Mobile collapsible rates — directly below the personalize button. */}
-        <div className="md:hidden w-full overflow-hidden rounded-2xl border border-[#c9a96e]/35 bg-[#14100a]">
+        {/* Mobile collapsible rates — above the personalize button. */}
+        <div className="md:hidden w-full shrink-0 flex-none overflow-hidden rounded-2xl border border-[#c9a96e]/35 bg-[#14100a]">
           <button
             onClick={() => setRatesOpen((v) => !v)}
             aria-expanded={ratesOpen}
@@ -257,13 +236,41 @@ function HeroSlider({ banners, groupRates = null }: { banners: any[]; groupRates
           </div>
         </div>
 
-        {/* Right 35% — Personalize image card + rates card (desktop only). */}
+        {/* Mobile personalize CTA — modern button below the rates card on small screens. */}
+        <button
+          onClick={() => router.push('/personalize')}
+          aria-label="Personalize your jewellery"
+          className="group md:hidden relative w-full shrink-0 flex-none overflow-hidden rounded-2xl border border-[#c9a96e]/35 bg-[#14100a] px-5 py-4 text-left shadow-[0_10px_40px_-12px_rgba(201,169,110,0.45)] transition-all duration-300 active:scale-[0.98]"
+        >
+          <span className="pointer-events-none absolute inset-0 bg-gradient-to-r from-transparent via-[#c9a96e]/[0.12] to-transparent bg-[length:250%_100%] animate-[pz-sheen_3.5s_ease-in-out_infinite]" />
+          <span className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-[#e9cf8f]/80 to-transparent" />
+          <span className="relative flex items-center gap-4">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#e9cf8f] to-[#9a7b38] text-[#0a0806] shadow-md">
+              <Sparkle size={16} />
+            </span>
+            <span className="flex flex-1 flex-col">
+              <span className="font-sans text-[9px] tracking-[0.35em] uppercase text-[#c9a96e]/80">Make it yours</span>
+              <span className="font-serif-editorial italic text-2xl font-light leading-tight text-[#f3e9d2]">Personalize</span>
+            </span>
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#c9a96e]/40 text-[#e9cf8f] transition-transform duration-300 group-hover:translate-x-1">
+              <ArrowRight size={14} />
+            </span>
+          </span>
+          <style>{`
+            @keyframes pz-sheen {
+              0% { background-position: 150% 0; }
+              60%, 100% { background-position: -50% 0; }
+            }
+          `}</style>
+        </button>
+
+        {/* Right 35% — Rates card + personalize image card (desktop only). */}
         <div className="hidden md:flex md:flex-none md:basis-[35%] md:max-w-[35%] flex-col gap-3 md:gap-4 md:h-[60vh] md:min-h-[60vh] w-full shrink-0 min-h-0">
-          <div className="relative w-full h-[42%] shrink-0 min-h-0">
-            <PersonalizeCard className="md:min-h-0" />
-          </div>
           <div className="flex-1 min-h-0 flex">
             <RatesCard groupRates={groupRates} variant="compact" className="w-full h-full overflow-hidden" />
+          </div>
+          <div className="relative w-full h-[42%] shrink-0 min-h-0">
+            <PersonalizeCard className="md:min-h-0" />
           </div>
         </div>
       </div>

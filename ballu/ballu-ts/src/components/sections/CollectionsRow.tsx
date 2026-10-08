@@ -27,15 +27,16 @@ export default function CollectionsRow() {
     .slice(0, 8);
 
   return (
-    <div className="text-bj-text-heading min-h-[30vh] flex flex-col justify-end bg-bj-bg-secondary">
-      <div className="max-w-7xl w-full mx-auto px-6 md:px-12 lg:px-16 pt-4 pb-4">
-        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-8">
-          <div className="flex flex-col space-y-3 max-w-4xl">
-            <h1 className={`${cormorantSC.variable} ${cormorant.variable} antialiased collections-row-heading text-[clamp(1.8rem,5vw,3.5rem)] font-light leading-[1.1] text-bj-text-heading tracking-tight font-serif-editorial`}>
+    <div className="text-bj-text-heading min-h-0 md:min-h-[30vh] flex flex-col justify-start md:justify-end bg-bj-bg-secondary">
+      <div className="max-w-7xl w-full mx-auto px-6 md:px-12 lg:px-16 pt-3 md:pt-6 pb-0 md:pb-2 text-center md:text-left">
+        <div className="flex flex-col items-center md:flex-row md:items-end md:justify-between gap-0">
+          <div className="flex flex-col items-center md:items-start space-y-0 max-w-4xl">
+            <h1 className={`${cormorantSC.variable} ${cormorant.variable} antialiased collections-row-heading text-[clamp(1.4rem,3.5vw,2.4rem)] font-light leading-[1.15] text-bj-text-heading max-md:text-bj-gold-rich tracking-tight font-serif-editorial`}>
               <span className="block fade-in-up" style={{ animationDelay: '0ms' }}>
                 The Collections
               </span>
             </h1>
+            <span aria-hidden="true" className="md:hidden mx-auto mt-1 mb-2 block h-px w-12 bg-bj-gold/60" />
           </div>
         </div>
       </div>
