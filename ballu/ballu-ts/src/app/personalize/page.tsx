@@ -196,22 +196,43 @@ export default function CommissionPage() {
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-bj-bg text-bj-text-alt antialiased">
-      <div className="w-full md:w-[45%] lg:w-[40%] relative flex flex-col justify-end p-6 sm:p-10 md:p-16 overflow-hidden min-h-[360px] sm:min-h-[450px] md:min-h-screen bg-[radial-gradient(circle_at_35%_35%,_#fbe4b5_0%,_#cda274_20%,_#6e5229_45%,_#16110a_100%)] shadow-[inset_0_-20px_40px_rgba(0,0,0,0.6)] md:shadow-[inset_-20px_0_40px_rgba(0,0,0,0.5)] border-b md:border-b-0 md:border-r border-bj-border-light">
+      <div className="pz-hero hidden md:flex w-full md:w-[45%] lg:w-[40%] relative flex-col justify-end p-5 sm:p-10 md:p-16 overflow-hidden min-h-[230px] sm:min-h-[450px] md:min-h-screen bg-[radial-gradient(circle_at_35%_35%,_#fbe4b5_0%,_#cda274_20%,_#6e5229_45%,_#16110a_100%)] shadow-[inset_0_-20px_40px_rgba(0,0,0,0.6)] md:shadow-[inset_-20px_0_40px_rgba(0,0,0,0.5)] border-b md:border-b-0 md:border-r border-bj-border-light">
+        <style>{`
+          /* Keep the artwork panel identical to dark mode when the light theme is on. */
+          [data-theme="light"] .pz-hero {
+            border-color: #1f1a10 !important;
+          }
+          [data-theme="light"] .pz-hero .pz-title {
+            color: #fbf7f0 !important;
+            font-weight: 300 !important;
+          }
+          [data-theme="light"] .pz-hero .pz-sub {
+            color: #e2d5c3 !important;
+            opacity: 0.8 !important;
+          }
+          [data-theme="light"] .pz-hero .pz-star {
+            color: #cda274 !important;
+            opacity: 0.8 !important;
+          }
+        `}</style>
         <div className="absolute top-[35%] left-[35%] -translate-x-1/2 -translate-y-1/2 w-[35%] h-[35%] rounded-full border border-white/10 pointer-events-none"></div>
         <div className="absolute top-[35%] left-[35%] -translate-x-1/2 -translate-y-1/2 w-[60%] h-[60%] rounded-full border border-white/5 pointer-events-none"></div>
         <div className="absolute top-[35%] left-[35%] -translate-x-1/2 -translate-y-1/2 w-[85%] h-[85%] rounded-full border border-white/[0.02] pointer-events-none"></div>
 
         <div className="relative z-10 max-w-sm mt-auto pb-2">
-          <FiStar className="text-[#cda274] mb-4 md:mb-6 opacity-80" size={16} />
-          <h1 className={`${cormorant.className} text-[42px] sm:text-[56px] lg:text-[72px] leading-[1.1] md:leading-[1.05] text-bj-text-heading tracking-tight mb-2 font-light`}>
+          <FiStar className="pz-star text-[#cda274] mb-4 md:mb-6 opacity-80" size={16} />
+          <h1 className={`pz-title ${cormorant.className} text-[34px] sm:text-[56px] lg:text-[72px] leading-[1.1] md:leading-[1.05] text-bj-text-heading tracking-tight mb-2 font-light`}>
             Commission<br />a piece.
           </h1>
-          <p className="italic font-serif text-[16px] sm:text-[18px] text-bj-text-body opacity-80 mb-4 md:mb-8 tracking-wide">
+          <p className="pz-sub italic font-serif text-[16px] sm:text-[18px] text-bj-text-body opacity-80 mb-2 md:mb-8 tracking-wide">
             विशेष अर्डर
           </p>
           
         </div>
-        <div className="absolute bottom-0 left-0 right-0 h-2/3 bg-gradient-to-t from-bj-bg-card to-transparent pointer-events-none" />
+        <div
+          className="pz-fade absolute bottom-0 left-0 right-0 h-2/3 pointer-events-none"
+          style={{ background: 'linear-gradient(to top, #080605, transparent)' }}
+        />
       </div>
 
       <div className="w-full md:w-[55%] lg:w-[60%] flex flex-col justify-center px-4 py-10 sm:px-10 md:px-16 lg:px-24">

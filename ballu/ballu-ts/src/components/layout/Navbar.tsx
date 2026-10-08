@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import React, { useState, useEffect } from 'react';
 import { Cormorant_Garamond, Cormorant_SC } from 'next/font/google';
 import { FiSearch, FiMenu, FiX, FiSun, FiMoon, FiChevronRight } from 'react-icons/fi';
@@ -127,11 +128,24 @@ function DesktopNav({ links }: { links: readonly { href: string; label: string }
   );
 }
 
+export function isNavActive(pathname: string | null, href: string): boolean {
+  if (!pathname) return false;
+  const path = pathname.split('?')[0].replace(/\/+$/, '') || '/';
+  const target = href.replace(/\/+$/, '') || '/';
+  if (target === '/') return path === '/';
+  return path === target || path.startsWith(`${target}/`);
+}
+
 function NavLink({ href, children }: { href: string; children: React.ReactNode }) {
+  const pathname = usePathname();
+  const active = isNavActive(pathname, href);
   return (
     <Link
       href={href}
-      className="relative nav-link text-[13px] tracking-[4px] uppercase text-bj-text-nav hover:font-semibold active:text-[#b99755] transition-colors duration-300"
+      aria-current={active ? 'page' : undefined}
+      className={`relative nav-link text-[13px] tracking-[4px] uppercase transition-colors duration-300 hover:font-semibold active:text-[#b99755] ${
+        active ? 'nav-link-active font-semibold text-bj-gold-rich' : 'text-bj-text-nav'
+      }`}
       >
       {children}
     </Link>
@@ -163,6 +177,7 @@ function MobileMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
   const [subItems, setSubItems] = useState<SubNavItem[]>([]);
   const [expanded, setExpanded] = useState<string | null>(null);
   const { data: settings } = useStoreSettings();
+  const pathname = usePathname();
 
   useEffect(() => {
     let cancelled = false;
@@ -218,16 +233,24 @@ function MobileMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
         <div className="mm-body flex-1 overflow-y-auto no-scrollbar bg-bj-bg">
           <nav className="flex flex-col">
             <div className="flex flex-col gap-3 px-5 py-5">
-              {primaryLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  onClick={close}
-                  className="flex h-12 items-center justify-center rounded-full border border-bj-gold-rich/50 bg-bj-gold-rich/10 text-[13px] tracking-[0.2em] uppercase text-bj-gold-rich transition-all duration-300 hover:bg-bj-gold-rich hover:text-bj-bg-secondary"
-                >
-                  {link.label}
-                </Link>
-              ))}
+              {primaryLinks.map((link) => {
+                const active = isNavActive(pathname, link.href);
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    onClick={close}
+                    aria-current={active ? 'page' : undefined}
+                    className={`flex h-12 items-center justify-center rounded-full border text-[13px] tracking-[0.2em] uppercase transition-all duration-300 ${
+                      active
+                        ? 'border-bj-gold-rich bg-bj-gold-rich font-semibold text-bj-bg-secondary'
+                        : 'border-bj-gold-rich/50 bg-bj-gold-rich/10 text-bj-gold-rich hover:bg-bj-gold-rich hover:text-bj-bg-secondary'
+                    }`}
+                  >
+                    {link.label}
+                  </Link>
+                );
+              })}
             </div>
 
             <div className="flex flex-col gap-3 px-5 py-5">
