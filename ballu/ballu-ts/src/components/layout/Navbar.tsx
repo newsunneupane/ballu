@@ -249,14 +249,36 @@ function MobileMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
     return () => clearTimeout(t);
   }, [isOpen]);
 
+  // Close on Escape for drawer UX.
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [isOpen, onClose]);
+
   if (!mounted || !renderMenu) return null;
 
   const menu = (
-    <div
-      className={`bj-mobile-menu md:hidden fixed inset-0 h-[100dvh] bg-bj-bg-secondary/98 backdrop-blur-lg transition-all duration-500 ease-in-out overflow-y-auto z-[60] no-scrollbar overscroll-contain [-webkit-overflow-scrolling:touch] ${
-        isOpen ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible -translate-y-full'
-      }`}
-    >
+    <>
+      {/* Backdrop = the visible gap on the right. Tapping it closes the menu. */}
+      <div
+        aria-hidden
+        onClick={close}
+        className={`md:hidden fixed inset-0 z-[60] bg-black/45 transition-opacity duration-500 ease-in-out ${
+          isOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
+        }`}
+      />
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label="Menu"
+        className={`bj-mobile-menu md:hidden fixed left-0 top-0 h-[100dvh] w-[87vw] max-w-[340px] bg-bj-bg-secondary/98 backdrop-blur-lg transition-all duration-500 ease-in-out overflow-y-auto z-[61] no-scrollbar overscroll-contain [-webkit-overflow-scrolling:touch] shadow-2xl ${
+          isOpen ? 'opacity-100 visible translate-x-0' : 'opacity-0 invisible -translate-x-full'
+        }`}
+      >
       <div className="flex flex-col h-full">
         <div className="mm-header sticky top-0 z-20 flex items-center justify-between px-5 h-16 bg-bj-bg-secondary/95 backdrop-blur border-b border-bj-border shrink-0">
           <Link
@@ -281,7 +303,7 @@ function MobileMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
 
         <div className="mm-body flex-1 overflow-y-auto no-scrollbar bg-bj-bg">
           <nav className="flex flex-col">
-            <div className="flex flex-col gap-3 px-5 py-5">
+            <div className="flex flex-col gap-0.5 px-5 py-4">
               {primaryLinks.map((link) => {
                 const active = isNavActive(pathname, link.href);
                 return (
@@ -290,19 +312,20 @@ function MobileMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
                     href={link.href}
                     onClick={close}
                     aria-current={active ? 'page' : undefined}
-                    className={`mm-primary flex h-12 items-center justify-center rounded-full border text-[13px] tracking-[0.2em] uppercase transition-all duration-300 shadow-sm font-semibold ${
-                      active
-                        ? 'mm-primary-active border-[#7a0000] bg-[#7a0000] text-white shadow-[0_8px_20px_-8px_rgba(122,0,0,.7)]'
-                        : 'border-[#cc0000] bg-[#cc0000] text-white active:bg-[#990000] active:border-[#990000]'
+                    className={`mm-primary flex items-center justify-start rounded-md px-1 py-2 text-[11px] tracking-[0.18em] uppercase font-medium transition-colors duration-200 ${
+                      active ? 'mm-primary-active' : ''
                     }`}
                   >
                     {link.label}
+                    <span aria-hidden className="mm-primary-arrow ml-auto text-[11px] leading-none">
+                      →
+                    </span>
                   </Link>
                 );
               })}
             </div>
 
-            <div className="flex flex-col gap-3 px-5 py-5">
+            <div className="flex flex-col gap-0.5 px-5 py-4">
               <p className="mm-muted px-1 pb-1 text-[11px] tracking-[0.3em] uppercase text-bj-text-muted">
                 Browse the collection
               </p>
@@ -315,16 +338,15 @@ function MobileMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
                       type="button"
                       onClick={() => toggle(item.label)}
                       aria-expanded={open}
-                      className={`mm-subbtn flex w-full items-center justify-between h-12 rounded-xl border px-5 text-[13px] tracking-[0.2em] uppercase transition-all duration-300 ${
-                        open
-                          ? 'mm-open border-[#7a0000] bg-[#7a0000] text-white shadow-[0_8px_20px_-8px_rgba(122,0,0,.7)]'
-                          : 'border-[#cc0000] bg-[#cc0000] text-white active:bg-[#990000] active:border-[#990000]'
+                      className={`mm-subbtn flex w-full items-center justify-start gap-2 rounded-md px-1 py-2 text-[11px] tracking-[0.18em] uppercase font-medium transition-colors duration-200 ${
+                        open ? 'mm-open' : ''
                       }`}
                     >
                       <span>{item.label}</span>
                       <FiChevronRight
-                        className={`h-4 w-4 transition-transform duration-300 ${
-                          open ? 'rotate-90' : ''
+                        size={12}
+                        className={`ml-auto shrink-0 transition-transform duration-300 ${
+                          open ? '-rotate-90' : 'rotate-90'
                         }`}
                       />
                     </button>
@@ -345,28 +367,21 @@ function MobileMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
           </nav>
         </div>
 
-        <div className="mm-footer shrink-0 border-t border-bj-border bg-bj-bg-secondary px-5 py-4">
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex flex-col">
-              <span className="text-[12px] tracking-[0.15em] text-bj-text-nav">{SITE.fullName}</span>
-              <span className="text-[10px] tracking-[0.3em] uppercase text-bj-text-muted">
-                Est. {SITE.est} · {SITE.location}
-              </span>
-            </div>
-            <a
-              href={whatsappBaseUrl(whatsappNumber(settings))}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={onClose}
-              className="inline-flex items-center gap-2 rounded-full border border-[#25D366] bg-[#25D366] px-4 py-2 text-[11px] tracking-[0.15em] uppercase text-white transition-colors duration-300 active:bg-[#1ebe5b]"
-            >
-              <FaWhatsapp size={14} />
-              WhatsApp
-            </a>
-          </div>
+        <div className="mm-footer shrink-0 border-t border-bj-border bg-bj-bg-secondary px-4 py-2 min-h-[48px] flex items-center justify-center">
+          <a
+            href={whatsappBaseUrl(whatsappNumber(settings))}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={onClose}
+            className="inline-flex items-center gap-1.5 rounded-full border border-[#25D366] bg-[#25D366] px-3 py-1.5 text-[10px] tracking-[0.12em] uppercase text-white transition-colors duration-300 active:bg-[#1ebe5b]"
+          >
+            <FaWhatsapp size={12} />
+            WhatsApp
+          </a>
         </div>
       </div>
     </div>
+    </>
   );
 
   return createPortal(menu, document.body);

@@ -177,21 +177,31 @@ function HeroSlider({ banners, groupRates = null }: { banners: any[]; groupRates
 
   return (
     <div
-      className={`${cormorant.variable} ${cormorantSC.variable} ${notoDevanagari.variable} hero-section min-h-0 md:min-h-[80vh] w-full text-bj-text-heading relative overflow-hidden font-serif-editorial flex flex-col px-6 md:px-10 lg:px-16 2xl:px-24 pb-0`}
+      className={`${cormorant.variable} ${cormorantSC.variable} ${notoDevanagari.variable} hero-section min-h-0 md:min-h-[80vh] w-full text-bj-text-heading relative overflow-hidden font-serif-editorial flex flex-col px-0 md:pl-0 md:pr-10 lg:pr-16 2xl:pr-24 pb-0`}
     >
       <HeroAnimations />
       <AmbientParticles />
 
-      <div className="relative z-10 flex md:flex-1 flex-col md:flex-row gap-2 md:gap-4 mt-1 md:mt-3 items-stretch">
-        {/* Left 65% — hero banner. Mobile: top 50%. */}
-        <div className="relative overflow-hidden rounded-xl md:rounded-2xl flex-none shrink-0 md:flex-none md:basis-[65%] md:max-w-[65%] min-h-[38vh] md:min-h-[60vh]">
+      <div className="relative z-10 flex md:flex-1 flex-col md:flex-row gap-2 md:gap-4 mt-0 md:mt-0 items-stretch">
+        {/* Left 65% — hero banner. Full-bleed to top + left, sharp corners, no crop on mobile. */}
+        <div className="relative overflow-hidden rounded-none flex-none shrink-0 md:flex-none md:basis-[65%] md:max-w-[65%] min-h-0 md:min-h-[60vh] grid mx-0 w-full md:w-auto">
           {banners.map((banner, i) => (
             <div
               key={i}
-              className={`absolute inset-0 transition-opacity duration-1000 ${i === activeIndex ? 'opacity-100' : 'opacity-0'}`}
+              className={`col-start-1 row-start-1 transition-opacity duration-1000 ${i === activeIndex ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'}`}
+              aria-hidden={i === activeIndex ? undefined : true}
             >
+              {/* Mobile: natural-height full-width image — zero cropping, edge-to-edge. */}
+              <img
+                src={cloudinaryUrl(banner.image, { width: 1080 })}
+                alt={banner?.name || 'hero banner'}
+                className="block w-full h-auto md:hidden bg-bj-bg-hero"
+                loading={i === 0 ? 'eager' : 'lazy'}
+                draggable={false}
+              />
+              {/* Desktop: keep cover banner unchanged. */}
               <div
-                className="absolute inset-0 bg-bj-bg-hero bg-cover bg-center"
+                className="hidden md:block w-full h-full min-h-[60vh] bg-bj-bg-hero bg-cover bg-center"
                 style={{ backgroundImage: `url(${cloudinaryUrl(banner.image, { width: 1920, aspect: '16:9' })})` }}
               />
             </div>
@@ -212,12 +222,12 @@ function HeroSlider({ banners, groupRates = null }: { banners: any[]; groupRates
         </div>
 
         {/* Mobile-only dots: just below the hero banner, above the personalize card. */}
-        <div className="flex md:hidden shrink-0 flex-none items-center justify-center gap-2 pt-1">
+        <div className="flex md:hidden shrink-0 flex-none items-center justify-center gap-2 pt-1 px-6">
           {renderDots('m')}
         </div>
 
         {/* Mobile collapsible rates — above the personalize button. */}
-        <div className="md:hidden w-full shrink-0 flex-none overflow-hidden rounded-2xl border border-[#c9a96e]/35 bg-[#14100a]">
+        <div className="md:hidden w-auto shrink-0 flex-none overflow-hidden rounded-2xl border border-[#c9a96e]/35 bg-[#14100a] mx-6">
           <button
             onClick={() => setRatesOpen((v) => !v)}
             aria-expanded={ratesOpen}
@@ -249,7 +259,7 @@ function HeroSlider({ banners, groupRates = null }: { banners: any[]; groupRates
         <button
           onClick={() => router.push('/personalize')}
           aria-label="Personalize your jewellery"
-          className="group md:hidden relative w-full shrink-0 flex-none overflow-hidden rounded-2xl border border-[#c9a96e]/35 bg-[#14100a] px-5 py-4 text-left shadow-[0_10px_40px_-12px_rgba(201,169,110,0.45)] transition-all duration-300 active:scale-[0.98]"
+          className="group md:hidden relative w-auto shrink-0 flex-none overflow-hidden rounded-2xl border border-[#c9a96e]/35 bg-[#14100a] px-5 py-4 mx-6 text-left shadow-[0_10px_40px_-12px_rgba(201,169,110,0.45)] transition-all duration-300 active:scale-[0.98]"
         >
           <span className="pointer-events-none absolute inset-0 bg-gradient-to-r from-transparent via-[#c9a96e]/[0.12] to-transparent bg-[length:250%_100%] animate-[pz-sheen_3.5s_ease-in-out_infinite]" />
           <span className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-[#e9cf8f]/80 to-transparent" />
@@ -284,7 +294,7 @@ function HeroSlider({ banners, groupRates = null }: { banners: any[]; groupRates
         </div>
       </div>
 
-      <div className="relative z-20 hidden md:flex items-center justify-center md:justify-start md:w-[65%] gap-2 pt-2">
+      <div className="relative z-20 hidden md:flex items-center justify-center md:w-[65%] gap-2 pt-3 md:pt-3 md:pb-5">
         {renderDots('d')}
       </div>
     </div>
