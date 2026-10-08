@@ -166,7 +166,7 @@ function HeroSlider({ banners }: { banners: any[] }) {
 
   return (
     <div
-      className={`${cormorant.variable} ${cormorantSC.variable} ${notoDevanagari.variable} hero-section min-h-[80vh] w-full text-bj-text-heading relative overflow-hidden font-serif-editorial flex flex-col px-6 md:px-10 lg:px-16 2xl:px-24 pb-3 md:pb-4`}
+      className={`${cormorant.variable} ${cormorantSC.variable} ${notoDevanagari.variable} hero-section min-h-[80vh] w-full text-bj-text-heading relative overflow-hidden font-serif-editorial flex flex-col px-6 md:px-10 lg:px-16 2xl:px-24 pb-0`}
     >
       <HeroAnimations />
       <AmbientParticles />

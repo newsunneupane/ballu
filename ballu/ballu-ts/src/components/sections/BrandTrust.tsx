@@ -43,7 +43,7 @@ export default function BrandTrust({ groupRates }: { groupRates: GroupRate[] | n
         [data-theme="light"] .brand-rates-card .rt-updated { color: #6b655b !important; opacity: 0.75; }
         [data-theme="light"] .brand-rates-card .rt-row { border-color: rgba(0,0,0,0.08) !important; }
       `}</style>
-      <div className="max-w-7xl w-full  mx-auto px-6 md:px-12 lg:px-16 pt-10 pb-40 flex flex-col items-center text-center relative overflow-hidden">
+      <div className="max-w-7xl w-full  mx-auto px-6 md:px-12 lg:px-16 pt-6 pb-40 flex flex-col items-center text-center relative overflow-hidden">
        
 
         <p className={`${cormorant.className} italic text-[clamp(1.5rem,4vw,2.5rem)] font-light tracking-wide max-w-4xl text-bj-text-body leading-relaxed mb-4 relative z-10`}>
@@ -127,7 +127,7 @@ function FeatureGrid({ groupRates }: { groupRates: GroupRate[] | null }) {
 
   return (
     <div className="brand-grid w-full   relative z-10 bg-bj-bg-secondary">
-      <div className="max-w-3xl w-full mx-auto px-6 md:px-12 lg:px-16 pb-10 md:pb-14 grid grid-cols-1 gap-10 items-center">
+      <div className="max-w-3xl w-full mx-auto px-6 md:px-12 lg:px-16 pb-6 grid grid-cols-1 gap-10 items-center">
         <div className="order-1">
           <div className="brand-rates-card rounded-2xl border border-bj-border bg-bj-bg-elevated p-6 md:p-8">
             <div className="flex items-center gap-3 mb-6">

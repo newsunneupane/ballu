@@ -28,7 +28,7 @@ export default function CollectionsRow() {
 
   return (
     <div className="text-bj-text-heading min-h-[30vh] flex flex-col justify-end bg-bj-bg-secondary">
-      <div className="max-w-7xl w-full mx-auto px-6 md:px-12 lg:px-16 pt-16 pb-8">
+      <div className="max-w-7xl w-full mx-auto px-6 md:px-12 lg:px-16 pt-6 pb-8">
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-8">
           <div className="flex flex-col space-y-3 max-w-4xl">
             <h1 className={`${cormorantSC.variable} ${cormorant.variable} antialiased collections-row-heading text-[clamp(1.8rem,5vw,3.5rem)] font-light leading-[1.1] text-bj-text-heading tracking-tight font-serif-editorial`}>
