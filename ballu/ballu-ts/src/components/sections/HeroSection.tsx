@@ -33,7 +33,11 @@ const notoDevanagari = Noto_Serif_Devanagari({
 
 export default function HeroSection({ groupRates = null }: { groupRates?: GroupRate[] | null }) {
   const { data: settings } = useStoreSettings();
-  const banners = settings?.heroBanners?.length ? settings.heroBanners : null;
+  const rawBanners = settings?.heroBanners?.length ? settings.heroBanners : null;
+  // Catalogue (no-filter) banners always show first, preserving admin order otherwise.
+  const banners = rawBanners
+    ? [...rawBanners.filter((b: any) => b.type === 'catalogue'), ...rawBanners.filter((b: any) => b.type !== 'catalogue')]
+    : null;
 
   if (banners && banners.length > 0) {
     return <HeroSlider banners={banners} groupRates={groupRates} />;
@@ -154,6 +158,11 @@ function HeroSlider({ banners, groupRates = null }: { banners: any[]; groupRates
       router.push(`/catalogue/${banner.refId}`);
       return;
     }
+    // Plain catalogue slide: no filter params.
+    if (banner.type === 'catalogue') {
+      router.push('/catalogue');
+      return;
+    }
     const params = new URLSearchParams();
     if (banner.type === 'collection') params.set('collection', banner.name || '');
     else if (banner.type === 'material') params.set('material', banner.name || '');
@@ -230,7 +239,7 @@ function HeroSlider({ banners, groupRates = null }: { banners: any[]; groupRates
           >
             <div className="min-h-0 overflow-hidden">
               <div className="px-3 pb-3">
-                <RatesCard groupRates={groupRates} variant="compact" className="w-full h-auto border-white/10 bg-white/[0.03]" />
+                <RatesCard groupRates={groupRates} variant="compact" className="brand-rates-desktop w-full h-auto overflow-hidden" />
               </div>
             </div>
           </div>
@@ -267,7 +276,7 @@ function HeroSlider({ banners, groupRates = null }: { banners: any[]; groupRates
         {/* Right 35% — Rates card + personalize image card (desktop only). */}
         <div className="hidden md:flex md:flex-none md:basis-[35%] md:max-w-[35%] flex-col gap-3 md:gap-4 md:h-[60vh] md:min-h-[60vh] w-full shrink-0 min-h-0">
           <div className="flex-1 min-h-0 flex">
-            <RatesCard groupRates={groupRates} variant="compact" className="w-full h-full overflow-hidden" />
+            <RatesCard groupRates={groupRates} variant="compact" className="brand-rates-desktop w-full h-full overflow-hidden" />
           </div>
           <div className="relative w-full h-[42%] shrink-0 min-h-0">
             <PersonalizeCard className="md:min-h-0" />

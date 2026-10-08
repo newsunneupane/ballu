@@ -13,8 +13,8 @@ export interface StoreSettings {
     item?: any;
   };
   heroBanners?: {
-    type: 'collection' | 'material' | 'group' | 'item' | 'occasion';
-    refId: string;
+    type: 'collection' | 'material' | 'group' | 'item' | 'occasion' | 'catalogue';
+    refId?: string;
     image: string;
     title?: string;
     subtitle?: string;

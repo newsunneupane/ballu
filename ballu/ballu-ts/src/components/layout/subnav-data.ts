@@ -28,6 +28,9 @@ export interface PanelData {
   baseQuery: string;
 }
 
+/** Catch-all collection: never shown as a nav/panel card, but its page keeps working. */
+export const isOthersCollection = (name: string) => name.trim().toUpperCase() === 'OTHERS';
+
 export function buildNavItems(): SubNavItem[] {
   const products = productService.getAll();
   const materials = productService.getMaterialsList();
@@ -56,7 +59,7 @@ export function buildNavItems(): SubNavItem[] {
       const label = (c?.name?.en || '').trim();
       return { label, upper: label.toUpperCase(), count: colCount.get(label.toUpperCase()) || 0 };
     })
-    .filter((c) => c.label)
+    .filter((c) => c.label && !isOthersCollection(c.label))
     .sort((a, b) => b.count - a.count)
     .slice(0, 4)
     .map((c) => ({
@@ -172,10 +175,13 @@ export function getPanelData(item: SubNavItem): PanelData {
   let collections: PanelCollection[] = [];
   let items: any[] = [];
 
-  const allMetas = productService.getCollectionsList().map((c: any) => {
-    const raw = (c?.name?.en || '').trim();
-    return { name: raw, slug: collectionSlugOf(raw), image: c?.image, nepali: c?.name?.np };
-  });
+  const allMetas = productService
+    .getCollectionsList()
+    .map((c: any) => {
+      const raw = (c?.name?.en || '').trim();
+      return { name: raw, slug: collectionSlugOf(raw), image: c?.image, nepali: c?.name?.np };
+    })
+    .filter((c) => c.name && !isOthersCollection(c.name));
 
   if (materialParam) {
     const matUpper = materialParam.toUpperCase();

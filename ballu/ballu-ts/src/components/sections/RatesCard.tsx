@@ -69,6 +69,83 @@ export default function RatesCard({
         [data-theme="light"] .brand-rates-card .rt-empty { color: #6b655b !important; }
         [data-theme="light"] .brand-rates-card .rt-updated { color: #6b655b !important; opacity: 0.75; }
         [data-theme="light"] .brand-rates-card .rt-row { border-color: rgba(0,0,0,0.08) !important; }
+
+        /* Desktop hero rates: dark-luxe spotlight with gold glow (dark + light readable). */
+        .brand-rates-card.brand-rates-desktop {
+          position: relative;
+          isolation: isolate;
+          background:
+            radial-gradient(120% 90% at 20% 0%, rgba(233,207,143,0.16), transparent 55%),
+            radial-gradient(100% 80% at 90% 100%, rgba(212,168,87,0.14), transparent 60%),
+            linear-gradient(180deg, #1a130a 0%, #14100a 55%, #0f0c08 100%) !important;
+          border-color: rgba(201,169,110,0.45) !important;
+          box-shadow:
+            0 18px 60px -18px rgba(201,169,110,0.45),
+            0 0 0 1px rgba(0,0,0,0.4),
+            inset 0 1px 0 rgba(255,255,255,0.06) !important;
+        }
+        .brand-rates-card.brand-rates-desktop::before {
+          content: '';
+          position: absolute;
+          left: 2rem;
+          right: 2rem;
+          top: 0;
+          height: 1px;
+          background: linear-gradient(90deg, transparent, rgba(233,207,143,0.9), transparent);
+          pointer-events: none;
+        }
+        .brand-rates-card.brand-rates-desktop::after {
+          content: '';
+          position: absolute;
+          inset: 0;
+          z-index: 0;
+          background: linear-gradient(105deg, transparent 40%, rgba(233,207,143,0.08) 50%, transparent 60%);
+          pointer-events: none;
+        }
+        .brand-rates-card.brand-rates-desktop .rt-value {
+          color: #e9cf8f !important;
+          font-weight: 600;
+          text-shadow: 0 0 12px rgba(233,207,143,0.35);
+        }
+        .brand-rates-card.brand-rates-desktop .rt-updated {
+          font-size: 13px !important;
+          font-weight: 600;
+          letter-spacing: 0.04em;
+          opacity: 1;
+        }
+        [data-theme="light"] .brand-rates-card.brand-rates-desktop {
+          background: linear-gradient(180deg, #fffdf6 0%, #faf3e0 55%, #f5ead0 100%) !important;
+          border-color: rgba(184,137,48,0.5) !important;
+          box-shadow:
+            0 18px 50px -20px rgba(184,137,48,0.5),
+            inset 0 1px 0 rgba(255,255,255,0.8) !important;
+        }
+        [data-theme="light"] .brand-rates-card.brand-rates-desktop .rt-material {
+          color: #8a6a30 !important;
+          opacity: 1;
+          font-weight: 700;
+        }
+        [data-theme="light"] .brand-rates-card.brand-rates-desktop .rt-name {
+          color: #1c1c1c !important;
+          font-weight: 600;
+        }
+        [data-theme="light"] .brand-rates-card.brand-rates-desktop .rt-value {
+          color: #684209 !important;
+          font-weight: 700;
+          text-shadow: none;
+        }
+        [data-theme="light"] .brand-rates-card.brand-rates-desktop .rt-empty { color: #4a3d24 !important; }
+        [data-theme="light"] .brand-rates-card.brand-rates-desktop .rt-updated {
+          color: #1c1c1c !important;
+          font-size: 13px !important;
+          font-weight: 600;
+          opacity: 1;
+        }
+        [data-theme="light"] .brand-rates-card.brand-rates-desktop .rt-row {
+          border-color: rgba(104,66,9,0.18) !important;
+        }
+
+
       `}</style>
     <div
       className={`brand-rates-card rounded-2xl border border-bj-border bg-bj-bg-elevated flex flex-col min-h-0 ${
@@ -130,7 +207,7 @@ export default function RatesCard({
       </div>
 
       <div className={`${compact ? 'mt-4 pt-3' : 'mt-6 pt-4'} border-t border-white/5`}>
-        <span className="rt-updated text-[11px] tracking-[0.04em] text-bj-text-muted">
+        <span className="rt-updated text-[13px] font-medium tracking-[0.04em] text-bj-text-muted">
           {updatedLabel ? `Updated: ${updatedLabel}` : 'Rates updated daily'}
         </span>
       </div>

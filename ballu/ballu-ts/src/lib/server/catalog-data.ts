@@ -320,6 +320,11 @@ async function resolveHeroBanners(banners: any[]) {
   const resolved = await Promise.all(
     banners.map(async (banner) => {
       const result: any = { ...banner };
+      // Catalogue banners link to plain /catalogue and need no entity lookup.
+      if (banner.type === 'catalogue') {
+        if (!result.name && !result.title) result.name = 'Catalogue';
+        return result;
+      }
       if (!banner.refId) return result;
       try {
         if (banner.type === 'collection') {
@@ -361,7 +366,9 @@ async function resolveHeroBanners(banners: any[]) {
       return result.name ? result : null;
     })
   );
-  return resolved.filter(Boolean);
+  const list = resolved.filter(Boolean);
+  // Catalogue (no-filter) banners always show first, preserving order otherwise.
+  return [...list.filter((b: any) => b.type === 'catalogue'), ...list.filter((b: any) => b.type !== 'catalogue')];
 }
 
 export const getGroupRateData = unstable_cache(

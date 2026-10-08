@@ -7,7 +7,7 @@ import { cloudinaryUrl } from '@/lib/cloudinary';
 import SearchableSelect from '@/components/SearchableSelect';
 import { Save, Plus, X, ChevronUp, ChevronDown, ImagePlus, Loader2, Presentation } from 'lucide-react';
 
-type BannerType = 'collection' | 'material' | 'group' | 'item' | 'occasion';
+type BannerType = 'collection' | 'material' | 'group' | 'item' | 'occasion' | 'catalogue';
 
 interface Banner {
   type: BannerType;
@@ -19,6 +19,7 @@ interface Banner {
 
 const MAX_BANNERS = 8;
 const TYPE_OPTIONS: { value: BannerType; label: string }[] = [
+  { value: 'catalogue', label: 'Catalogue (all)' },
   { value: 'collection', label: 'Collection' },
   { value: 'material', label: 'Material' },
   { value: 'group', label: 'Group' },
@@ -123,6 +124,8 @@ export default function HeroBannerPage() {
 
   const entityOptions = (type: BannerType): { value: string; label: string }[] => {
     switch (type) {
+      case 'catalogue':
+        return [];
       case 'collection':
         return collections.map((c) => ({ value: c._id, label: c.name?.en || '' }));
       case 'material':
@@ -180,10 +183,10 @@ export default function HeroBannerPage() {
   const save = async () => {
     setSaveError('');
     const complete = banners
-      .filter((b) => b.type && b.refId && b.image.trim())
+      .filter((b) => b.type && (b.type === 'catalogue' || b.refId) && b.image.trim())
       .map((b) => ({
         type: b.type,
-        refId: b.refId,
+        ...(b.type === 'catalogue' ? {} : { refId: b.refId }),
         image: b.image.trim(),
         title: b.title?.trim() || undefined,
         subtitle: b.subtitle?.trim() || undefined,
@@ -194,7 +197,7 @@ export default function HeroBannerPage() {
     }
     const seen = new Set<string>();
     for (const b of complete) {
-      const key = `${b.type}:${b.refId}`;
+      const key = b.type === 'catalogue' ? 'catalogue:all' : `${b.type}:${b.refId}`;
       if (seen.has(key)) {
         setSaveError(`Can't create the duplicate item: the ${b.type} "${b.refId}" is already used in another banner.`);
         return;
@@ -220,8 +223,8 @@ export default function HeroBannerPage() {
         </button>
       </div>
       <p className="text-[11px] text-[#6b655b] mb-6">
-        Build a rotating homepage slider (up to {MAX_BANNERS} banners). Each banner links to a collection, material, material group, item, or occasion.
-        Order shown here is the slider order.
+        Build a rotating homepage slider (up to {MAX_BANNERS} banners). Each banner links to the plain catalogue, a collection, material, material group, item, or occasion.
+        Catalogue banners need no entity and always show first on the site; other banners follow in this order.
       </p>
 
       <input
@@ -276,13 +279,19 @@ export default function HeroBannerPage() {
               </div>
               <div>
                 <label className="block text-[10px] tracking-[0.2em] uppercase text-[#6b655b] mb-1.5">Link To</label>
-                <SearchableSelect
-                  value={banner.refId}
-                  onChange={(v) => updateBanner(index, { refId: v })}
-                  options={entityOptions(banner.type)}
-                  placeholder={`Select ${banner.type}`}
-                  clearLabel={`No ${banner.type}`}
-                />
+                {banner.type === 'catalogue' ? (
+                  <div className="w-full bg-[#faf8f4] border border-[#e5ded2] rounded px-3 py-2 text-sm text-[#6b655b]">
+                    Plain catalogue page (no filter) — always shows first on the site.
+                  </div>
+                ) : (
+                  <SearchableSelect
+                    value={banner.refId}
+                    onChange={(v) => updateBanner(index, { refId: v })}
+                    options={entityOptions(banner.type)}
+                    placeholder={`Select ${banner.type}`}
+                    clearLabel={`No ${banner.type}`}
+                  />
+                )}
               </div>
               <div>
                 <label className="block text-[10px] tracking-[0.2em] uppercase text-[#6b655b] mb-1.5">Title (optional)</label>
@@ -344,10 +353,16 @@ export default function HeroBannerPage() {
               </div>
             </div>
 
-            {banner.refId && banner.type && (
+            {banner.type === 'catalogue' ? (
               <div className="mt-3 text-[11px] text-[#6b655b]">
-                Target: <span className="text-[#b8860b]">{entityLabel(banner)}</span>
+                Target: <span className="text-[#b8860b]">/catalogue (no filter)</span>
               </div>
+            ) : (
+              banner.refId && banner.type && (
+                <div className="mt-3 text-[11px] text-[#6b655b]">
+                  Target: <span className="text-[#b8860b]">{entityLabel(banner)}</span>
+                </div>
+              )
             )}
           </div>
         ))}

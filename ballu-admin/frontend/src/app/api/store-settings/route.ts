@@ -16,12 +16,12 @@ function sanitizePieceOfTheWeek(pieceOfTheWeek: { item?: string; material?: stri
   };
 }
 
-const BANNER_TYPES = ['collection', 'material', 'group', 'item', 'occasion'];
+const BANNER_TYPES = ['collection', 'material', 'group', 'item', 'occasion', 'catalogue'];
 const MAX_BANNERS = 8;
 
 interface HeroBannerInput {
   type: string;
-  refId: string;
+  refId?: string;
   image: string;
   title?: string;
   subtitle?: string;
@@ -34,12 +34,15 @@ function sanitizeHeroBanners(banners: unknown): HeroBannerInput[] {
     .filter((b): b is HeroBannerInput => {
       const candidate = b as HeroBannerInput | null;
       if (!candidate) return false;
-      const valid =
-        BANNER_TYPES.includes(candidate.type) &&
-        isObjectId(candidate.refId) &&
-        typeof candidate.image === 'string' &&
-        candidate.image.trim().length > 0;
-      if (!valid) return false;
+      if (!BANNER_TYPES.includes(candidate.type)) return false;
+      if (typeof candidate.image !== 'string' || candidate.image.trim().length === 0) return false;
+      // Catalogue banners link to plain /catalogue and need no entity.
+      if (candidate.type === 'catalogue') {
+        if (seen.has('catalogue:all')) return false;
+        seen.add('catalogue:all');
+        return true;
+      }
+      if (!isObjectId(candidate.refId)) return false;
       const key = `${candidate.type}:${candidate.refId}`;
       if (seen.has(key)) return false;
       seen.add(key);
@@ -47,7 +50,7 @@ function sanitizeHeroBanners(banners: unknown): HeroBannerInput[] {
     })
     .map((b) => ({
       type: b.type,
-      refId: b.refId,
+      ...(b.type === 'catalogue' ? {} : { refId: b.refId }),
       image: b.image.trim(),
       title: typeof b.title === 'string' && b.title.trim() ? b.title.trim() : undefined,
       subtitle: typeof b.subtitle === 'string' && b.subtitle.trim() ? b.subtitle.trim() : undefined,
