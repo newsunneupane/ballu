@@ -191,7 +191,7 @@ function HeroSlider({ banners, groupRates = null }: { banners: any[]; groupRates
               className={`absolute inset-0 transition-opacity duration-1000 ${i === activeIndex ? 'opacity-100' : 'opacity-0'}`}
             >
               <div
-                className="absolute inset-0 bg-cover bg-center"
+                className="absolute inset-0 bg-bj-bg-hero bg-cover bg-center"
                 style={{ backgroundImage: `url(${cloudinaryUrl(banner.image, { width: 1920, aspect: '16:9' })})` }}
               />
             </div>
@@ -312,11 +312,11 @@ function FeaturedCard({ potw }: { potw: any }) {
         </div>
         {item?.images?.[0] ? (
           <div
-            className="w-[calc(100%-1rem)] aspect-[4/3] mb-3 mx-2 rounded-sm overflow-hidden group-hover:scale-110 transition-transform duration-500 bg-cover bg-center"
+            className="w-[calc(100%-1rem)] aspect-[4/3] mb-3 mx-2 rounded-sm overflow-hidden bg-bj-bg-elevated bg-cover bg-center"
             style={{ backgroundImage: `url(${cloudinaryUrl(item.images[0], { width: 640, aspect: '4:3' })})` }}
           />
         ) : (
-          <div className="w-[calc(100%-1rem)] aspect-[4/3] bg-linear-to-tr from-[#3a3127] to-[#5a4b3b] opacity-80 mb-3 mx-2 rounded-sm group-hover:scale-110 transition-transform duration-500" />
+          <div className="w-[calc(100%-1rem)] aspect-[4/3] bg-linear-to-tr from-[#3a3127] to-[#5a4b3b] opacity-80 mb-3 mx-2 rounded-sm" />
         )}
         <div className="space-y-1">
           <h3 className="text-[20px] mx-2 font-normal text-bj-text-heading">{item?.name?.en || 'Piece of the Week'}</h3>

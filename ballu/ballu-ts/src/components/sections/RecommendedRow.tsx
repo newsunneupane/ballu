@@ -37,11 +37,11 @@ export default function RecommendedRow() {
   if (!dataReady || products.length === 0) return null;
 
   return (
-    <div className="bg-bj-bg-elevated px-4 sm:px-6 md:px-16 lg:px-15 pt-6 md:pt-8 pb-8 md:pb-10">
+    <div className="bg-bj-bg-elevated px-3 sm:px-6 md:px-16 lg:px-15 pt-6 md:pt-8 pb-8 md:pb-10">
       <h2 className={`${cormorant.className} recommended-row-heading text-3xl md:text-4xl font-light text-bj-text-heading mb-5`}>
         {heading}
       </h2>
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
         {products.map((p) => (
           <ProductCard key={p.id} product={p} viewMode="GRID" />
         ))}

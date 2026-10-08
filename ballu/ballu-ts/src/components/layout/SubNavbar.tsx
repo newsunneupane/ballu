@@ -238,9 +238,9 @@ function CollectionCards({ cards, baseQuery, onClose }: { cards: PanelCollection
           <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg border border-bj-border bg-bj-bg-elevated">
             {card.image ? (
               <img
-                src={cloudinaryUrl(card.image, { width: 600 })}
+                src={cloudinaryUrl(card.image, { width: 600, aspect: '4:3' })}
                 alt={card.name}
-                className="h-full w-full object-cover transition-transform duration-500 group-hover/col:scale-105"
+                className="h-full w-full object-cover"
               />
             ) : (
               <div className="h-full w-full bg-gradient-to-br from-[#423722] to-[#1a140f]" />
@@ -272,9 +272,9 @@ function ItemCards({ items, onClose }: { items: any[]; onClose: () => void }) {
           <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg border border-bj-border bg-bj-bg-elevated">
             {product.images?.[0] ? (
               <img
-                src={cloudinaryUrl(product.images[0], { width: 600 })}
+                src={cloudinaryUrl(product.images[0], { width: 600, aspect: '4:3' })}
                 alt={product.title}
-                className="h-full w-full object-cover transition-transform duration-500 group-hover/item:scale-105"
+                className="h-full w-full object-cover"
               />
             ) : (
               <div className="h-full w-full bg-gradient-to-br from-[#423722] to-[#1a140f]" />
@@ -305,9 +305,9 @@ function OccasionCards({ cards, onClose }: { cards: PanelData['occasions']; onCl
           <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg border border-bj-border bg-bj-bg-elevated">
             {card.image ? (
               <img
-                src={cloudinaryUrl(card.image, { width: 600 })}
+                src={cloudinaryUrl(card.image, { width: 600, aspect: '4:3' })}
                 alt={card.name}
-                className="h-full w-full object-cover transition-transform duration-500 group-hover/occ:scale-105"
+                className="h-full w-full object-cover"
               />
             ) : (
               <div className="h-full w-full bg-gradient-to-br from-[#423722] to-[#1a140f]" />

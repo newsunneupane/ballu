@@ -139,11 +139,11 @@ export default function ProductDetail() {
               {images.length > 0 && (
                 <div className="absolute inset-0">
                   {images.map((src, i) => (
-                    <img
+                      <img
                       key={i}
                       src={cloudinaryUrl(src, { width: 900, aspect: '4:5' })}
                       alt={`${product.title} ${i + 1}`}
-                      className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ease-in-out ${i === activeIndex ? 'opacity-100' : 'opacity-0'}`}
+                      className={`absolute inset-0 w-full h-full object-cover bg-bj-bg-elevated transition-opacity duration-700 ease-in-out ${i === activeIndex ? 'opacity-100' : 'opacity-0'}`}
                     />
                   ))}
                 </div>

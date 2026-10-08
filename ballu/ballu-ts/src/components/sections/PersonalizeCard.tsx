@@ -22,7 +22,7 @@ export default function PersonalizeCard({ className = '', imgClassName = '' }: {
         <img
           src="/personalize.jpg"
           alt="Personalize your jewellery"
-          className={`absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover/pz:scale-[1.03] ${imgClassName}`}
+          className={`absolute inset-0 h-full w-full object-cover ${imgClassName}`}
         />
       </div>
       <div className="pointer-events-none absolute inset-0 flex items-end bg-gradient-to-t from-black/60 via-black/0 to-black/0 p-5 md:p-6">

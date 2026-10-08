@@ -492,7 +492,7 @@ export default function CatalogueContent({
         </div>
       </div>
 
-      <main ref={mainRef} className="px-4 sm:px-6 md:px-16 lg:px-15 pb-32 mt-6">
+      <main ref={mainRef} className="px-3 sm:px-6 md:px-16 lg:px-15 pb-32 mt-6">
         {!dataReady ? (
           <div className={`${tenorSans.className} col-span-full text-center py-20 text-xs tracking-[4px] uppercase text-bj-text-muted`}>
             Loading ...
@@ -502,7 +502,7 @@ export default function CatalogueContent({
             No personalised designs found matching these selections.
           </div>
         ) : viewMode === 'GRID' ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
             {pageItems.map((product) => (
               <ProductCard key={product.id} product={product} viewMode="GRID" />
             ))}

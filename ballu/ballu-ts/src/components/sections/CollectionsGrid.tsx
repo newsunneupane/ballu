@@ -38,9 +38,9 @@ export default function CollectionsGrid({
           >
             {c.image ? (
               <img
-                src={cloudinaryUrl(c.image, { width: 600 })}
+                src={cloudinaryUrl(c.image, { width: 600, aspect: '4:5' })}
                 alt={c.englishTitle}
-                className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                className="absolute inset-0 h-full w-full object-cover"
               />
             ) : (
               <div className="absolute inset-0 bg-gradient-to-br from-[#423722] to-[#1a140f]" />

@@ -118,7 +118,7 @@ export default function SearchOverlay({ onClose }: { onClose: () => void }) {
                     >
                       <div className="w-12 h-12 rounded border border-bj-border-light overflow-hidden shrink-0 bg-bj-bg">
                         {product.images?.[0] ? (
-                          <img src={cloudinaryUrl(product.images[0], { width: 96, aspect: '1:1' })} alt="" className="w-full h-full object-cover" />
+                          <img src={cloudinaryUrl(product.images[0], { width: 96, aspect: '1:1' })} alt="" className="w-full h-full object-cover bg-bj-bg-elevated" />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center">
                             <FiSearch className="text-[#2b2415]" size={14} />

@@ -50,7 +50,7 @@ export default function OccasionsBento({
               <img
                 src={cloudinaryUrl(o.image, { width: 800 })}
                 alt={o.name.en}
-                className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                className="absolute inset-0 h-full w-full object-cover"
               />
             ) : (
               <div className="absolute inset-0 bg-gradient-to-br from-[#423722] to-[#1a140f]" />
