@@ -3,10 +3,10 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Cormorant_Garamond, Cormorant_SC } from 'next/font/google';
 import { FiSearch, FiMenu, FiX, FiSun, FiMoon, FiChevronRight } from 'react-icons/fi';
 import { FaWhatsapp } from 'react-icons/fa';
-import { useScrollPosition } from '@/hooks/useScrollPosition';
 import { NAV_LINKS, SITE } from '@/lib/constants';
 import { useStoreSettings, whatsappNumber } from '@/hooks/useStoreSettings';
 import { whatsappBaseUrl } from '@/lib/utils/whatsapp';
@@ -27,30 +27,60 @@ const cormorant = Cormorant_Garamond({
 });
 
 export default function Navbar() {
-  const { isPinned } = useScrollPosition();
+  const [isPinned, setIsPinned] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
-  const [tickerOffset, setTickerOffset] = useState(32);
   const { theme, toggleTheme } = useTheme();
   const { data: settings } = useStoreSettings();
 
+  // Shadow-only scroll flag (no positioning). rAF-throttled so it never
+  // causes the navbar to lag behind the page on fast mobile flings.
   useEffect(() => {
-    const updateOffset = () => {
-      const tickerH = window.innerWidth >= 768 ? 24 : 32;
-      setTickerOffset(Math.max(0, tickerH - window.scrollY));
+    let ticking = false;
+    const update = () => {
+      ticking = false;
+      setIsPinned((prev) => {
+        const next = window.scrollY > 8;
+        return prev === next ? prev : next;
+      });
     };
-    window.addEventListener('scroll', updateOffset, { passive: true });
-    updateOffset();
-    return () => window.removeEventListener('scroll', updateOffset);
+    const onScroll = () => {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(update);
+      }
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  // Lock background scroll when the mobile menu is open so the page
+  // behind can't drift (standard drawer behavior).
   useEffect(() => {
     document.body.classList.toggle('bj-menu-open', isOpen);
-    return () => document.body.classList.remove('bj-menu-open');
+    if (!isOpen) return () => document.body.classList.remove('bj-menu-open');
+    const scrollY = window.scrollY;
+    const prevOverflow = document.body.style.overflow;
+    const prevPosition = document.body.style.position;
+    const prevTop = document.body.style.top;
+    const prevWidth = document.body.style.width;
+    document.body.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = '100%';
+    return () => {
+      document.body.classList.remove('bj-menu-open');
+      document.body.style.overflow = prevOverflow;
+      document.body.style.position = prevPosition;
+      document.body.style.top = prevTop;
+      document.body.style.width = prevWidth;
+      window.scrollTo(0, scrollY);
+    };
   }, [isOpen]);
 
   return (
-    <div className={`${cormorant.className} bg-bj-bg-ticker text-[#dbb86b] w-full fixed z-50`} style={{ top: tickerOffset }}>
+    <div className={`${cormorant.className} bg-bj-bg-ticker text-[#dbb86b] w-full relative z-50`}>
       <div
         className={`
           bg-bj-bg-secondary border-b border-bj-border w-full
@@ -202,9 +232,28 @@ function MobileMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
   const toggle = (label: string) =>
     setExpanded((cur) => (cur === label ? null : label));
 
-  return (
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+    return () => setMounted(false);
+  }, []);
+
+  // Keep it mounted for the exit transition, then unmount.
+  const [renderMenu, setRenderMenu] = useState(isOpen);
+  useEffect(() => {
+    if (isOpen) {
+      setRenderMenu(true);
+      return;
+    }
+    const t = setTimeout(() => setRenderMenu(false), 500);
+    return () => clearTimeout(t);
+  }, [isOpen]);
+
+  if (!mounted || !renderMenu) return null;
+
+  const menu = (
     <div
-      className={`bj-mobile-menu md:hidden fixed inset-0 bg-bj-bg-secondary/98 backdrop-blur-lg transition-all duration-500 ease-in-out overflow-y-auto z-[60] no-scrollbar ${
+      className={`bj-mobile-menu md:hidden fixed inset-0 h-[100dvh] bg-bj-bg-secondary/98 backdrop-blur-lg transition-all duration-500 ease-in-out overflow-y-auto z-[60] no-scrollbar overscroll-contain [-webkit-overflow-scrolling:touch] ${
         isOpen ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible -translate-y-full'
       }`}
     >
@@ -319,6 +368,8 @@ function MobileMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
       </div>
     </div>
   );
+
+  return createPortal(menu, document.body);
 }
 
 function MobileSubPanel({ item, onClose }: { item: SubNavItem; onClose: () => void }) {

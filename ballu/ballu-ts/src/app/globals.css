@@ -865,3 +865,8 @@ body {
 body.bj-menu-open .bj-filter-fab {
   display: none !important;
 }
+
+body.bj-menu-open {
+  overflow: hidden;
+  overscroll-behavior: none;
+}

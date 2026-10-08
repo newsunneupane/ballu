@@ -39,6 +39,21 @@ export default function SearchOverlay({ onClose }: { onClose: () => void }) {
     inputRef.current?.focus();
   }, []);
 
+  // Lock background scroll while overlay is open
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, []);
+
+  // Blur input before closing so iOS dismisses keyboard/zoom cleanly
+  const handleClose = useCallback(() => {
+    inputRef.current?.blur();
+    onClose();
+  }, [onClose]);
+
   useEffect(() => {
     const timer = setTimeout(() => {
       if (query.trim()) {
@@ -53,7 +68,7 @@ export default function SearchOverlay({ onClose }: { onClose: () => void }) {
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
-      if (e.key === 'Escape') { onClose(); return; }
+      if (e.key === 'Escape') { handleClose(); return; }
       if (e.key === 'ArrowDown') {
         e.preventDefault();
         setSelectedIndex((prev) => (prev < results.length - 1 ? prev + 1 : prev));
@@ -64,16 +79,16 @@ export default function SearchOverlay({ onClose }: { onClose: () => void }) {
       }
       if (e.key === 'Enter' && selectedIndex >= 0 && results[selectedIndex]) {
         router.push(`/catalogue/${results[selectedIndex].id}`);
-        onClose();
+        handleClose();
       }
     },
-    [results, selectedIndex, router, onClose]
+    [results, selectedIndex, router, handleClose]
   );
 
   return (
     <div
       className={`${cormorant.variable} ${cormorantSC.variable} fixed inset-0 z-[100] flex items-start justify-center pt-[15vh] md:pt-[20vh]`}
-      onClick={onClose}
+      onClick={handleClose}
     >
       <div className="absolute inset-0 bg-bj-bg-ticker/85 backdrop-blur-sm" />
 
@@ -90,9 +105,13 @@ export default function SearchOverlay({ onClose }: { onClose: () => void }) {
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Search pieces, materials, collections..."
-            className="flex-1 bg-transparent text-bj-text-heading text-sm md:text-base placeholder:text-bj-text-dim outline-none font-sans"
+            enterKeyHint="search"
+            autoComplete="off"
+            autoCorrect="off"
+            autoCapitalize="off"
+            className="flex-1 bg-transparent text-bj-text-heading text-base placeholder:text-sm placeholder:text-bj-text-dim outline-none font-sans"
           />
-          <button onClick={onClose} className="text-bj-text-dim hover:text-bj-gold transition-colors">
+          <button onClick={handleClose} className="text-bj-text-dim hover:text-bj-gold transition-colors">
             <FiX size={18} />
           </button>
         </div>
@@ -111,7 +130,7 @@ export default function SearchOverlay({ onClose }: { onClose: () => void }) {
                   return (
                     <button
                       key={product.id}
-                      onClick={() => { router.push(`/catalogue/${product.id}`); onClose(); }}
+                      onClick={() => { router.push(`/catalogue/${product.id}`); handleClose(); }}
                       className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-colors ${
                         isSelected ? 'bg-bj-selected' : 'hover:bg-bj-selected'
                       }`}

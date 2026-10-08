@@ -82,7 +82,7 @@ export default function GoldTicker() {
           0% { transform: translateX(0); }
           100% { transform: translateX(-50%); }
         }
-        .animate-ticker { animation: tickerScroll 40s linear infinite; will-change: transform; backface-visibility: hidden; }
+        .animate-ticker { animation: tickerScroll 40s linear infinite; will-change: transform; backface-visibility: hidden; transform: translateZ(0); }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
       `}</style>

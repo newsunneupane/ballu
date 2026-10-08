@@ -62,10 +62,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <CatalogStoreHydration items={items} collections={collections} materials={materials} groups={groups} occasions={occasions}>
               <ThemeProvider>
                 <GoldTicker />
-                <header className="w-full">
+                <header className="sticky top-0 z-50 w-full">
                   <Navbar />
                 </header>
-                <main className="relative max-w-full overflow-x-clip pt-[50px] md:pt-[68px]">
+                <main className="relative max-w-full overflow-x-clip">
                   <SubNavbar />
                   {children}
                 </main>
