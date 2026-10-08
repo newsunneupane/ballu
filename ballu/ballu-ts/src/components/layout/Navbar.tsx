@@ -214,7 +214,7 @@ function MobileMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
             href="/"
             onClick={onClose}
             aria-label="Go to homepage"
-            className="flex items-baseline gap-2 cursor-pointer transition-opacity duration-300 hover:opacity-80"
+            className="flex items-baseline gap-2 cursor-pointer transition-opacity duration-300 active:opacity-70"
           >
             <span className="italic text-bj-text-nav text-[20px] leading-none">{SITE.name}</span>
             <span className="text-[10px] tracking-[0.35em] uppercase text-bj-text-muted leading-none">
@@ -224,7 +224,7 @@ function MobileMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
           <button
             onClick={onClose}
             aria-label="Close menu"
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-bj-border text-bj-text-nav transition-all duration-300 hover:border-bj-gold-rich hover:bg-bj-gold-rich/10 hover:text-bj-gold-rich"
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-bj-border text-bj-text-nav transition-all duration-300 active:border-bj-gold-rich active:bg-bj-gold-rich/10 active:text-bj-gold-rich"
           >
             <FiX size={20} />
           </button>
@@ -241,10 +241,10 @@ function MobileMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
                     href={link.href}
                     onClick={close}
                     aria-current={active ? 'page' : undefined}
-                    className={`flex h-12 items-center justify-center rounded-full border text-[13px] tracking-[0.2em] uppercase transition-all duration-300 ${
+                    className={`mm-primary flex h-12 items-center justify-center rounded-full border text-[13px] tracking-[0.2em] uppercase transition-all duration-300 shadow-sm font-semibold ${
                       active
-                        ? 'border-bj-gold-rich bg-bj-gold-rich font-semibold text-bj-bg-secondary'
-                        : 'border-bj-gold-rich/50 bg-bj-gold-rich/10 text-bj-gold-rich hover:bg-bj-gold-rich hover:text-bj-bg-secondary'
+                        ? 'mm-primary-active border-[#7a0000] bg-[#7a0000] text-white shadow-[0_8px_20px_-8px_rgba(122,0,0,.7)]'
+                        : 'border-[#cc0000] bg-[#cc0000] text-white active:bg-[#990000] active:border-[#990000]'
                     }`}
                   >
                     {link.label}
@@ -266,11 +266,15 @@ function MobileMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
                       type="button"
                       onClick={() => toggle(item.label)}
                       aria-expanded={open}
-                      className="mm-subbtn flex w-full items-center justify-between h-12 rounded-xl border border-bj-border bg-bj-bg-elevated/40 px-5 text-[13px] tracking-[0.2em] uppercase text-bj-text-nav transition-all duration-300 hover:border-bj-gold-rich/60 hover:text-bj-gold-rich"
+                      className={`mm-subbtn flex w-full items-center justify-between h-12 rounded-xl border px-5 text-[13px] tracking-[0.2em] uppercase transition-all duration-300 ${
+                        open
+                          ? 'mm-open border-[#7a0000] bg-[#7a0000] text-white shadow-[0_8px_20px_-8px_rgba(122,0,0,.7)]'
+                          : 'border-[#cc0000] bg-[#cc0000] text-white active:bg-[#990000] active:border-[#990000]'
+                      }`}
                     >
                       <span>{item.label}</span>
                       <FiChevronRight
-                        className={`h-4 w-4 text-bj-gold-richer transition-transform duration-300 ${
+                        className={`h-4 w-4 transition-transform duration-300 ${
                           open ? 'rotate-90' : ''
                         }`}
                       />
@@ -305,7 +309,7 @@ function MobileMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
               target="_blank"
               rel="noopener noreferrer"
               onClick={onClose}
-              className="inline-flex items-center gap-2 rounded-full border border-[#25D366] bg-[#25D366] px-4 py-2 text-[11px] tracking-[0.15em] uppercase text-white transition-colors duration-300 hover:bg-[#1ebe5b]"
+              className="inline-flex items-center gap-2 rounded-full border border-[#25D366] bg-[#25D366] px-4 py-2 text-[11px] tracking-[0.15em] uppercase text-white transition-colors duration-300 active:bg-[#1ebe5b]"
             >
               <FaWhatsapp size={14} />
               WhatsApp
@@ -348,26 +352,27 @@ function MobileSubPanel({ item, onClose }: { item: SubNavItem; onClose: () => vo
                 More pieces
               </p>
             )}
-            <div className="grid grid-cols-3 gap-2">
-              {data.items.map((p) => (
+            <div className="grid grid-cols-3 gap-3">
+              {data.items.slice(0, 6).map((p) => (
                 <Link
                   key={p.id}
                   href={`/catalogue/${p.id}`}
                   onClick={onClose}
-                  className="group block"
+                  className="mm-piece block"
                 >
-                  <div className="relative aspect-[3/4] w-full overflow-hidden rounded-md border border-bj-border bg-bj-bg-elevated">
+                  <div className="relative aspect-[3/4] w-full overflow-hidden rounded-lg border border-bj-gold-rich/20 bg-bj-bg-elevated">
                     {p.images?.[0] ? (
                       <img
                         src={cloudinaryUrl(p.images[0], { width: 300, aspect: '3:4' })}
                         alt={p.title}
-                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        loading="lazy"
+                        className="h-full w-full object-cover"
                       />
                     ) : (
                       <div className="absolute inset-0 bg-gradient-to-br from-[#423722] to-[#1a140f]" />
                     )}
                   </div>
-                  <p className="mt-1.5 truncate text-[11px] tracking-wide text-bj-text-nav">
+                  <p className="mt-1.5 truncate text-[11px] uppercase tracking-[0.08em] text-bj-text-nav">
                     {p.title}
                   </p>
                 </Link>
@@ -386,6 +391,7 @@ function MobileSubPanel({ item, onClose }: { item: SubNavItem; onClose: () => vo
                 href={o.href}
                 label={o.name}
                 sub={o.nepali}
+                image={o.image}
                 onClose={onClose}
               />
             ))}
@@ -395,16 +401,18 @@ function MobileSubPanel({ item, onClose }: { item: SubNavItem; onClose: () => vo
 
       {!item.leftover && data.priceRanges.length > 0 && (
         <MobileSection title="Shop by Price">
-          <ul>
+          <div className="mm-chips flex flex-wrap gap-2 px-1 pt-1">
             {data.priceRanges.map((r) => (
-              <MobileLinkRow
+              <Link
                 key={r.href + r.label}
                 href={r.href}
-                label={r.label}
-                onClose={onClose}
-              />
+                onClick={onClose}
+                className="mm-chip rounded-full border border-bj-gold-rich/30 bg-bj-gold-rich/10 px-4 py-2 text-[11px] uppercase tracking-[0.15em] text-bj-gold-rich transition-all duration-300 active:border-bj-gold-rich active:bg-bj-gold-rich active:text-bj-bg-secondary"
+              >
+                {r.label}
+              </Link>
             ))}
-          </ul>
+          </div>
         </MobileSection>
       )}
     </div>
@@ -414,7 +422,10 @@ function MobileSubPanel({ item, onClose }: { item: SubNavItem; onClose: () => vo
 function MobileSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="mt-5">
-      <h3 className="mb-2 text-[11px] tracking-[0.3em] uppercase text-bj-text-muted">{title}</h3>
+      <div className="mb-2 flex items-center gap-3">
+        <h3 className="shrink-0 text-[11px] tracking-[0.3em] uppercase text-bj-text-muted">{title}</h3>
+        <span className="h-px flex-1 bg-gradient-to-r from-bj-gold-rich/40 to-transparent" />
+      </div>
       <div className="space-y-0.5">{children}</div>
     </div>
   );
@@ -438,22 +449,23 @@ function MobileLinkRow({
       <Link
         href={href}
         onClick={onClose}
-        className="group flex items-center gap-3 rounded-md px-3 py-2.5 transition-colors hover:bg-bj-bg-elevated hover:text-bj-gold-rich"
+        className="mm-row flex items-center gap-3 rounded-xl border border-transparent px-3 py-2.5 transition-colors active:border-bj-gold-rich/40 active:bg-bj-gold-rich/10"
       >
         {image && (
-          <span className="relative h-10 w-10 shrink-0 overflow-hidden rounded border border-bj-border bg-bj-bg-elevated">
+          <span className="relative h-11 w-11 shrink-0 overflow-hidden rounded-full border border-bj-gold-rich/40 bg-bj-bg-elevated ring-1 ring-bj-gold-rich/20">
             <img
               src={cloudinaryUrl(image, { width: 80, aspect: '1:1' })}
               alt={label}
+              loading="lazy"
               className="h-full w-full object-cover"
             />
           </span>
         )}
         <span className="flex min-w-0 flex-1 flex-col">
-          <span className="truncate text-[13px] tracking-[0.08em] text-bj-text-nav">{label}</span>
+          <span className="truncate text-[12px] font-medium uppercase tracking-[0.12em] text-bj-text-nav">{label}</span>
           {sub && <span className="text-[10px] tracking-wide text-bj-text-muted">{sub}</span>}
         </span>
-        <span className="text-bj-gold-richer opacity-0 -translate-x-1 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0">
+        <span className="translate-x-0 text-bj-gold-rich/70 opacity-100">
           →
         </span>
       </Link>

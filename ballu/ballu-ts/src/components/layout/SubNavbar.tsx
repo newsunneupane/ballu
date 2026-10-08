@@ -327,22 +327,20 @@ function PriceFilters({ ranges, onClose }: { ranges: PanelLink[]; onClose: () =>
     return <p className="text-[12px] tracking-wide text-bj-text-muted">No price ranges available.</p>;
   }
   return (
-    <div className="flex flex-col gap-3">
-      {ranges.map((range) => (
-        <Link
-          key={range.href + range.label}
-          href={range.href}
-          onClick={onClose}
-          className="group/price flex items-center justify-between rounded-lg border border-bj-border bg-bj-bg-elevated px-6 py-4 transition-all duration-300 hover:border-bj-border-hover"
-        >
-          <span className="text-[14px] tracking-[0.1em] text-bj-text-nav transition-colors group-hover/price:text-bj-gold-rich">
+    <div>
+      <p className="mb-4 text-[11px] tracking-[0.3em] uppercase text-bj-text-muted">Shop by budget</p>
+      <div className="flex flex-wrap gap-3">
+        {ranges.map((range) => (
+          <Link
+            key={range.href + range.label}
+            href={range.href}
+            onClick={onClose}
+            className="rounded-full border border-bj-gold-rich/30 bg-bj-bg-elevated/60 px-5 py-2.5 text-[12px] tracking-[0.15em] uppercase text-bj-text-nav transition-all duration-300 hover:border-bj-gold-rich hover:bg-bj-gold-rich hover:text-bj-bg-secondary hover:shadow-[0_0_18px_-4px_rgba(219,184,107,0.6)]"
+          >
             {range.label}
-          </span>
-          <span className="text-bj-gold-richer transition-transform duration-300 group-hover/price:translate-x-1.5">
-            →
-          </span>
-        </Link>
-      ))}
+          </Link>
+        ))}
+      </div>
     </div>
   );
 }

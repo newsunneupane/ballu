@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useCallback } from "react";
+import React, { useState, useRef, useCallback, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Cormorant_Garamond, Cormorant_SC, Tenor_Sans } from "next/font/google";
 import { FiStar, FiX, FiCheck } from "react-icons/fi";
@@ -65,6 +65,20 @@ export default function CommissionPage() {
 
   if (cols.length > 0 && !selectedCollection) setSelectedCollection(cols[0]._id);
   if (mats.length > 0 && !selectedMaterial) setSelectedMaterial(mats[0]._id);
+
+  // Same-name items (admin numbers them 1,2,3…) share one option.
+  const pieceTypeOptions = useMemo(() => {
+    const seen = new Set<string>();
+    const out: string[] = [];
+    for (const item of items) {
+      const label = (item.name?.en || '').trim();
+      if (label && !seen.has(label)) {
+        seen.add(label);
+        out.push(label);
+      }
+    }
+    return out;
+  }, [items]);
 
   const MAX_IMAGE_SIZE = 2 * 1024 * 1024;
 
@@ -258,8 +272,8 @@ export default function CommissionPage() {
                 style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238e897e' d='M6 8L1 3h10z'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center' }}
               >
                 <option value="" disabled className="bg-bj-bg">Select a piece type</option>
-                {items.map((item: any) => (
-                  <option key={item._id} value={item.name?.en || ''} className="bg-bj-bg">{item.name?.en || 'Untitled'}</option>
+                {pieceTypeOptions.map((label) => (
+                  <option key={label} value={label} className="bg-bj-bg">{label}</option>
                 ))}
                 <option value="other" className="bg-bj-bg">Other (custom)</option>
               </select>
