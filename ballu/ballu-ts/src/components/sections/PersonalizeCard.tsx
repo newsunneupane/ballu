@@ -19,7 +19,7 @@ export default function PersonalizeCard({ className = '', imgClassName = '' }: {
         />
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/lightmode.jpg"
+          src="/light-mode.jpg"
           alt=""
           aria-hidden="true"
           className="absolute inset-0 hidden h-full w-full object-cover [[data-theme=light]_&]:block"
