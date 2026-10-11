@@ -771,23 +771,23 @@ body {
 [data-theme="light"] .bj-mobile-menu [class*="border-bj-gold-rich"] {
   border-color: #cc0000;
 }
-/* Sub-category headers: plain red text like primaries (no button) */
+/* Sub-category headers: golden text in dark, red only in light (no button) */
 .bj-mobile-menu .mm-subbtn {
   background: transparent;
   border: none;
   box-shadow: none;
-  color: #ff7a7a;
+  color: var(--bj-gold-rich);
   font-weight: 500;
 }
 .bj-mobile-menu .mm-subbtn:hover {
-  color: #e05555;
+  color: var(--bj-gold-light);
 }
 .bj-mobile-menu .mm-subbtn:active,
 .bj-mobile-menu .mm-subbtn.mm-open {
   background: transparent;
   border: none;
   box-shadow: none;
-  color: #e05555;
+  color: var(--bj-gold-richer);
   font-weight: 700;
 }
 .bj-mobile-menu .mm-subbtn svg {
@@ -817,25 +817,25 @@ body {
 [data-theme="light"] .bj-mobile-menu .mm-subbtn.mm-open svg {
   color: currentColor;
 }
-/* Primary links: plain red text (no button), smaller — dark red on hover/active */
+/* Primary links: golden text in dark, red only in light (no button), smaller */
 .bj-mobile-menu .mm-primary {
   background: transparent;
   border: none;
   box-shadow: none;
-  color: #ff7a7a;
+  color: var(--bj-gold-rich);
   font-weight: 500;
 }
 .bj-mobile-menu .mm-primary:hover {
-  color: #e05555;
+  color: var(--bj-gold-light);
 }
 .bj-mobile-menu .mm-primary:active {
-  color: #c93a3a;
+  color: var(--bj-gold-richer);
 }
 .bj-mobile-menu .mm-primary.mm-primary-active {
   background: transparent;
   border: none;
   box-shadow: none;
-  color: #e05555;
+  color: var(--bj-gold-richer);
   font-weight: 700;
 }
 [data-theme="light"] .bj-mobile-menu .mm-primary {
@@ -901,10 +901,11 @@ body {
   border-color: #7a0000;
   color: #ffffff;
 }
-/* More-pieces cards lift on ivory */
+/* More-pieces cards: single border only (on image wrapper). Outer link stays borderless so it doesn't look like a container inside a container. */
 [data-theme="light"] .bj-mobile-menu .mm-piece {
-  border: 1.5px solid #cc0000;
-  box-shadow: 0 4px 0 rgba(204, 0, 0, 0.3), 0 12px 22px -12px rgba(204, 0, 0, 0.45);
+  border: none;
+  box-shadow: none;
+  background: transparent;
 }
 /* Sharp section hairlines + headings */
 [data-theme="light"] .bj-mobile-menu .mm-subpanel h3,

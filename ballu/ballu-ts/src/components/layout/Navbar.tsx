@@ -24,6 +24,7 @@ const cormorantSC = Cormorant_SC({
 const cormorant = Cormorant_Garamond({
   subsets: ['latin'],
   weight: ['300', '400', '500', '600'],
+  style: ['normal', 'italic'],
 });
 
 export default function Navbar() {
@@ -285,12 +286,18 @@ function MobileMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
             href="/"
             onClick={onClose}
             aria-label="Go to homepage"
-            className="flex items-baseline gap-2 cursor-pointer transition-opacity duration-300 active:opacity-70"
+            className="text-center flex flex-row space-x-2 items-baseline cursor-pointer transition-opacity duration-300 active:opacity-70"
           >
-            <span className="italic text-bj-text-nav text-[20px] leading-none">{SITE.name}</span>
-            <span className="text-[10px] tracking-[0.35em] uppercase text-bj-text-muted leading-none">
+            <div
+              className={`${cormorant.className} italic text-bj-text-nav leading-none text-[19px]`}
+            >
+              {SITE.name}
+            </div>
+            <div
+              className={`${cormorantSC.className} jewellers-text tracking-[0.35em] leading-none [font-variant:small-caps] text-[15px]`}
+            >
               {SITE.suffix}
-            </span>
+            </div>
           </Link>
           <button
             onClick={onClose}
