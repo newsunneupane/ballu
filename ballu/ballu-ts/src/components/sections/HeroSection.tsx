@@ -227,19 +227,19 @@ function HeroSlider({ banners, groupRates = null }: { banners: any[]; groupRates
         </div>
 
         {/* Mobile collapsible rates — above the personalize button. */}
-        <div className="md:hidden w-auto shrink-0 flex-none overflow-hidden rounded-2xl border border-[#c9a96e]/35 bg-[#14100a] mx-6">
+        <div className="md:hidden w-auto shrink-0 flex-none overflow-hidden rounded-2xl border border-[#c9a96e]/35 bg-[#14100a] mx-6 [[data-theme=light]_&]:bg-white [[data-theme=light]_&]:border-[#cc0000]/40 [[data-theme=light]_&]:shadow-[0_10px_30px_-15px_rgba(204,0,0,0.25)]">
           <button
             onClick={() => setRatesOpen((v) => !v)}
             aria-expanded={ratesOpen}
             aria-label="Toggle today's rates"
             className="flex w-full items-center gap-3 px-5 py-4 text-left"
           >
-            <span className="h-px w-8 bg-bj-gold/60" />
-            <span className="flex-1 font-sans text-[10px] tracking-[0.4em] uppercase text-[#c9a96e]/80">
+            <span className="h-px w-8 bg-bj-gold/60 [[data-theme=light]_&]:bg-[#cc0000]/50" />
+            <span className="flex-1 font-sans text-[10px] tracking-[0.4em] uppercase text-[#c9a96e]/80 [[data-theme=light]_&]:text-[#cc0000]">
               Today&apos;s Rates
             </span>
             <span
-              className={`inline-block text-[#e9cf8f] transition-transform duration-300 ${ratesOpen ? 'rotate-180' : ''}`}
+              className={`inline-block text-[#e9cf8f] [[data-theme=light]_&]:text-[#cc0000] transition-transform duration-300 ${ratesOpen ? 'rotate-180' : ''}`}
             >
               ↓
             </span>
@@ -259,19 +259,19 @@ function HeroSlider({ banners, groupRates = null }: { banners: any[]; groupRates
         <button
           onClick={() => router.push('/personalize')}
           aria-label="Personalize your jewellery"
-          className="group md:hidden relative w-auto shrink-0 flex-none overflow-hidden rounded-2xl border border-[#c9a96e]/35 bg-[#14100a] px-5 py-4 mx-6 text-left shadow-[0_10px_40px_-12px_rgba(201,169,110,0.45)] transition-all duration-300 active:scale-[0.98]"
+          className="group md:hidden relative w-auto shrink-0 flex-none overflow-hidden rounded-2xl border border-[#c9a96e]/35 bg-[#14100a] px-5 py-4 mx-6 text-left shadow-[0_10px_40px_-12px_rgba(201,169,110,0.45)] [[data-theme=light]_&]:bg-white [[data-theme=light]_&]:border-[#cc0000]/40 [[data-theme=light]_&]:shadow-[0_10px_30px_-15px_rgba(204,0,0,0.25)] transition-all duration-300 active:scale-[0.98]"
         >
-          <span className="pointer-events-none absolute inset-0 bg-gradient-to-r from-transparent via-[#c9a96e]/[0.12] to-transparent bg-[length:250%_100%] animate-[pz-sheen_3.5s_ease-in-out_infinite]" />
-          <span className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-[#e9cf8f]/80 to-transparent" />
+          <span className="pointer-events-none absolute inset-0 bg-gradient-to-r from-transparent via-[#c9a96e]/[0.12] to-transparent bg-[length:250%_100%] animate-[pz-sheen_3.5s_ease-in-out_infinite] [[data-theme=light]_&]:via-[#cc0000]/[0.08]" />
+          <span className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-[#e9cf8f]/80 to-transparent [[data-theme=light]_&]:via-[#cc0000]/60" />
           <span className="relative flex items-center gap-4">
             <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#e9cf8f] to-[#9a7b38] text-[#0a0806] shadow-md">
               <Sparkle size={16} />
             </span>
             <span className="flex flex-1 flex-col">
-              <span className="font-sans text-[9px] tracking-[0.35em] uppercase text-[#c9a96e]/80">Make it yours</span>
-              <span className="font-serif-editorial italic text-2xl font-light leading-tight text-[#f3e9d2]">Personalize</span>
+              <span className="font-sans text-[9px] tracking-[0.35em] uppercase text-[#c9a96e]/80 [[data-theme=light]_&]:text-[#cc0000]/80">Make it yours</span>
+              <span className="font-serif-editorial italic text-2xl font-light leading-tight text-[#f3e9d2] [[data-theme=light]_&]:text-[#0d0a08]">Personalize</span>
             </span>
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#c9a96e]/40 text-[#e9cf8f] transition-transform duration-300 group-hover:translate-x-1">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#c9a96e]/40 text-[#e9cf8f] [[data-theme=light]_&]:border-[#cc0000]/40 [[data-theme=light]_&]:text-[#cc0000] transition-transform duration-300 group-hover:translate-x-1">
               <ArrowRight size={14} />
             </span>
           </span>
