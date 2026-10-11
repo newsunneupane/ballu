@@ -41,6 +41,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       suppressHydrationWarning
     >
       <head>
+        <link rel="preload" as="image" href="/darkmode.jpg" fetchPriority="high" />
+        <link rel="preload" as="image" href="/lightmode.jpg" fetchPriority="high" />
         <script
           dangerouslySetInnerHTML={{
             __html: `

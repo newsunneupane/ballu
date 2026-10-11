@@ -2,13 +2,6 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Cormorant_Garamond } from 'next/font/google';
-
-const cormorant = Cormorant_Garamond({
-  subsets: ['latin'],
-  weight: ['300', '400', '500'],
-  style: ['normal', 'italic'],
-});
 
 export default function PersonalizeCard({ className = '', imgClassName = '' }: { className?: string; imgClassName?: string }) {
   return (
@@ -20,15 +13,17 @@ export default function PersonalizeCard({ className = '', imgClassName = '' }: {
       <div className="absolute inset-0 overflow-hidden">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/personalize.jpg"
+          src="/darkmode.jpg"
           alt="Personalize your jewellery"
-          className={`absolute inset-0 h-full w-full object-cover ${imgClassName}`}
+          className={`absolute inset-0 h-full w-full object-cover [[data-theme=light]_&]:hidden ${imgClassName}`}
         />
-      </div>
-      <div className="pointer-events-none absolute inset-0 flex items-end bg-gradient-to-t from-black/60 via-black/0 to-black/0 p-5 md:p-6">
-        <span className={`${cormorant.className} italic text-2xl md:text-3xl font-light text-white`}>
-          Personalize
-        </span>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/lightmode.jpg"
+          alt=""
+          aria-hidden="true"
+          className="absolute inset-0 hidden h-full w-full object-cover [[data-theme=light]_&]:block"
+        />
       </div>
     </Link>
   );
