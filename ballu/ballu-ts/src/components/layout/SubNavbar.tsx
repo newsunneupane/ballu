@@ -207,7 +207,7 @@ function OptionButton({
     <button
       type="button"
       onMouseEnter={onHover}
-      className={`flex items-center border-l-4 px-5 py-3 text-[13px] tracking-[0.2em] uppercase transition-colors duration-300 ${
+      className={`mega-option flex items-center border-l-4 px-5 py-3 text-[13px] tracking-[0.2em] uppercase transition-colors duration-300 ${
         active
           ? 'border-bj-gold-rich bg-bj-bg-elevated text-bj-gold-rich'
           : 'border-transparent text-bj-text-muted hover:border-bj-gold-rich/50 hover:bg-bj-bg-elevated/50 hover:text-bj-text-nav'
@@ -335,7 +335,7 @@ function PriceFilters({ ranges, onClose }: { ranges: PanelLink[]; onClose: () =>
             key={range.href + range.label}
             href={range.href}
             onClick={onClose}
-            className="rounded-full border border-bj-gold-rich/30 bg-bj-bg-elevated/60 px-5 py-2.5 text-[12px] tracking-[0.15em] uppercase text-bj-text-nav transition-all duration-300 hover:border-bj-gold-rich hover:bg-bj-gold-rich hover:text-bj-bg-secondary hover:shadow-[0_0_18px_-4px_rgba(219,184,107,0.6)]"
+            className="price-filter-chip rounded-full border border-bj-gold-rich/30 bg-bj-bg-elevated/60 px-5 py-2.5 text-[12px] tracking-[0.15em] uppercase text-bj-text-nav transition-all duration-300 hover:border-bj-gold-rich hover:bg-bj-gold-rich hover:text-bj-bg-secondary hover:shadow-[0_0_18px_-4px_rgba(219,184,107,0.6)]"
           >
             {range.label}
           </Link>

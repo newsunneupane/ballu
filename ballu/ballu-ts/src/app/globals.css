@@ -745,6 +745,24 @@ body {
   background-color: #cc0000 !important;
 }
 
+/* Desktop mega-panel: red hover + active in light, golden in dark */
+[data-theme="light"] .mega-option:hover {
+  border-color: #cc0000 !important;
+  color: #cc0000 !important;
+  background-color: rgba(204, 0, 0, 0.08) !important;
+}
+[data-theme="light"] .mega-option.border-bj-gold-rich {
+  border-color: #cc0000 !important;
+  color: #cc0000 !important;
+  background-color: rgba(204, 0, 0, 0.1) !important;
+}
+[data-theme="light"] .price-filter-chip:hover {
+  border-color: #cc0000 !important;
+  background-color: #cc0000 !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 18px -4px rgba(204, 0, 0, 0.6) !important;
+}
+
 /* Mobile menu — curated light-mode skin (dark mode left untouched) — SHARP + RED BORDERS */
 [data-theme="light"] .bj-mobile-menu {
   background: linear-gradient(180deg, #fffdf6 0%, #f5e6c4 55%, #e9d3a0 100%);
