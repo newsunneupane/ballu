@@ -762,6 +762,12 @@ body {
   color: #ffffff !important;
   box-shadow: 0 0 18px -4px rgba(204, 0, 0, 0.6) !important;
 }
+/* Desktop mega-panel card names: red hover in light, golden in dark (default) */
+[data-theme="light"] .group\/col:hover .mega-card-name,
+[data-theme="light"] .group\/item:hover .mega-card-name,
+[data-theme="light"] .group\/occ:hover .mega-card-name {
+  color: #cc0000 !important;
+}
 
 /* Mobile menu — curated light-mode skin (dark mode left untouched) — SHARP + RED BORDERS */
 [data-theme="light"] .bj-mobile-menu {

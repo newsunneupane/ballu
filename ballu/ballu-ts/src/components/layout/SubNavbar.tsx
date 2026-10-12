@@ -246,7 +246,7 @@ function CollectionCards({ cards, baseQuery, onClose }: { cards: PanelCollection
               <div className="h-full w-full bg-gradient-to-br from-[#423722] to-[#1a140f]" />
             )}
           </div>
-          <p className="mt-3 text-center text-[12px] tracking-[0.15em] uppercase text-bj-text-nav transition-colors group-hover/col:text-bj-gold-rich">
+          <p className="mega-card-name mt-3 text-center text-[12px] tracking-[0.15em] uppercase text-bj-text-nav transition-colors group-hover/col:text-bj-gold-rich">
             {card.name}
           </p>
         </Link>
@@ -280,7 +280,7 @@ function ItemCards({ items, onClose }: { items: any[]; onClose: () => void }) {
               <div className="h-full w-full bg-gradient-to-br from-[#423722] to-[#1a140f]" />
             )}
           </div>
-          <p className="mt-3 text-center text-[12px] tracking-[0.15em] uppercase text-bj-text-nav transition-colors group-hover/item:text-bj-gold-rich">
+          <p className="mega-card-name mt-3 text-center text-[12px] tracking-[0.15em] uppercase text-bj-text-nav transition-colors group-hover/item:text-bj-gold-rich">
             {product.title}
           </p>
         </Link>
@@ -313,7 +313,7 @@ function OccasionCards({ cards, onClose }: { cards: PanelData['occasions']; onCl
               <div className="h-full w-full bg-gradient-to-br from-[#423722] to-[#1a140f]" />
             )}
           </div>
-          <p className="mt-3 text-center text-[12px] tracking-[0.15em] uppercase text-bj-text-nav transition-colors group-hover/occ:text-bj-gold-rich">
+          <p className="mega-card-name mt-3 text-center text-[12px] tracking-[0.15em] uppercase text-bj-text-nav transition-colors group-hover/occ:text-bj-gold-rich">
             {card.name}
           </p>
         </Link>
