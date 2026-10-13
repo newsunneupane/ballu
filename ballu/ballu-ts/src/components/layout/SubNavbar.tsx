@@ -63,7 +63,7 @@ export default function SubNavbar() {
   const activeItem = activeIndex !== null ? navItems[activeIndex] : null;
 
   return (
-    <div className={`${cormorant.variable} relative hidden w-full md:block`}>
+    <div className={`${cormorant.variable} relative hidden w-full md:block md:pb-4`}>
       <nav className="subnav bj-subnav flex w-full items-stretch justify-center bg-bj-bg-secondary/90 backdrop-blur-sm px-10 py-0">
         {navItems.map((item, i) => (
           <button
@@ -124,7 +124,7 @@ function MegaPanel({
     <div
       onMouseEnter={onEnter}
       onMouseLeave={onLeave}
-      className="absolute left-[8%] right-[8%] top-full z-[60] flex h-[calc(80vh-15px)] flex-col overflow-hidden border-4 border-bj-border border-t-0 rounded-b-2xl bg-bj-bg-secondary shadow-[0_30px_38px_-12px_rgba(0,0,0,0.85)] backdrop-blur-md"
+      className="absolute left-[8%] right-[8%] top-[calc(100%-1rem)] z-[60] flex h-[calc(80vh-15px)] flex-col overflow-hidden border-4 border-bj-border border-t-0 rounded-b-2xl bg-bj-bg-secondary shadow-[0_30px_38px_-12px_rgba(0,0,0,0.85)] backdrop-blur-md"
     >
       <div className="flex items-end justify-between border-b border-bj-border px-6 py-6 md:px-10">
         <div>

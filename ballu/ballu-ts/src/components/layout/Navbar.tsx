@@ -84,11 +84,11 @@ export default function Navbar() {
     <div className={`${cormorant.className} bg-bj-bg-ticker text-[#dbb86b] w-full relative z-50`}>
       <div
         className={`
-          bj-main-navbar bg-bj-bg-secondary border-b border-bj-border w-full
+          bj-main-navbar bg-bj-bg-secondary border-b md:border-b-0 border-bj-border w-full
           ${isPinned ? 'shadow-xl' : ''}
         `}
       >
-        <div className="max-w-[1400px] mx-auto px-4 md:px-10 flex items-center justify-between h-[50px]">
+        <div className="max-w-[1400px] mx-auto px-4 md:px-10 flex items-center justify-between h-[50px] md:h-auto md:py-2">
           <button
             onClick={() => setIsOpen(!isOpen)}
             className="md:hidden order-1 text-bj-text-nav hover:font-semibold focus:outline-none transition-colors p-1"
@@ -186,15 +186,15 @@ function Logo() {
     <Link
       href="/"
       aria-label="Go to homepage"
-      className="text-center flex flex-row space-x-2 items-baseline cursor-pointer group/logo"
+      className="text-center flex flex-col items-center leading-none cursor-pointer group/logo"
     >
       <div
-        className={`italic text-bj-text-nav leading-none transition-opacity duration-300 group-hover/logo:opacity-80 text-[22px] md:text-[23px]`}
+        className={`italic text-bj-text-nav leading-none transition-opacity duration-300 group-hover/logo:opacity-80 text-[22px] md:text-[30px]`}
       >
         {SITE.name}
       </div>
       <div
-        className={`${cormorantSC.className} jewellers-text  tracking-[0.35em] leading-none [font-variant:small-caps] transition-opacity duration-300 group-hover/logo:opacity-80 text-[18px] md:text-[20px]`}
+        className={`${cormorantSC.className} jewellers-text tracking-[0.35em] leading-none [font-variant:small-caps] transition-opacity duration-300 group-hover/logo:opacity-80 text-[11px] md:text-[15px] mt-0.5`}
       >
         {SITE.suffix}
       </div>
