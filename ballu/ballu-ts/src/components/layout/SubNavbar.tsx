@@ -64,7 +64,7 @@ export default function SubNavbar() {
 
   return (
     <div className={`${cormorant.variable} relative hidden w-full md:block`}>
-      <nav className="subnav flex w-full items-stretch justify-center bg-bj-bg-secondary/90 backdrop-blur-sm px-10 py-0">
+      <nav className="subnav bj-subnav flex w-full items-stretch justify-center bg-bj-bg-secondary/90 backdrop-blur-sm px-10 py-0">
         {navItems.map((item, i) => (
           <button
             key={item.label}

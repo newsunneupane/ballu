@@ -359,6 +359,11 @@
     background: linear-gradient(135deg, #fff5f5 0%, #fde2e2 55%, #f9caca 100%) !important;
     background-color: #fde2e2 !important;
   }
+
+  .bj-subnav {
+    background: linear-gradient(135deg, #fde2e2 0%, #f9caca 55%, #f3b0b0 100%) !important;
+    background-color: #f9caca !important;
+  }
 }
 
 .font-thin {
