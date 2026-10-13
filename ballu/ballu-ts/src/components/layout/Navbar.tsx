@@ -186,7 +186,7 @@ function Logo() {
     <Link
       href="/"
       aria-label="Go to homepage"
-      className="text-center flex flex-col items-center leading-none cursor-pointer group/logo"
+      className="text-center flex flex-row md:flex-col items-baseline md:items-center gap-1.5 md:gap-0 whitespace-nowrap leading-none cursor-pointer group/logo"
     >
       <div
         className={`italic text-bj-text-nav leading-none transition-opacity duration-300 group-hover/logo:opacity-80 text-[22px] md:text-[30px]`}
@@ -194,7 +194,7 @@ function Logo() {
         {SITE.name}
       </div>
       <div
-        className={`${cormorantSC.className} jewellers-text tracking-[0.35em] leading-none [font-variant:small-caps] transition-opacity duration-300 group-hover/logo:opacity-80 text-[11px] md:text-[15px] mt-0.5`}
+        className={`${cormorantSC.className} jewellers-text tracking-[0.25em] md:tracking-[0.35em] leading-none [font-variant:small-caps] transition-opacity duration-300 group-hover/logo:opacity-80 text-[15px] md:text-[15px] mt-0 md:mt-0.5`}
       >
         {SITE.suffix}
       </div>
