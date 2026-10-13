@@ -91,20 +91,18 @@ export default function Navbar() {
         <div className="max-w-[1400px] mx-auto px-4 md:px-10 flex items-center justify-between h-[50px]">
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden text-bj-text-nav hover:font-semibold focus:outline-none transition-colors p-1"
+            className="md:hidden order-1 text-bj-text-nav hover:font-semibold focus:outline-none transition-colors p-1"
             aria-label="Toggle menu"
           >
             {isOpen ? <FiX size={18} /> : <FiMenu size={18} />}
           </button>
 
-          <DesktopNav links={NAV_LINKS.left} />
+          <div className="order-2 md:order-1">
+            <Logo />
+          </div>
 
-          <Logo />
-
-          <div className="flex items-center gap-3 md:gap-5 text-[13px] text-bj-text-nav">
-            <div className="hidden md:flex gap-5 tracking-[8px]">
-              <NavLink href="/visit">Visit</NavLink>
-            </div>
+          <div className="order-3 md:order-2 flex items-center gap-3 md:gap-5 text-[13px] text-bj-text-nav">
+            <DesktopNav links={[...NAV_LINKS.left, ...NAV_LINKS.right]} />
 
             <div className="hidden md:block text-[13px] text-bj-text-separator">
               <span>|</span>
