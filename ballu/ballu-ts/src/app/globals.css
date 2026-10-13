@@ -204,6 +204,10 @@
     color: #cc0000 !important;
   }
 
+  .pz-make-heading {
+    color: #cc0000 !important;
+  }
+
   .bj-range::-webkit-slider-thumb {
     background: #cc0000 !important;
     box-shadow: 0 0 10px rgba(204, 0, 0, 0.4);

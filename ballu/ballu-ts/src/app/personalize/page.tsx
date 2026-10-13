@@ -256,7 +256,7 @@ export default function CommissionPage() {
             <span className="opacity-60 pieces-count">Ref. BJ-2026-0148</span>
           </div>
 
-          <h2 className={`${cormorant.className} text-[32px] sm:text-[40px] text-bj-text-heading font-light mb-8 md:mb-12`}>
+          <h2 className={`${cormorant.className} pz-make-heading text-[32px] sm:text-[40px] text-bj-text-heading font-light mb-8 md:mb-12`}>
             What shall we make?
           </h2>
 
