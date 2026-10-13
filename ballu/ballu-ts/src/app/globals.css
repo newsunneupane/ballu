@@ -758,11 +758,19 @@ body {
   color: #cc0000 !important;
   background-color: rgba(204, 0, 0, 0.1) !important;
 }
+[data-theme="light"] .price-filter-chip {
+  border-color: rgba(204, 0, 0, 0.45) !important;
+  background: linear-gradient(135deg, #fff5f5 0%, #fde2e2 55%, #f9caca 100%) !important;
+  background-color: #fde2e2 !important;
+  color: #990000 !important;
+  box-shadow: 0 2px 0 rgba(204, 0, 0, 0.25) !important;
+}
 [data-theme="light"] .price-filter-chip:hover {
-  border-color: #cc0000 !important;
-  background-color: #cc0000 !important;
+  border-color: #7a0000 !important;
+  background: linear-gradient(135deg, #990000 0%, #7a0000 100%) !important;
+  background-color: #990000 !important;
   color: #ffffff !important;
-  box-shadow: 0 0 18px -4px rgba(204, 0, 0, 0.6) !important;
+  box-shadow: 0 0 18px -4px rgba(122, 0, 0, 0.65) !important;
 }
 /* Desktop mega-panel card names: red hover in light, golden in dark (default) */
 [data-theme="light"] .group\/col:hover .mega-card-name,
