@@ -355,13 +355,6 @@
     color: #ffffff !important;
   }
 
-  @media (max-width: 767px) {
-    .bj-main-navbar {
-      background: linear-gradient(135deg, #fff5f5 0%, #fde2e2 55%, #f9caca 100%) !important;
-      background-color: #fde2e2 !important;
-    }
-  }
-
   .bj-subnav {
     background: #ffffff !important;
     background-color: #ffffff !important;
