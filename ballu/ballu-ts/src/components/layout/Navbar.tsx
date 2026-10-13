@@ -84,7 +84,7 @@ export default function Navbar() {
     <div className={`${cormorant.className} bg-bj-bg-ticker text-[#dbb86b] w-full relative z-50`}>
       <div
         className={`
-          bg-bj-bg-secondary border-b border-bj-border w-full
+          bj-main-navbar bg-bj-bg-secondary border-b border-bj-border w-full
           ${isPinned ? 'shadow-xl' : ''}
         `}
       >

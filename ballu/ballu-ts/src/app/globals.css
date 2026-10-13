@@ -354,6 +354,11 @@
     border-color: #cc0000 !important;
     color: #ffffff !important;
   }
+
+  .bj-main-navbar {
+    background: linear-gradient(135deg, #fff5f5 0%, #fde2e2 55%, #f9caca 100%) !important;
+    background-color: #fde2e2 !important;
+  }
 }
 
 .font-thin {
