@@ -344,10 +344,10 @@ export default function CommissionPage() {
                   onChange={(e) => setBudget(Number(e.target.value))}
                   className="bj-range absolute w-full appearance-none bg-transparent cursor-pointer z-20"
                 />
-                <div 
-                  className="absolute w-full h-[3px] rounded-full z-10 pointer-events-none"
+                <div
+                  className="bj-range-track absolute w-full h-[3px] rounded-full z-10 pointer-events-none"
                   style={{
-                    background: `linear-gradient(to right, #cda274 0%, #cda274 ${sliderFillPercentage}%, #2b2415 ${sliderFillPercentage}%, #2b2415 100%)`
+                    background: `linear-gradient(to right, var(--bj-budget-fill, #cda274) 0%, var(--bj-budget-fill, #cda274) ${sliderFillPercentage}%, var(--bj-budget-track, #2b2415) ${sliderFillPercentage}%, var(--bj-budget-track, #2b2415) 100%)`
                   }}
                 />
               </div>

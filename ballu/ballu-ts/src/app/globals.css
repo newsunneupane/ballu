@@ -59,6 +59,8 @@
 }
 
 [data-theme="light"] {
+  --bj-budget-fill: #cc0000;
+  --bj-budget-track: rgba(204, 0, 0, 0.18);
   --bj-bg: #ffffff;
   --bj-text-opacity: 1;
   --bj-bg-secondary: #ffffff;
@@ -199,16 +201,16 @@
   }
 
   .budget-amount {
-    color: #684209 !important;
+    color: #cc0000 !important;
   }
 
   .bj-range::-webkit-slider-thumb {
-    background: #684209 !important;
-    box-shadow: 0 0 10px rgba(104, 66, 9, 0.4);
+    background: #cc0000 !important;
+    box-shadow: 0 0 10px rgba(204, 0, 0, 0.4);
   }
 
   .bj-range::-moz-range-thumb {
-    background: #684209 !important;
+    background: #cc0000 !important;
     border: none;
   }
 
