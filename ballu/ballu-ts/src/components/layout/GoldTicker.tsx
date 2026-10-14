@@ -96,7 +96,7 @@ export default function GoldTicker() {
       </span>
 
       <div className={`${cormorant.className} bg-black text-[#dbb86b] border-b border-[#2b2415]/30`}>
-      <div className="w-full mx-auto h-8 md:h-6 flex items-center text-[11px] tracking-[4px] uppercase [font-variant-numeric:lining-nums] overflow-hidden">
+      <div className="w-full mx-auto h-6 md:h-6 flex items-center text-[11px] tracking-[4px] uppercase [font-variant-numeric:lining-nums] overflow-hidden">
         <div className="flex w-full whitespace-nowrap overflow-hidden relative">
           <div className="animate-ticker inline-flex shrink-0">
             {group('a')}
