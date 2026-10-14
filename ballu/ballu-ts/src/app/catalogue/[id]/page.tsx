@@ -7,7 +7,6 @@ import { Cormorant_Garamond, Tenor_Sans } from "next/font/google";
 import { productService } from "@/services/product-service";
 import { useProductData } from "@/hooks/useProductData";
 import { cloudinaryUrl } from "@/lib/cloudinary";
-import { collectionSlugMap } from "@/data/collections";
 import { useCurrency } from "@/hooks/useCurrency";
 import { buildWhatsappLink } from "@/lib/utils/whatsapp";
 import { useStoreSettings, whatsappNumber } from "@/hooks/useStoreSettings";
@@ -89,9 +88,9 @@ export default function ProductDetail() {
 
   const hasGallery = images.length > 1;
 
-  const collectionSlug =
-    collectionSlugMap[product?.collection as keyof typeof collectionSlugMap] ||
-    (product?.collection || "").toLowerCase().replace(/\s+/g, "-");
+  const collectionFilterHref = product
+    ? `/catalogue?collection=${encodeURIComponent(product.collections?.[0] ?? product.collection)}`
+    : "/catalogue";
 
   if (!dataReady) {
     return (
@@ -120,9 +119,9 @@ export default function ProductDetail() {
           <span>·</span>
           <Link href="/catalogue" className="hover:text-bj-gold-alt cursor-pointer transition-colors">Catalogue</Link>
           <span>·</span>
-          <Link href={`/${collectionSlug}`} className="hover:text-bj-gold-alt cursor-pointer transition-colors">{product.collection}</Link>
+          <Link href={collectionFilterHref} className="hover:text-bj-gold-alt cursor-pointer transition-colors">{product.collection}</Link>
           <span>·</span>
-          <span>{product.title}</span>
+          <span aria-current="page">{product.title}</span>
         </nav>
 
         <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_1fr] gap-10 lg:gap-20">
@@ -166,15 +165,6 @@ export default function ProductDetail() {
                     <ChevronRight size={16} />
                   </button>
                 </>
-              )}
-
-              {product.material?.toUpperCase() === 'GOLD' && (
-                <div className="absolute top-4 right-4 border border-bj-gold-alt bg-bj-bg-ticker/40 backdrop-blur-md text-bj-gold-alt px-3 py-1.5 flex items-center gap-2">
-                  <span className="text-[8px]">✦</span>
-                  <span className={`${tenorSans.className} text-[8px] tracking-[0.25em] uppercase font-semibold`}>
-                    Hallmarked 916
-                  </span>
-                </div>
               )}
 
               <div className="absolute bottom-6 left-6 flex gap-1.5">
