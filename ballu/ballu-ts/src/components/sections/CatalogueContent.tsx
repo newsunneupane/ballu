@@ -494,12 +494,19 @@ export default function CatalogueContent({
 
       <main ref={mainRef} className="px-3 sm:px-6 md:px-16 lg:px-15 pb-32 mt-6">
         {!dataReady ? (
-          <div className={`${tenorSans.className} col-span-full text-center py-20 text-xs tracking-[4px] uppercase text-bj-text-muted`}>
-            Loading ...
+          <div role="status" aria-live="polite" className={`${tenorSans.className} col-span-full text-center py-20 text-xs tracking-[4px] uppercase text-bj-text-muted`}>
+            Loading pieces…
           </div>
         ) : filteredProducts.length === 0 ? (
           <div className={`${tenorSans.className} col-span-full text-center py-20 text-xs tracking-[4px] uppercase text-bj-text-muted`}>
-            No personalised designs found matching these selections.
+            <p role="status">No personalised designs found matching these selections.</p>
+            <button
+              type="button"
+              onClick={clearFilters}
+              className="mt-6 px-6 py-3 rounded-full border border-bj-gold-rich/60 text-bj-gold-rich text-[11px] tracking-[0.2em] uppercase hover:bg-bj-gold-rich hover:text-bj-bg transition-colors"
+            >
+              Clear filters
+            </button>
           </div>
         ) : viewMode === 'GRID' ? (
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
