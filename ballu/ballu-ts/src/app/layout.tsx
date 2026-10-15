@@ -22,8 +22,27 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "Ballu Jewellers",
+  metadataBase: new URL("https://ballujewellers.example.com"),
+  title: {
+    default: "Ballu Jewellers",
+    template: "%s · Ballu Jewellers",
+  },
   description: "Heirloom jewellery crafted for a quieter wear. Three generations of artistry from a single bench in the heart of the city.",
+  openGraph: {
+    type: "website",
+    siteName: "Ballu Jewellers",
+    title: "Ballu Jewellers",
+    description: "Heirloom jewellery crafted for a quieter wear. Three generations of artistry from a single bench in the heart of the city.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Ballu Jewellers",
+    description: "Heirloom jewellery crafted for a quieter wear. Three generations of artistry from a single bench in the heart of the city.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export const revalidate = 300;

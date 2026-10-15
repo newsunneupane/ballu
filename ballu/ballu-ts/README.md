@@ -11,9 +11,24 @@ Built with Next.js 16, TypeScript, and Tailwind CSS.
 | `/[collection]` | Dynamic collection pages (festive, daily-wear, engagement, office, gift) |
 | `/catalogue` | Full catalogue with filters |
 | `/catalogue/[id]` | Product detail |
+| `/collections` | Collections overview |
+| `/occasions` | Shop by occasion |
 | `/personalize` | Commission form |
 | `/stories` | Stories |
 | `/visit` | Store info & about |
+
+## Requirements
+
+- Node.js 20+ (`node --version`)
+- Admin panel API running at `http://localhost:3001` for live data (optional — falls back to static data)
+
+## Setup
+
+```bash
+cd ballu/ballu-ts
+npm install
+cp .env.example .env.local # or create .env.local manually
+```
 
 ## Data
 
