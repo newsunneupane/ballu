@@ -111,7 +111,7 @@ export default function SearchOverlay({ onClose }: { onClose: () => void }) {
             autoCapitalize="off"
             className="flex-1 bg-transparent text-bj-text-heading text-base placeholder:text-sm placeholder:text-bj-text-dim outline-none font-sans"
           />
-          <button onClick={handleClose} className="text-bj-text-dim hover:text-bj-gold transition-colors">
+          <button onClick={handleClose} aria-label="Close search" className="text-bj-text-dim hover:text-bj-gold transition-colors">
             <FiX size={18} />
           </button>
         </div>
@@ -137,7 +137,7 @@ export default function SearchOverlay({ onClose }: { onClose: () => void }) {
                     >
                       <div className="w-12 h-12 rounded border border-bj-border-light overflow-hidden shrink-0 bg-bj-bg">
                         {product.images?.[0] ? (
-                          <img src={cloudinaryUrl(product.images[0], { width: 96, aspect: '1:1' })} alt="" className="w-full h-full object-cover bg-bj-bg-elevated" />
+                          <img src={cloudinaryUrl(product.images[0], { width: 96, aspect: '1:1' })} alt={product.title} loading="lazy" decoding="async" className="w-full h-full object-cover bg-bj-bg-elevated" />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center">
                             <FiSearch className="text-[#2b2415]" size={14} />

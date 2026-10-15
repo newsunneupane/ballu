@@ -109,27 +109,32 @@ export default function Navbar() {
             </div>
 
             <div className="flex items-center gap-4 md:gap-6 ml-0 md:ml-4">
-              <span
-  onClick={toggleTheme}
-  className="relative inline-flex cursor-pointer group text-bj-text-nav transition-all duration-300"
-  title={theme === 'dark' ? 'Light mode' : 'Dark mode'}
->
-  {theme === 'dark' ? <FiSun size={14} /> : <FiMoon size={14} />}
-  <span className="absolute left-0 -bottom-1 h-px w-0 bg-[#d4b77a] transition-all duration-500 group-hover:w-full" />
-</span>
+              <button
+                type="button"
+                onClick={toggleTheme}
+                aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+                title={theme === 'dark' ? 'Light mode' : 'Dark mode'}
+                className="relative inline-flex cursor-pointer group text-bj-text-nav transition-all duration-300"
+              >
+                {theme === 'dark' ? <FiSun size={14} /> : <FiMoon size={14} />}
+                <span className="absolute left-0 -bottom-1 h-px w-0 bg-[#d4b77a] transition-all duration-500 group-hover:w-full" />
+              </button>
 
-              <span
-  onClick={() => setShowSearch(true)}
-  className="relative inline-flex cursor-pointer group text-bj-text-nav transition-all duration-300"
->
-  <FiSearch size={14} />
-  <span className="absolute left-0 -bottom-1 h-px w-0 bg-[#d4b77a] transition-all duration-500 group-hover:w-full" />
-</span>
+              <button
+                type="button"
+                onClick={() => setShowSearch(true)}
+                aria-label="Search pieces"
+                className="relative inline-flex cursor-pointer group text-bj-text-nav transition-all duration-300"
+              >
+                <FiSearch size={14} />
+                <span className="absolute left-0 -bottom-1 h-px w-0 bg-[#d4b77a] transition-all duration-500 group-hover:w-full" />
+              </button>
 
               <a
                 href={whatsappBaseUrl(whatsappNumber(settings))}
                 target="_blank"
                 rel="noopener noreferrer"
+                aria-label="Chat on WhatsApp"
                 className="relative inline-flex cursor-pointer group text-bj-text-nav transition-all duration-300"
               >
                 <FaWhatsapp size={14} />
