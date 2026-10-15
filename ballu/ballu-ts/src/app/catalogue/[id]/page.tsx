@@ -316,7 +316,7 @@ export default function ProductDetail() {
                 rel="noopener noreferrer"
               >
                 <Button variant="outline" size="lg" className="w-full py-4 justify-center px-8">
-                  Whatsapp
+                  WhatsApp
                 </Button>
               </a>
             </div>

@@ -368,7 +368,7 @@ export default function CommissionPage() {
 
             <div>
               <label className={`${tenorSans.className} block text-[9px] tracking-[0.3em] uppercase text-bj-text-muted mb-1`}>
-                Whatsapp / Phone
+                WhatsApp / Phone
               </label>
               <input
                 type="tel"
